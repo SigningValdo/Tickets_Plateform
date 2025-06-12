@@ -1,0 +1,238 @@
+# =============================================================================
+# FICHIERS ET DOSSIERS À IGNORER - BACKEND NODE.JS
+# =============================================================================
+
+# =============================================================================
+# VARIABLES D'ENVIRONNEMENT ET CONFIGURATION SENSIBLE
+# =============================================================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+config/config.json
+
+# =============================================================================
+# DÉPENDANCES NODE.JS
+# =============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# =============================================================================
+# LOGS
+# =============================================================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+
+# =============================================================================
+# FICHIERS TEMPORAIRES ET CACHE
+# =============================================================================
+.cache/
+.tmp/
+tmp/
+temp/
+.sass-cache/
+.connect.lock
+.coverage
+.nyc_output
+
+# =============================================================================
+# UPLOADS ET FICHIERS UTILISATEUR
+# =============================================================================
+uploads/
+public/uploads/
+src/uploads/
+static/uploads/
+
+# Garder les dossiers mais ignorer le contenu
+!uploads/.gitkeep
+!public/uploads/.gitkeep
+!src/uploads/.gitkeep
+
+# =============================================================================
+# BASE DE DONNÉES
+# =============================================================================
+# Fichiers SQLite
+*.sqlite
+*.sqlite3
+*.db
+
+# Dumps de base de données
+*.sql
+*.dump
+
+# =============================================================================
+# TESTS
+# =============================================================================
+coverage/
+.coverage
+.nyc_output
+junit.xml
+test-results/
+
+# =============================================================================
+# ÉDITEURS ET IDE
+# =============================================================================
+# Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# =============================================================================
+# SYSTÈME D'EXPLOITATION
+# =============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# OUTILS DE BUILD ET DÉPLOIEMENT
+# =============================================================================
+build/
+dist/
+out/
+.next/
+.nuxt/
+.vuepress/dist
+
+# =============================================================================
+# DOCKER
+# =============================================================================
+.dockerignore
+Dockerfile.dev
+docker-compose.override.yml
+
+# =============================================================================
+# CERTIFICATS ET CLÉS
+# =============================================================================
+*.pem
+*.key
+*.crt
+*.csr
+*.p12
+*.pfx
+
+# =============================================================================
+# MONITORING ET PROFILING
+# =============================================================================
+*.heapsnapshot
+*.cpuprofile
+
+# =============================================================================
+# SAUVEGARDES
+# =============================================================================
+*.backup
+*.bak
+*.old
+*.orig
+
+# =============================================================================
+# FICHIERS SPÉCIFIQUES AU PROJET
+# =============================================================================
+# Documentation générée
+docs/generated/
+
+# Fichiers de migration temporaires
+migrations/temp/
+
+# Fichiers de seed temporaires
+seeders/temp/
+
+# Rapports de tests
+test-report.html
+coverage.html
+
+# =============================================================================
+# OUTILS DE DÉVELOPPEMENT
+# =============================================================================
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# Stylelint cache
+.stylelintcache
+
+# Jest cache
+.jest/
+
+# =============================================================================
+# VARIABLES LOCALES DE DÉVELOPPEMENT
+# =============================================================================
+.local
+.dev
+.development
+
+# =============================================================================
+# NOTES IMPORTANTES
+# =============================================================================
+# 1. Toujours vérifier que .env n'est pas commité
+# 2. Les dossiers uploads/ doivent être ignorés mais gardez les .gitkeep
+# 3. Ne jamais commiter de clés API ou mots de passe
+# 4. Les logs peuvent contenir des informations sensibles
+# 5. Adapter selon les besoins spécifiques du projet

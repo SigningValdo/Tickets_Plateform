@@ -1,0 +1,9 @@
+# Ce fichier maintient le dossier tests dans le contrôle de version
+# Les fichiers de tests unitaires et d'intégration seront créés ici
+# Structure recommandée :
+# tests/
+# ├── unit/
+# ├── integration/
+# ├── helpers/
+# ├── setup.js
+# └── globalSetup.js
