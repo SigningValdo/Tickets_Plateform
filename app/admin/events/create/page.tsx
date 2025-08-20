@@ -1,470 +1,371 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useFieldArray, useForm } from "react-hook-form"
+import * as z from "zod"
 import { useRouter } from "next/navigation"
-import { Calendar, Menu, X, Home, Settings, LogOut, ArrowLeft, Upload, Plus, Minus } from "lucide-react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import axios from "axios"
+import { format } from "date-fns"
+import { fr } from "date-fns/locale"
+import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/components/ui/use-toast"
+import { cn } from "@/lib/utils"
+import { EventWithTicketTypes } from "@/components/admin-event-list"
+import { useEffect, useState } from "react"
+
+const ticketTypeSchema = z.object({
+  name: z.string().min(1, "Le nom du type de ticket est requis."),
+  price: z.coerce.number().min(0, "Le prix doit être positif."),
+  quantity: z.coerce.number().int().min(1, "La quantité doit être d'au moins 1."),
+})
+
+const formSchema = z.object({
+  title: z.string().min(3, "Le titre doit contenir au moins 3 caractères."),
+  description: z.string().min(10, "La description doit contenir au moins 10 caractères."),
+  date: z.date({ required_error: "La date de l'événement est requise." }),
+  location: z.string().min(3, "Le lieu doit contenir au moins 3 caractères."),
+  address: z.string().min(3, "L'adresse doit contenir au moins 3 caractères."),
+  city: z.string().min(2, "La ville est requise."),
+  country: z.string().min(2, "Le pays est requis."),
+  organizer: z.string().min(2, "L'organisateur est requis."),
+  imageUrl: z.string().url("L'URL de l'image n'est pas valide.").optional().or(z.literal('')),
+  categoryId: z.string().min(1, "La catégorie est requise."),
+  ticketTypes: z.array(ticketTypeSchema).min(1, "Vous devez ajouter au moins un type de ticket."),
+})
 
 export default function CreateEventPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [ticketTypes, setTicketTypes] = useState([{ id: 1, name: "", price: "", quantity: "" }])
+  const queryClient = useQueryClient()
 
-  const addTicketType = () => {
-    setTicketTypes([...ticketTypes, { id: Date.now(), name: "", price: "", quantity: "" }])
-  }
+  // State pour les catégories
+  const [categories, setCategories] = useState<any[]>([])
+  useEffect(() => {
+    axios.get("/api/admin/event-categories").then(res => {
+      setCategories(res.data)
+    })
+  }, [])
 
-  const removeTicketType = (id: number) => {
-    if (ticketTypes.length > 1) {
-      setTicketTypes(ticketTypes.filter((ticket) => ticket.id !== id))
-    }
-  }
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      date: undefined,
+      location: "",
+      address: "",
+      city: "",
+      country: "",
+      organizer: "",
+      imageUrl: "",
+      categoryId: "",
+      ticketTypes: [{ name: "Standard", price: 25, quantity: 100 }],
+    },
+  })
 
-  const updateTicketType = (id: number, field: string, value: string) => {
-    setTicketTypes(ticketTypes.map((ticket) => (ticket.id === id ? { ...ticket, [field]: value } : ticket)))
-  }
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "ticketTypes",
+  })
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    // Simuler une requête API
-    setTimeout(() => {
-      setIsSubmitting(false)
+  const mutation = useMutation<EventWithTicketTypes, Error, z.infer<typeof formSchema>>({
+    mutationFn: (newEvent) => {
+      // On prépare le payload pour matcher le backend
+      return axios.post("/api/admin/events", {
+        ...newEvent,
+        date: newEvent.date instanceof Date ? newEvent.date.toISOString() : newEvent.date,
+      }).then(res => res.data)
+    },
+    onSuccess: (data) => {
       toast({
-        title: "Événement créé",
-        description: "Votre événement a été créé avec succès",
+        title: "Événement créé !",
+        description: `L'événement "${data.title}" a été créé avec succès.`,
       })
+      queryClient.invalidateQueries({ queryKey: ["adminEvents"] })
       router.push("/admin/events")
-    }, 1500)
+    },
+    onError: (error) => {
+      toast({
+        title: "Erreur",
+        description: `Une erreur est survenue: ${error.message}`,
+        variant: "destructive",
+      })
+    },
+  })
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    mutation.mutate(values)
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Sidebar mobile */}
-      <div
-        className={`fixed inset-0 z-50 bg-black bg-opacity-50 transition-opacity lg:hidden ${
-          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-      >
-        <div
-          className={`fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform transition-transform ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-        >
-          <div className="flex items-center justify-between p-4 border-b">
-            <span className="text-xl font-bold text-purple-600">E-Tickets Admin</span>
-            <button onClick={() => setSidebarOpen(false)}>
-              <X className="h-6 w-6 text-gray-500" />
-            </button>
-          </div>
-          <nav className="p-4 space-y-1">
-            <Link
-              href="/admin/dashboard"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Home className="h-5 w-5" />
-              <span>Tableau de bord</span>
-            </Link>
-            <Link
-              href="/admin/events"
-              className="flex items-center space-x-3 text-purple-600 bg-purple-50 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Événements</span>
-            </Link>
-            <Link
-              href="/admin/tickets"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Billets</span>
-            </Link>
-            <Link
-              href="/admin/users"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Utilisateurs</span>
-            </Link>
-            <Link
-              href="/admin/reports"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Rapports</span>
-            </Link>
-            <Link
-              href="/admin/settings"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Settings className="h-5 w-5" />
-              <span>Paramètres</span>
-            </Link>
-          </nav>
-          <div className="absolute bottom-0 w-full p-4 border-t">
-            <Button variant="outline" className="w-full justify-start text-red-600 border-red-200">
-              <LogOut className="h-5 w-5 mr-2" />
-              Déconnexion
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="max-w-4xl mx-auto p-4 md:p-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-6">Créer un nouvel événement</h1>
+        <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Titre de l'événement</FormLabel>
+                            <FormControl>
+                                <Input placeholder="Ex: Concert de Rock" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-      {/* Sidebar desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r">
-          <div className="flex items-center h-16 px-4 border-b">
-            <span className="text-xl font-bold text-purple-600">E-Tickets Admin</span>
-          </div>
-          <nav className="flex-1 p-4 space-y-1">
-            <Link
-              href="/admin/dashboard"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Home className="h-5 w-5" />
-              <span>Tableau de bord</span>
-            </Link>
-            <Link
-              href="/admin/events"
-              className="flex items-center space-x-3 text-purple-600 bg-purple-50 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Événements</span>
-            </Link>
-            <Link
-              href="/admin/tickets"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Billets</span>
-            </Link>
-            <Link
-              href="/admin/users"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Utilisateurs</span>
-            </Link>
-            <Link
-              href="/admin/reports"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Calendar className="h-5 w-5" />
-              <span>Rapports</span>
-            </Link>
-            <Link
-              href="/admin/settings"
-              className="flex items-center space-x-3 text-gray-700 hover:bg-gray-100 px-3 py-2 rounded-md"
-            >
-              <Settings className="h-5 w-5" />
-              <span>Paramètres</span>
-            </Link>
-          </nav>
-          <div className="p-4 border-t">
-            <Button variant="outline" className="w-full justify-start text-red-600 border-red-200">
-              <LogOut className="h-5 w-5 mr-2" />
-              Déconnexion
-            </Button>
-          </div>
-        </div>
-      </div>
+                <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Description</FormLabel>
+                            <FormControl>
+                                <Textarea placeholder="Décrivez l'événement..." {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-      {/* Main content */}
-      <div className="lg:pl-64">
-        <header className="bg-white shadow-sm">
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-            <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-              <Menu className="h-6 w-6 text-gray-500" />
-            </button>
-
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
-                  AD
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                        control={form.control}
+                        name="date"
+                        render={({ field }) => (
+                            <FormItem className="flex flex-col">
+                                <FormLabel>Date de l'événement</FormLabel>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <FormControl>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full pl-3 text-left font-normal",
+                                                    !field.value && "text-muted-foreground"
+                                                )}
+                                            >
+                                                {field.value ? (
+                                                    format(field.value, "PPP", { locale: fr })
+                                                ) : (
+                                                    <span>Choisissez une date</span>
+                                                )}
+                                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                            </Button>
+                                        </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <Calendar
+                                            mode="single"
+                                            selected={field.value}
+                                            onSelect={field.onChange}
+                                            disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                                            initialFocus
+                                        />
+                                    </PopoverContent>
+                                </Popover>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="location"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Lieu</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Ex: Le Zénith, Paris" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
                 </div>
-                <span className="text-sm font-medium">Admin</span>
-              </div>
-            </div>
-          </div>
-        </header>
 
-        <main className="p-4 sm:p-6 lg:p-8">
-          <div className="mb-6">
-            <Link href="/admin/events" className="flex items-center text-purple-600 hover:text-purple-700">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour aux événements
-            </Link>
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Adresse</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Adresse complète de l'événement" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Ville</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Ville" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
 
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold">Créer un nouvel événement</h1>
-            <p className="text-gray-500">Remplissez les informations ci-dessous pour créer un nouvel événement</p>
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <FormField
+                        control={form.control}
+                        name="country"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Pays</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Pays" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="organizer"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Organisateur</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="Nom de l'organisateur" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                </div>
 
-          <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2 space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Informations générales</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                        Titre de l'événement *
-                      </label>
-                      <Input id="title" placeholder="Ex: Festival de Jazz" required />
-                    </div>
-                    <div>
-                      <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                        Description *
-                      </label>
-                      <Textarea
-                        id="description"
-                        placeholder="Décrivez votre événement en détail..."
-                        className="min-h-[150px]"
-                        required
-                      />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                          Catégorie *
-                        </label>
-                        <Select required>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionner une catégorie" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="concerts">Concerts</SelectItem>
-                            <SelectItem value="conferences">Conférences</SelectItem>
-                            <SelectItem value="expositions">Expositions</SelectItem>
-                            <SelectItem value="festivals">Festivals</SelectItem>
-                            <SelectItem value="theatre">Théâtre</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label htmlFor="organizer" className="block text-sm font-medium text-gray-700 mb-1">
-                          Organisateur *
-                        </label>
-                        <Input id="organizer" placeholder="Nom de l'organisateur" required />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <FormField
+                    control={form.control}
+                    name="categoryId"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Catégorie</FormLabel>
+                            <FormControl>
+                                <select
+                                    {...field}
+                                    className="input input-bordered w-full"
+                                    value={field.value || ''}
+                                    onChange={field.onChange}
+                                >
+                                    <option value="">Sélectionnez une catégorie</option>
+                                    {categories && categories.map((cat: any) => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Date et lieu</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="date" className="block text-sm font-medium text-gray-700 mb-1">
-                          Date *
-                        </label>
-                        <Input id="date" type="date" required />
-                      </div>
-                      <div>
-                        <label htmlFor="time" className="block text-sm font-medium text-gray-700 mb-1">
-                          Heure *
-                        </label>
-                        <Input id="time" type="time" required />
-                      </div>
-                    </div>
-                    <div>
-                      <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-                        Lieu *
-                      </label>
-                      <Input id="location" placeholder="Ex: Palais de la Culture" required />
-                    </div>
-                    <div>
-                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                        Adresse complète *
-                      </label>
-                      <Input id="address" placeholder="Adresse complète du lieu" required />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
-                          Ville *
-                        </label>
-                        <Input id="city" placeholder="Ex: Abidjan" required />
-                      </div>
-                      <div>
-                        <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
-                          Pays *
-                        </label>
-                        <Input id="country" placeholder="Ex: Côte d'Ivoire" required />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <FormField
+                    control={form.control}
+                    name="imageUrl"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>URL de l'image</FormLabel>
+                            <FormControl>
+                                <Input placeholder="https://..." {...field} />
+                            </FormControl>
+                            <FormDescription>Lien vers l'image promotionnelle de l'événement.</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Types de billets</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {ticketTypes.map((ticket, index) => (
-                      <div key={ticket.id} className="p-4 border rounded-md bg-gray-50">
-                        <div className="flex justify-between items-center mb-2">
-                          <h4 className="font-medium">Type de billet #{index + 1}</h4>
-                          {ticketTypes.length > 1 && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeTicketType(ticket.id)}
-                              className="text-red-500 hover:text-red-700"
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                          )}
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nom *</label>
-                            <Input
-                              placeholder="Ex: Standard"
-                              value={ticket.name}
-                              onChange={(e) => updateTicketType(ticket.id, "name", e.target.value)}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Prix (FCFA) *</label>
-                            <Input
-                              type="number"
-                              placeholder="Ex: 15000"
-                              value={ticket.price}
-                              onChange={(e) => updateTicketType(ticket.id, "price", e.target.value)}
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Quantité disponible *
-                            </label>
-                            <Input
-                              type="number"
-                              placeholder="Ex: 100"
-                              value={ticket.quantity}
-                              onChange={(e) => updateTicketType(ticket.id, "quantity", e.target.value)}
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
+                <div>
+                    <h3 className="text-lg font-medium mb-4">Types de tickets</h3>
+                    <div className="space-y-4">
+                        {fields.map((field, index) => (
+                            <div key={field.id} className="flex items-end gap-4 p-4 border rounded-md relative">
+                                <FormField
+                                    control={form.control}
+                                    name={`ticketTypes.${index}.name`}
+                                    render={({ field }) => (
+                                        <FormItem className="flex-1">
+                                            <FormLabel>Nom du ticket</FormLabel>
+                                            <FormControl>
+                                                <Input {...field} placeholder="Ex: VIP, Early Bird" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`ticketTypes.${index}.price`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Prix (€)</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" {...field} placeholder="Ex: 50" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name={`ticketTypes.${index}.quantity`}
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>Quantité</FormLabel>
+                                            <FormControl>
+                                                <Input type="number" {...field} placeholder="Ex: 200" />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => remove(index)}
+                                    disabled={fields.length <= 1}
+                                    className="text-red-500 hover:text-red-700 disabled:text-gray-400"
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
                     <Button
-                      type="button"
-                      variant="outline"
-                      onClick={addTicketType}
-                      className="w-full flex items-center justify-center"
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="mt-4"
+                        onClick={() => append({ name: "", price: 0, quantity: 50 })}
                     >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Ajouter un type de billet
+                        <PlusCircle className="h-4 w-4 mr-2" />
+                        Ajouter un type de ticket
                     </Button>
-                  </CardContent>
-                </Card>
-              </div>
+                </div>
 
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Image de l'événement</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
-                      <div className="mb-4 bg-gray-100 p-2 rounded-full">
-                        <Upload className="h-6 w-6 text-gray-400" />
-                      </div>
-                      <p className="text-sm text-gray-500 text-center mb-2">
-                        Glissez-déposez une image ici ou cliquez pour parcourir
-                      </p>
-                      <p className="text-xs text-gray-400 text-center">PNG, JPG ou JPEG (max. 2MB)</p>
-                      <input type="file" className="hidden" accept="image/*" />
-                      <Button type="button" variant="outline" size="sm" className="mt-4">
-                        Parcourir
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Statut et visibilité</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Statut de l'événement</label>
-                      <Select defaultValue="draft">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un statut" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="draft">Brouillon</SelectItem>
-                          <SelectItem value="published">Publié</SelectItem>
-                          <SelectItem value="upcoming">À venir</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Visibilité</label>
-                      <Select defaultValue="public">
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner une visibilité" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">Public</SelectItem>
-                          <SelectItem value="private">Privé</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Publication</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-500 mb-4">
-                      Votre événement sera visible par tous les utilisateurs une fois publié.
-                    </p>
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        type="submit"
-                        className="w-full bg-purple-600 hover:bg-purple-700"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Création en cours..." : "Créer l'événement"}
-                      </Button>
-                      <Button type="button" variant="outline" className="w-full">
-                        Enregistrer comme brouillon
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </form>
-        </main>
-      </div>
+                <div className="flex justify-end pt-4">
+                    <Button type="submit" disabled={mutation.isPending}>
+                        {mutation.isPending ? "Création en cours..." : "Créer l'événement"}
+                    </Button>
+                </div>
+            </form>
+        </Form>
     </div>
   )
 }

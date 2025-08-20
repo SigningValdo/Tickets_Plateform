@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { Calendar, MapPin } from "lucide-react"
 import { Label } from "@/components/ui/label"
@@ -8,6 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useQueryState } from "nuqs"
 
 // Données simulées pour les filtres
 const categories = [
@@ -33,40 +33,26 @@ const locations = [
   { id: "tunis", name: "Tunis" },
 ]
 
-interface EventFiltersProps {
-  selectedCategory?: string
-  selectedDate?: string
-  selectedLocation?: string
-}
-
-export function EventFilters({ selectedCategory = "", selectedDate = "", selectedLocation = "" }: EventFiltersProps) {
+export function EventFilters() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const [category, setCategory] = useState(selectedCategory || "all")
-  const [date, setDate] = useState(selectedDate || "")
-  const [location, setLocation] = useState(selectedLocation || "all")
-  const [dateFilter, setDateFilter] = useState<"all" | "today" | "weekend" | "month" | "custom">(
-    selectedDate ? "custom" : "all",
+  const [category, setCategory] = useQueryState("category", {
+    defaultValue: "all",
+  })
+  const [date, setDate] = useQueryState("date", {
+    defaultValue: "",
+  })
+  const [location, setLocation] = useQueryState("location", {
+    defaultValue: "all",
+  })
+  const [dateFilter, setDateFilter] = useQueryState(
+    "dateFilter",
+    {
+      defaultValue: "all",
+    },
   )
 
-  const applyFilters = () => {
-    const params = new URLSearchParams()
-
-    if (category && category !== "all") {
-      params.set("category", category)
-    }
-
-    if (location && location !== "all") {
-      params.set("location", location)
-    }
-
-    if (date) {
-      params.set("date", date)
-    }
-
-    router.push(`${pathname}?${params.toString()}`)
-  }
 
   const resetFilters = () => {
     setCategory("all")
@@ -75,15 +61,6 @@ export function EventFilters({ selectedCategory = "", selectedDate = "", selecte
     setDateFilter("all")
     router.push(pathname)
   }
-
-  useEffect(() => {
-    if (selectedCategory) setCategory(selectedCategory)
-    if (selectedLocation) setLocation(selectedLocation)
-    if (selectedDate) {
-      setDate(selectedDate)
-      setDateFilter("custom")
-    }
-  }, [selectedCategory, selectedDate, selectedLocation])
 
   const handleDateFilterChange = (value: string) => {
     const today = new Date()
@@ -187,9 +164,6 @@ export function EventFilters({ selectedCategory = "", selectedDate = "", selecte
       </div>
 
       <div className="space-y-2 pt-4">
-        <Button onClick={applyFilters} className="w-full bg-purple-600 hover:bg-purple-700">
-          Appliquer les filtres
-        </Button>
         <Button onClick={resetFilters} variant="outline" className="w-full">
           Réinitialiser
         </Button>

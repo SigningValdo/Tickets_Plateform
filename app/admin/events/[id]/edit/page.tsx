@@ -26,27 +26,22 @@ interface EventFormData {
   title: string
   description: string
   date: string
-  time: string
   location: string
   address: string
-  category: string
+  city: string
+  country: string
+  organizer: string
+  imageUrl: string
+  maxAttendees?: number
+  categoryId: string
   image: string
-  maxAttendees: number
+  time: string
   ticketTypes: TicketType[]
   status: 'draft' | 'published' | 'cancelled'
 }
 
-const categories = [
-  'Musique',
-  'Sport',
-  'Théâtre',
-  'Conférence',
-  'Festival',
-  'Exposition',
-  'Cinéma',
-  'Danse',
-  'Autre'
-]
+type Category = { id: string; name: string }
+
 
 export default function EditEventPage() {
   const router = useRouter()
@@ -59,64 +54,55 @@ export default function EditEventPage() {
     title: '',
     description: '',
     date: '',
-    time: '',
     location: '',
     address: '',
-    category: '',
-    image: '',
+    city: '',
+    country: '',
+    organizer: '',
+    imageUrl: '',
     maxAttendees: 100,
+    categoryId: '',
     ticketTypes: [],
+    image: '',
+    time: '',
     status: 'draft'
   })
+  const [categories, setCategories] = useState<Category[]>([])
+
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchEventAndCategories = async () => {
       try {
-        // Dans une implémentation réelle, nous appellerions une API pour récupérer l'événement
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        
-        // Données simulées
-        const mockEvent: EventFormData = {
-          title: "Concert de Jazz - Miles Davis Tribute",
-          description: "Une soirée exceptionnelle dédiée au légendaire Miles Davis avec les meilleurs musiciens de jazz du Cameroun. Venez découvrir ou redécouvrir les plus grands standards du jazz dans une ambiance intimiste et chaleureuse.",
-          date: "2024-02-15",
-          time: "20:00",
-          location: "Palais des Congrès",
-          address: "Avenue Kennedy, Yaoundé, Cameroun",
-          category: "Musique",
-          image: "/api/placeholder/600/400",
-          maxAttendees: 500,
-          ticketTypes: [
-            {
-              id: '1',
-              name: 'Standard',
-              price: 15000,
-              quantity: 300,
-              description: 'Accès standard à l\'événement'
-            },
-            {
-              id: '2',
-              name: 'VIP',
-              price: 25000,
-              quantity: 100,
-              description: 'Accès VIP avec boissons incluses'
-            },
-            {
-              id: '3',
-              name: 'Premium',
-              price: 35000,
-              quantity: 50,
-              description: 'Accès premium avec meet & greet'
-            }
-          ],
-          status: 'published'
-        }
-        
-        setFormData(mockEvent)
+        const [eventRes, catRes] = await Promise.all([
+          fetch(`/api/admin/events/${params.id}`),
+          fetch('/api/admin/event-categories')
+        ])
+        if (!eventRes.ok) throw new Error('Event not found')
+        if (!catRes.ok) throw new Error('Categories fetch failed')
+        const event = await eventRes.json()
+        const categories: Category[] = await catRes.json()
+        setCategories(categories)
+        setFormData({
+          title: event.title,
+          description: event.description,
+          date: event.date?.slice(0, 10) || '',
+          location: event.location || '',
+          address: event.address || '',
+          city: event.city || '',
+          country: event.country || '',
+          organizer: event.organizer || '',
+          imageUrl: event.imageUrl || '',
+          maxAttendees: event.maxAttendees || 100,
+          categoryId: event.categoryId || '',
+          image: event.image || '',
+          time: event.time || '',
+          ticketTypes: event.ticketTypes || [],
+          status: event.status || 'draft',
+        })
       } catch (error) {
         toast({
           title: "Erreur",
-          description: "Impossible de charger l'événement",
+          description: "Impossible de charger l'événement ou les catégories",
           variant: "destructive",
         })
         router.push('/admin/events')
@@ -126,7 +112,7 @@ export default function EditEventPage() {
     }
 
     if (params.id) {
-      fetchEvent()
+      fetchEventAndCategories()
     }
   }, [params.id, router, toast])
 
@@ -170,7 +156,7 @@ export default function EditEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!formData.title || !formData.date || !formData.time || !formData.location) {
+    if (!formData.title || !formData.date || !formData.location || !formData.categoryId) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -191,14 +177,19 @@ export default function EditEventPage() {
     setSaving(true)
 
     try {
-      // Dans une implémentation réelle, nous appellerions une API pour sauvegarder l'événement
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
+      const res = await fetch(`/api/admin/events/${params.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          ticketTypes: formData.ticketTypes,
+        })
+      })
+      if (!res.ok) throw new Error('Erreur lors de la sauvegarde')
       toast({
         title: "Événement mis à jour",
         description: "L'événement a été mis à jour avec succès",
       })
-
       router.push('/admin/events')
     } catch (error) {
       toast({
@@ -300,15 +291,15 @@ export default function EditEventPage() {
                 </div>
                 
                 <div>
-                  <Label htmlFor="category">Catégorie</Label>
-                  <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
+                  <Label htmlFor="categoryId">Catégorie</Label>
+                  <Select value={formData.categoryId} onValueChange={(value) => handleInputChange('categoryId', value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner une catégorie" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
+                      {categories.map((cat) => (
+                        <SelectItem key={cat.id} value={cat.id}>
+                          {cat.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

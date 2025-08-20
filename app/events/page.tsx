@@ -6,16 +6,7 @@ import { SearchBar } from "@/components/search-bar"
 import { EventList } from "@/components/event-list"
 import { EventFilters } from "@/components/event-filters"
 
-export default function EventsPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined }
-}) {
-  const search = typeof searchParams.search === "string" ? searchParams.search : ""
-  const category = typeof searchParams.category === "string" ? searchParams.category : ""
-  const date = typeof searchParams.date === "string" ? searchParams.date : ""
-  const location = typeof searchParams.location === "string" ? searchParams.location : ""
-
+export default function EventsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -59,12 +50,12 @@ export default function EventsPage({
           <div className="w-full md:w-1/4">
             <Card className="p-4 sticky top-4">
               <h2 className="font-bold text-lg mb-4">Filtres</h2>
-              <EventFilters selectedCategory={category} selectedDate={date} selectedLocation={location} />
+              <EventFilters />
             </Card>
           </div>
           <div className="w-full md:w-3/4">
             <Suspense fallback={<div>Chargement des événements...</div>}>
-              <EventList search={search} category={category} date={date} location={location} />
+              <EventList />
             </Suspense>
           </div>
         </div>

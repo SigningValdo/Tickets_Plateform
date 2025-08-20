@@ -1,0 +1,316 @@
+"use client";
+
+import { useRouter, useParams } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
+
+const formSchema = z.object({
+  name: z.string().min(2, {
+    message: "Le nom doit contenir au moins 2 caractères.",
+  }),
+  description: z.string().optional(),
+  color: z
+    .string()
+    .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+      message: "La couleur doit être au format hexadécimal (ex: #ff0000)",
+    })
+    .optional(),
+});
+
+export default function EditEventCategoryPage() {
+  const router = useRouter();
+  const params = useParams();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const categoryId = params.id as string;
+
+  // Fetch category data
+  const { data: category, isLoading: isLoadingCategory } = useQuery({
+    queryKey: ["event-category", categoryId],
+    queryFn: async () => {
+      const response = await fetch(`/api/admin/event-categories/${categoryId}`);
+      if (!response.ok) {
+        throw new Error("Catégorie non trouvée");
+      }
+      return response.json();
+    },
+  });
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+    },
+    values: category
+      ? {
+          name: category.name,
+          description: category.description || "",
+        }
+      : undefined,
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const response = await fetch(
+        `/api/admin/event-categories/${categoryId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Une erreur est survenue");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Catégorie mise à jour",
+        description: "La catégorie a été mise à jour avec succès.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["event-categories"] });
+      queryClient.invalidateQueries({
+        queryKey: ["event-category", categoryId],
+      });
+      router.push("/admin/event-categories");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erreur",
+        description:
+          error.message ||
+          "Une erreur est survenue lors de la mise à jour de la catégorie.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(
+        `/api/admin/event-categories/${categoryId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Une erreur est survenue");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Catégorie supprimée",
+        description: "La catégorie a été supprimée avec succès.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["event-categories"] });
+      router.push("/admin/event-categories");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erreur",
+        description:
+          error.message ||
+          "Une erreur est survenue lors de la suppression de la catégorie.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    mutation.mutate(values);
+  }
+
+  function handleDelete() {
+    if (
+      window.confirm(
+        "Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette action est irréversible."
+      )
+    ) {
+      deleteMutation.mutate();
+    }
+  }
+
+  if (isLoadingCategory) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!category) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold">Catégorie non trouvée</h2>
+        <p className="text-muted-foreground mt-2">
+          La catégorie demandée n'existe pas ou a été supprimée.
+        </p>
+        <Button
+          className="mt-4"
+          onClick={() => router.push("/admin/event-categories")}
+        >
+          Retour à la liste des catégories
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-10">
+      <div className="mb-6">
+        <Link
+          href="/admin/event-categories"
+          className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour à la liste des catégories
+        </Link>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Modifier la catégorie
+        </h1>
+        <p className="text-muted-foreground">
+          Modifiez les informations de cette catégorie
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Détails de la catégorie</CardTitle>
+              <CardDescription>
+                Modifiez les informations de la catégorie. Les champs marqués
+                d'un astérisque (*) sont obligatoires.
+              </CardDescription>
+            </div>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Trash2 className="h-4 w-4 mr-2" />
+              )}
+              Supprimer
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="grid gap-6 md:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nom de la catégorie *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ex: Musique, Sport, Conférence..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Le nom qui sera affiché pour cette catégorie.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Décrivez cette catégorie..."
+                        className="min-h-[100px]"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Une brève description de cette catégorie (optionnelle).
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-between pt-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Créé le:{" "}
+                    {new Date(category.createdAt).toLocaleDateString("fr-FR")}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Dernière mise à jour:{" "}
+                    {new Date(category.updatedAt).toLocaleDateString("fr-FR")}
+                  </p>
+                </div>
+                <div className="flex gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => router.push("/admin/event-categories")}
+                    disabled={mutation.isPending}
+                  >
+                    Annuler
+                  </Button>
+                  <Button type="submit" disabled={mutation.isPending}>
+                    {mutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        Enregistrement...
+                      </>
+                    ) : (
+                      "Enregistrer les modifications"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

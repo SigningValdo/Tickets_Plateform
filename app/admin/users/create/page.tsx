@@ -7,7 +7,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Save, Loader2, User, Mail, Phone, Shield, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -15,39 +15,34 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/hooks/use-toast"
 
 interface UserFormData {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  password: string
-  confirmPassword: string
-  role: 'user' | 'admin' | 'organizer'
-  isActive: boolean
-  emailVerified: boolean
-  sendWelcomeEmail: boolean
+  name: string;
+  email: string;
+  password: string;
+  role: 'USER' | 'ADMIN';
+  status: 'ACTIVE' | 'INACTIVE' | 'BANNED';
+  emailVerified?: Date | null;
+  image?: string | null;
 }
 
 export default function CreateUserPage() {
   const router = useRouter()
   const { toast } = useToast()
   
-  const [saving, setSaving] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [saving, setSaving] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [formData, setFormData] = useState<UserFormData>({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    phone: '',
     password: '',
-    confirmPassword: '',
-    role: 'user',
-    isActive: true,
-    emailVerified: false,
-    sendWelcomeEmail: true
+    role: 'USER',
+    status: 'ACTIVE',
+    emailVerified: null,
+    image: null
   })
 
-  const handleInputChange = (field: keyof UserFormData, value: string | boolean) => {
+  const handleInputChange = (field: keyof UserFormData, value: string | boolean | Date | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -55,19 +50,10 @@ export default function CreateUserPage() {
   }
 
   const validateForm = () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+    if (!formData.name || !formData.email || !formData.password) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive",
-      })
-      return false
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Erreur",
-        description: "Les mots de passe ne correspondent pas",
         variant: "destructive",
       })
       return false
@@ -96,32 +82,61 @@ export default function CreateUserPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+    
+    if (formData.password !== confirmPassword) {
+      toast({
+        title: "Erreur",
+        description: "Les mots de passe ne correspondent pas",
+        variant: "destructive",
+      });
+      return;
+    }
     
     if (!validateForm()) {
-      return
+      return;
     }
+    
+    // Préparer les données pour l'API
+    const { emailVerified, ...userData } = formData;
+    const dataToSend = {
+      ...userData,
+      emailVerified: emailVerified ? new Date(emailVerified).toISOString() : null
+    };
 
     setSaving(true)
 
     try {
-      // Dans une implémentation réelle, nous appellerions une API pour créer l'utilisateur
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur lors de la création de l\'utilisateur');
+      }
+
+      const newUser = await response.json();
 
       toast({
         title: "Utilisateur créé",
-        description: `L'utilisateur ${formData.firstName} ${formData.lastName} a été créé avec succès${formData.sendWelcomeEmail ? '. Un email de bienvenue a été envoyé.' : '.'}`
-      })
+        description: `L'utilisateur ${newUser.name} a été créé avec succès`
+      });
 
-      router.push('/admin/users')
+      router.push('/admin/users');
     } catch (error) {
+      console.error('Erreur création utilisateur:', error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création de l'utilisateur",
+        description: error instanceof Error ? error.message : "Une erreur est survenue lors de la création de l'utilisateur",
         variant: "destructive",
-      })
+      });
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
   }
 
@@ -168,28 +183,15 @@ export default function CreateUserPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">Prénom *</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    placeholder="Prénom"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="lastName">Nom *</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    placeholder="Nom de famille"
-                    required
-                  />
-                </div>
+              <div>
+                <Label htmlFor="name">Nom complet *</Label>
+                <Input
+                  id="name"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  placeholder="Nom complet"
+                  required
+                />
               </div>
             </CardContent>
           </Card>
@@ -216,14 +218,20 @@ export default function CreateUserPage() {
               </div>
               
               <div>
-                <Label htmlFor="phone">Numéro de téléphone</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="+237 6XX XXX XXX"
-                />
+                <Label htmlFor="status">Statut du compte</Label>
+                <Select 
+                  value={formData.status} 
+                  onValueChange={(value) => handleInputChange('status', value as 'ACTIVE' | 'INACTIVE' | 'BANNED')}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner un statut" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ACTIVE">Actif</SelectItem>
+                    <SelectItem value="INACTIVE">Inactif</SelectItem>
+                    <SelectItem value="BANNED">Banni</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>
@@ -270,8 +278,7 @@ export default function CreateUserPage() {
                   <Input
                     id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirmer le mot de passe"
                     required
                   />
@@ -293,83 +300,50 @@ export default function CreateUserPage() {
               
               <div>
                 <Label htmlFor="role">Rôle</Label>
-                <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value as 'user' | 'admin' | 'organizer')}>
+                <Select 
+                  value={formData.role} 
+                  onValueChange={(value) => handleInputChange('role', value as 'USER' | 'ADMIN')}
+                >
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Sélectionner un rôle" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="user">Utilisateur</SelectItem>
-                    <SelectItem value="organizer">Organisateur</SelectItem>
-                    <SelectItem value="admin">Administrateur</SelectItem>
+                    <SelectItem value="USER">Utilisateur</SelectItem>
+                    <SelectItem value="ADMIN">Administrateur</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </CardContent>
+            
+            <CardFooter className="flex justify-end border-t px-6 py-4">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="emailVerified" 
+                    checked={!!formData.emailVerified}
+                    onCheckedChange={(checked) => handleInputChange('emailVerified', checked ? new Date() : null)}
+                  />
+                  <Label htmlFor="emailVerified" className="font-normal">
+                    Email vérifié
+                  </Label>
+                </div>
+                
+                <Button type="submit" disabled={saving}>
+                  {saving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Création...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Créer l'utilisateur
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardFooter>
           </Card>
-
-          {/* Options */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Options du compte</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="isActive"
-                  checked={formData.isActive}
-                  onCheckedChange={(checked) => handleInputChange('isActive', checked as boolean)}
-                />
-                <Label htmlFor="isActive">Compte actif</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="emailVerified"
-                  checked={formData.emailVerified}
-                  onCheckedChange={(checked) => handleInputChange('emailVerified', checked as boolean)}
-                />
-                <Label htmlFor="emailVerified">Email vérifié</Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="sendWelcomeEmail"
-                  checked={formData.sendWelcomeEmail}
-                  onCheckedChange={(checked) => handleInputChange('sendWelcomeEmail', checked as boolean)}
-                />
-                <Label htmlFor="sendWelcomeEmail">Envoyer un email de bienvenue</Label>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <div className="flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push('/admin/users')}
-              disabled={saving}
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              className="bg-purple-600 hover:bg-purple-700"
-              disabled={saving}
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Création...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Créer l'utilisateur
-                </>
-              )}
-            </Button>
-          </div>
         </form>
       </div>
     </div>

@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"
-import { ArrowLeft, Save, Loader2, User, Mail, Phone, Shield, Eye, EyeOff, Calendar, Activity } from "lucide-react"
+import { ArrowLeft, Save, Loader2, User, Mail, Phone, Shield, Eye, EyeOff } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,22 +16,18 @@ import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 
 interface UserFormData {
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  role: 'user' | 'admin' | 'organizer'
-  isActive: boolean
-  emailVerified: boolean
-  createdAt: string
-  lastLogin: string
-  ticketsPurchased: number
-  eventsCreated: number
+  name: string;
+  email: string;
+  password?: string;
+  role: 'USER' | 'ADMIN';
+  status: 'ACTIVE' | 'INACTIVE' | 'BANNED';
+  emailVerified: Date | null;
+  image: string | null;
 }
 
 interface PasswordChangeData {
-  newPassword: string
-  confirmPassword: string
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export default function EditUserPage() {
@@ -46,17 +42,12 @@ export default function EditUserPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   
   const [formData, setFormData] = useState<UserFormData>({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
-    phone: '',
-    role: 'user',
-    isActive: true,
-    emailVerified: false,
-    createdAt: '',
-    lastLogin: '',
-    ticketsPurchased: 0,
-    eventsCreated: 0
+    role: 'USER',
+    status: 'ACTIVE',
+    emailVerified: null,
+    image: null
   })
   
   const [passwordData, setPasswordData] = useState<PasswordChangeData>({
@@ -67,25 +58,17 @@ export default function EditUserPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Dans une implémentation réelle, nous appellerions une API pour récupérer l'utilisateur
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        const response = await fetch(`/api/admin/users/${params.id}`)
+        const data = await response.json()
         
-        // Données simulées
-        const mockUser: UserFormData = {
-          firstName: "Jean",
-          lastName: "Dupont",
-          email: "jean.dupont@email.com",
-          phone: "+237 677 123 456",
-          role: "user",
-          isActive: true,
-          emailVerified: true,
-          createdAt: "2024-01-15T10:30:00Z",
-          lastLogin: "2024-02-10T14:22:00Z",
-          ticketsPurchased: 12,
-          eventsCreated: 0
-        }
-        
-        setFormData(mockUser)
+        setFormData({
+          name: data.name,
+          email: data.email,
+          role: data.role,
+          status: data.status,
+          emailVerified: data.emailVerified,
+          image: data.image
+        })
       } catch (error) {
         toast({
           title: "Erreur",
@@ -103,7 +86,7 @@ export default function EditUserPage() {
     }
   }, [params.id, router, toast])
 
-  const handleInputChange = (field: keyof UserFormData, value: string | boolean) => {
+  const handleInputChange = (field: keyof UserFormData, value: string | boolean | Date | null) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -118,7 +101,7 @@ export default function EditUserPage() {
   }
 
   const validateForm = () => {
-    if (!formData.firstName || !formData.lastName || !formData.email) {
+    if (!formData.name || !formData.email) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -170,15 +153,36 @@ export default function EditUserPage() {
     setSaving(true)
 
     try {
-      // Dans une implémentation réelle, nous appellerions une API pour mettre à jour l'utilisateur
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      toast({
-        title: "Utilisateur mis à jour",
-        description: `L'utilisateur ${formData.firstName} ${formData.lastName} a été mis à jour avec succès${showPasswordSection && passwordData.newPassword ? '. Le mot de passe a été modifié.' : '.'}`
+      const response = await fetch(`/api/admin/users/${params.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          status: formData.status,
+          emailVerified: formData.emailVerified,
+          image: formData.image,
+          password: showPasswordSection ? passwordData.newPassword : undefined
+        })
       })
 
-      router.push('/admin/users')
+      if (response.ok) {
+        toast({
+          title: "Utilisateur mis à jour",
+          description: `L'utilisateur ${formData.name} a été mis à jour avec succès${showPasswordSection && passwordData.newPassword ? '. Le mot de passe a été modifié.' : '.'}`
+        })
+
+        router.push('/admin/users')
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue lors de la mise à jour",
+          variant: "destructive",
+        })
+      }
     } catch (error) {
       toast({
         title: "Erreur",
@@ -188,16 +192,6 @@ export default function EditUserPage() {
     } finally {
       setSaving(false)
     }
-  }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
   }
 
   if (loading) {
@@ -247,15 +241,15 @@ export default function EditUserPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Activity className="mr-2 h-5 w-5" />
+                  <Shield className="mr-2 h-5 w-5" />
                   Statistiques
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-600">Statut</span>
-                  <Badge variant={formData.isActive ? "default" : "secondary"}>
-                    {formData.isActive ? "Actif" : "Inactif"}
+                  <Badge variant={formData.status === 'ACTIVE' ? "default" : "secondary"}>
+                    {formData.status === 'ACTIVE' ? "Actif" : "Inactif"}
                   </Badge>
                 </div>
                 
@@ -264,34 +258,6 @@ export default function EditUserPage() {
                   <Badge variant={formData.emailVerified ? "default" : "destructive"}>
                     {formData.emailVerified ? "Vérifié" : "Non vérifié"}
                   </Badge>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Billets achetés</span>
-                  <span className="font-medium">{formData.ticketsPurchased}</span>
-                </div>
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-600">Événements créés</span>
-                  <span className="font-medium">{formData.eventsCreated}</span>
-                </div>
-                
-                <div className="pt-4 border-t">
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Créé le
-                    </div>
-                    <p className="text-sm font-medium">{formatDate(formData.createdAt)}</p>
-                  </div>
-                  
-                  <div className="space-y-2 mt-4">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Activity className="mr-2 h-4 w-4" />
-                      Dernière connexion
-                    </div>
-                    <p className="text-sm font-medium">{formatDate(formData.lastLogin)}</p>
-                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -309,28 +275,15 @@ export default function EditUserPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">Prénom *</Label>
-                      <Input
-                        id="firstName"
-                        value={formData.firstName}
-                        onChange={(e) => handleInputChange('firstName', e.target.value)}
-                        placeholder="Prénom"
-                        required
-                      />
-                    </div>
-                    
-                    <div>
-                      <Label htmlFor="lastName">Nom *</Label>
-                      <Input
-                        id="lastName"
-                        value={formData.lastName}
-                        onChange={(e) => handleInputChange('lastName', e.target.value)}
-                        placeholder="Nom de famille"
-                        required
-                      />
-                    </div>
+                  <div>
+                    <Label htmlFor="name">Nom *</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      placeholder="Nom"
+                      required
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -357,13 +310,13 @@ export default function EditUserPage() {
                   </div>
                   
                   <div>
-                    <Label htmlFor="phone">Numéro de téléphone</Label>
+                    <Label htmlFor="image">URL de l'image de profil</Label>
                     <Input
-                      id="phone"
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange('phone', e.target.value)}
-                      placeholder="+237 6XX XXX XXX"
+                      id="image"
+                      type="url"
+                      value={formData.image || ''}
+                      onChange={(e) => handleInputChange('image', e.target.value || null)}
+                      placeholder="https://exemple.com/photo.jpg"
                     />
                   </div>
                 </CardContent>
@@ -380,14 +333,13 @@ export default function EditUserPage() {
                 <CardContent className="space-y-4">
                   <div>
                     <Label htmlFor="role">Rôle</Label>
-                    <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value as 'user' | 'admin' | 'organizer')}>
+                    <Select value={formData.role} onValueChange={(value) => handleInputChange('role', value as 'USER' | 'ADMIN')}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="user">Utilisateur</SelectItem>
-                        <SelectItem value="organizer">Organisateur</SelectItem>
-                        <SelectItem value="admin">Administrateur</SelectItem>
+                        <SelectItem value="USER">Utilisateur</SelectItem>
+                        <SelectItem value="ADMIN">Administrateur</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -395,18 +347,18 @@ export default function EditUserPage() {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <Checkbox
-                        id="isActive"
-                        checked={formData.isActive}
-                        onCheckedChange={(checked) => handleInputChange('isActive', checked as boolean)}
+                        id="status"
+                        checked={formData.status === 'ACTIVE'}
+                        onCheckedChange={(checked) => handleInputChange('status', checked ? 'ACTIVE' : 'INACTIVE')}
                       />
-                      <Label htmlFor="isActive">Compte actif</Label>
+                      <Label htmlFor="status">Compte actif</Label>
                     </div>
                     
                     <div className="flex items-center space-x-2">
                       <Checkbox
                         id="emailVerified"
-                        checked={formData.emailVerified}
-                        onCheckedChange={(checked) => handleInputChange('emailVerified', checked as boolean)}
+                        checked={!!formData.emailVerified}
+                        onCheckedChange={(checked) => handleInputChange('emailVerified', checked ? new Date() : null)}
                       />
                       <Label htmlFor="emailVerified">Email vérifié</Label>
                     </div>

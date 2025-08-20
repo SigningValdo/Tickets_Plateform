@@ -1,26 +1,19 @@
 "use client"
 
 import type React from "react"
+import { useQueryState } from 'nuqs'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 
 export function SearchBar() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const router = useRouter()
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/events?search=${encodeURIComponent(searchQuery)}`)
-    }
-  }
+  const [searchQuery, setSearchQuery] = useQueryState("search", {
+    defaultValue: "",
+  })
 
   return (
-    <form onSubmit={handleSearch} className="flex w-full">
+    <form onSubmit={(e) => e.preventDefault()} className="flex w-full">
       <div className="relative flex-grow">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
         <Input

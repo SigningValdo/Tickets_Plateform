@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Calendar, Clock, MapPin, Users, Share2 } from "lucide-react"
@@ -7,43 +9,15 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import TicketSelection from "@/components/ticket-selection"
 import EventMap from "@/components/event-map"
-
-// Données simulées pour les détails de l'événement
-const events = [
-  {
-    id: "1",
-    title: "Festival de Jazz",
-    image: "/placeholder.svg?height=600&width=1200",
-    date: "15 Juin 2024",
-    time: "19:00 - 23:00",
-    location: "Palais de la Culture, Abidjan",
-    address: "Boulevard de la République, Abidjan, Côte d'Ivoire",
-    category: "Concerts",
-    organizer: "Association Culturelle d'Abidjan",
-    price: "À partir de 15000 FCFA",
-    description: `
-      <p>Profitez d'une soirée exceptionnelle avec les meilleurs artistes de jazz internationaux et locaux.</p>
-      <p>Le Festival de Jazz d'Abidjan revient pour sa 10ème édition avec une programmation exceptionnelle qui ravira tous les amateurs de musique.</p>
-      <p>Au programme :</p>
-      <ul>
-        <li>Performances live de musiciens de renommée internationale</li>
-        <li>Découverte de nouveaux talents locaux</li>
-        <li>Jam sessions et collaborations inédites</li>
-        <li>Espace restauration avec spécialités locales</li>
-      </ul>
-      <p>Ne manquez pas cet événement incontournable de la scène culturelle africaine !</p>
-    `,
-    ticketTypes: [
-      { id: "standard", name: "Standard", price: 15000, available: 200 },
-      { id: "vip", name: "VIP", price: 30000, available: 50 },
-      { id: "premium", name: "Premium", price: 50000, available: 20 },
-    ],
-  },
-  // Autres événements...
-]
+import { useQuery } from "@tanstack/react-query"
+import moment from "moment"
+import { EventAndCategory } from "@/types"
 
 export default function EventDetailPage({ params }: { params: { id: string } }) {
-  const event = events.find((e) => e.id === params.id)
+  const { data: event } = useQuery({
+    queryKey: ["event", params.id],
+    queryFn: async (): Promise<EventAndCategory | null> => fetch(`/api/admin/events/${params.id}`).then(res => res.json()),
+  })
 
   if (!event) {
     return (
@@ -89,19 +63,19 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
       </header>
 
       <div className="relative h-64 md:h-96 w-full">
-        <Image src={event.image || "/placeholder.svg"} alt={event.title} fill className="object-cover" priority />
+        <Image src={event.imageUrl || "/placeholder.svg"} alt={event.title} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
           <div className="container mx-auto px-4 py-6">
-            <Badge className="mb-2 bg-purple-600">{event.category}</Badge>
+            <Badge className="mb-2 bg-purple-600">{event.category?.name}</Badge>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">{event.title}</h1>
             <div className="flex flex-wrap gap-4 text-white">
               <div className="flex items-center">
                 <Calendar className="h-5 w-5 mr-2" />
-                <span>{event.date}</span>
+                <span>{event.date && moment(event.date).isValid() ? moment(event.date).format("DD MMM YYYY") : "-"}</span>
               </div>
               <div className="flex items-center">
                 <Clock className="h-5 w-5 mr-2" />
-                <span>{event.time}</span>
+                <span>{event.status}</span>
               </div>
               <div className="flex items-center">
                 <MapPin className="h-5 w-5 mr-2" />
@@ -139,7 +113,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
                         <div>
                           <h3 className="font-medium">Date et heure</h3>
                           <p className="text-gray-600">
-                            {event.date}, {event.time}
+                            {event.date && moment(event.date).isValid() ? moment(event.date).format("DD MMM YYYY") : "-"}, {event.status}
                           </p>
                         </div>
                       </div>
@@ -207,7 +181,7 @@ export default function EventDetailPage({ params }: { params: { id: string } }) 
               <Card>
                 <CardContent className="p-6">
                   <h2 className="text-xl font-bold mb-4">Réserver vos billets</h2>
-                  <p className="text-purple-600 font-bold text-lg mb-6">{event.price}</p>
+                  <p className="text-purple-600 font-bold text-lg mb-6">{event.status}</p>
 
                   <TicketSelection tickets={event.ticketTypes} eventId={event.id} />
 

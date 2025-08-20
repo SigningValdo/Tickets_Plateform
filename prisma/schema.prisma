@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum EventStatus {
+  UPCOMING
+  ACTIVE
+  PAST
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+}
+
+enum TicketStatus {
+  VALID
+  USED
+  INVALID
+  CANCELLED
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String?
+  email         String?    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role       @default(USER)
+  accounts      Account[]
+  sessions      Session[]
+  events        Event[]
+  reports       Report[] // Rapports générés par l'utilisateur
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  status        UserStatus @default(ACTIVE)
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Event {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  address     String
+  city        String
+  country     String
+  organizer   String
+  imageUrl    String
+  status      EventStatus   @default(UPCOMING)
+  author      User          @relation(fields: [authorId], references: [id])
+  authorId    String
+  category    EventCategory @relation(fields: [categoryId], references: [id])
+  categoryId  String
+  ticketTypes TicketType[]
+  tickets     Ticket[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model EventCategory {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  description String?
+  events      Event[]
+}
+
+model TicketType {
+  id        String   @id @default(cuid())
+  name      String
+  price     Float
+  quantity  Int
+  event     Event    @relation(fields: [eventId], references: [id])
+  eventId   String
+  tickets   Ticket[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  totalAmount Float
+  status      OrderStatus @default(PENDING)
+  tickets     Ticket[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  qrCode       String       @unique
+  status       TicketStatus @default(VALID)
+  event        Event        @relation(fields: [eventId], references: [id])
+  eventId      String
+  ticketType   TicketType   @relation(fields: [ticketTypeId], references: [id])
+  ticketTypeId String
+  order        Order        @relation(fields: [orderId], references: [id])
+  orderId      String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  name         String
+  email        String?
+  phone        String?
+  address      String?
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  type      String // 'string', 'number', 'boolean', 'json'
+  group     String // 'general', 'notifications', 'payments', 'security'
+  label     String
+  helpText  String?
+  options   Json? // Pour les champs de type select
+  order     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  name       String
+  type       String // 'sales', 'events', 'users', 'tickets'
+  format     String // 'pdf', 'csv', 'xlsx'
+  parameters Json // Paramètres utilisés pour générer le rapport
+  filePath   String? // Chemin vers le fichier généré
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  status     String   @default("pending") // 'pending', 'processing', 'completed', 'failed'
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

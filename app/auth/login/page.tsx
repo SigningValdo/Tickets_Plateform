@@ -1,61 +1,56 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { toast } from "sonner";
 
 export default function LoginPage() {
-  const router = useRouter()
-  const { toast } = useToast()
+  const router = useRouter();
 
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+    setIsLoading(true);
 
-    if (!email || !password) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive",
-      })
-      return
+    const result = await signIn("credentials", {
+      redirect: false,
+      email: email,
+      password: password,
+    });
+
+    setIsLoading(false);
+
+    if (result?.error) {
+      toast.error("Erreur de connexion", {
+        description: "Email ou mot de passe incorrect.",
+      });
+    } else {
+      toast.success("Connexion réussie", {
+        description: "Bienvenue ! Redirection en cours...",
+      });
+      router.push("/admin/dashboard");
     }
-
-    setIsLoading(true)
-
-    try {
-      // Dans une implémentation réelle, nous appellerions une API d'authentification
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // Simuler une connexion réussie
-      toast({
-        title: "Connexion réussie",
-        description: "Bienvenue sur E-Tickets",
-      })
-
-      router.push("/")
-    } catch (error) {
-      toast({
-        title: "Erreur de connexion",
-        description: "Email ou mot de passe incorrect",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -64,10 +59,15 @@ export default function LoginPage() {
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-bold text-purple-600">E-Tickets</h1>
           </Link>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">Connectez-vous à votre compte</h2>
+          <h2 className="mt-6 text-2xl font-bold text-gray-900">
+            Connectez-vous à votre compte
+          </h2>
           <p className="mt-2 text-gray-600">
             Ou{" "}
-            <Link href="/auth/register" className="text-purple-600 hover:text-purple-500">
+            <Link
+              href="/auth/register"
+              className="text-purple-600 hover:text-purple-500"
+            >
               créez un nouveau compte
             </Link>
           </p>
@@ -76,7 +76,9 @@ export default function LoginPage() {
         <Card>
           <CardHeader>
             <CardTitle>Connexion</CardTitle>
-            <CardDescription>Entrez vos identifiants pour accéder à votre compte</CardDescription>
+            <CardDescription>
+              Entrez vos identifiants pour accéder à votre compte
+            </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
@@ -94,7 +96,10 @@ export default function LoginPage() {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <Label htmlFor="password">Mot de passe</Label>
-                  <Link href="/auth/forgot-password" className="text-sm text-purple-600 hover:text-purple-500">
+                  <Link
+                    href="/auth/forgot-password"
+                    className="text-sm text-purple-600 hover:text-purple-500"
+                  >
                     Mot de passe oublié?
                   </Link>
                 </div>
@@ -112,13 +117,21 @@ export default function LoginPage() {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                     onClick={() => setShowPassword(!showPassword)}
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </button>
                 </div>
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full bg-purple-600 hover:bg-purple-700"
+                disabled={isLoading}
+              >
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -138,7 +151,9 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">Ou continuer avec</span>
+              <span className="px-2 bg-gray-50 text-gray-500">
+                Ou continuer avec
+              </span>
             </div>
           </div>
 
@@ -153,5 +168,5 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
