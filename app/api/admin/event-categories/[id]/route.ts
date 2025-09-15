@@ -6,7 +6,7 @@ import prisma from "@/lib/db";
 // PUT: Modifier une catégorie (admin seulement)
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
@@ -14,7 +14,7 @@ export async function PUT(
       status: 403,
     });
   }
-  const { id } = params;
+  const { id } = await params;
   const body = await req.json();
   const { name, description } = body;
   if (!name) {
@@ -44,7 +44,7 @@ export async function PUT(
 // DELETE: Supprimer une catégorie (admin seulement)
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
@@ -52,11 +52,20 @@ export async function DELETE(
       status: 403,
     });
   }
-  const { id } = params;
+  const { id } = await params;
   try {
     await prisma.eventCategory.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === "P2003") {
+      return new NextResponse(
+        JSON.stringify({
+          error:
+            "Impossible de supprimer la catégorie car des événements y sont encore associés. Supprimez ou réassignez ces événements avant de réessayer.",
+        }),
+        { status: 409 }
+      );
+    }
     return new NextResponse(JSON.stringify({ error: "Erreur interne" }), {
       status: 500,
     });
@@ -65,7 +74,7 @@ export async function DELETE(
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
@@ -73,7 +82,7 @@ export async function GET(
       status: 403,
     });
   }
-  const { id } = params;
+  const { id } = await params;
   try {
     const category = await prisma.eventCategory.findFirst({ where: { id } });
 

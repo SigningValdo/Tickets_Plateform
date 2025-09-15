@@ -47,6 +47,7 @@ export default function AdminEventsPage() {
     data: events,
     isLoading,
     error,
+    refetch,
   } = useQuery<EventWithTicketTypes[]>({
     queryKey: ["admin-events"],
     queryFn: fetchEvents,
@@ -124,6 +125,7 @@ export default function AdminEventsPage() {
               isLoading={isLoading}
               error={error as Error | null}
               filter="all"
+              onDeleted={() => { refetch(); }}
             />
           </TabsContent>
           <TabsContent value="active">
@@ -132,6 +134,7 @@ export default function AdminEventsPage() {
               isLoading={isLoading}
               error={error as Error | null}
               filter="active"
+              onDeleted={() => { refetch(); }}
             />
           </TabsContent>
           <TabsContent value="upcoming">
@@ -140,6 +143,7 @@ export default function AdminEventsPage() {
               isLoading={isLoading}
               error={error as Error | null}
               filter="upcoming"
+              onDeleted={() => { refetch(); }}
             />
           </TabsContent>
           <TabsContent value="past">
@@ -148,6 +152,7 @@ export default function AdminEventsPage() {
               isLoading={isLoading}
               error={error as Error | null}
               filter="past"
+              onDeleted={() => { refetch(); }}
             />
           </TabsContent>
         </Tabs>

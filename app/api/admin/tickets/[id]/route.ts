@@ -18,7 +18,7 @@ export async function GET(
     const ticket = await prisma.ticket.findUnique({
       where: { id: params.id },
       include: {
-        event: { select: { id: true, title: true } },
+        event: { select: { id: true, title: true, imageUrl: true } },
         ticketType: { select: { id: true, name: true } },
         order: { select: { id: true } },
       },

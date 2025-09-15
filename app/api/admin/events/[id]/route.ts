@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import prisma from "@/lib/db"
 
 interface Params {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }
 
 export async function GET(req: Request, { params }: Params) {
@@ -15,8 +15,9 @@ export async function GET(req: Request, { params }: Params) {
   }
 
   try {
+    const { id } = await params
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { ticketTypes: true },
     })
 
@@ -26,7 +27,7 @@ export async function GET(req: Request, { params }: Params) {
 
     return NextResponse.json(event)
   } catch (error) {
-    console.error(`Error fetching event ${params.id}:`, error)
+    console.error(`Error fetching event`, error)
     return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), { status: 500 })
   }
 }
@@ -41,15 +42,15 @@ export async function PUT(req: Request, { params }: Params) {
   try {
     const body = await req.json()
     const { ticketTypes, ...eventData } = body
-
+    const { id } = await params
     const updatedEvent = await prisma.event.update({
-      where: { id: params.id },
+      where: { id },
       data: eventData,
     })
 
     return NextResponse.json(updatedEvent)
   } catch (error) {
-    console.error(`Error updating event ${params.id}:`, error)
+    console.error(`Error updating event`, error)
     return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), { status: 500 })
   }
 }
@@ -62,14 +63,24 @@ export async function DELETE(req: Request, { params }: Params) {
   }
 
   try {
-    // Prisma cascading delete will handle related TicketTypes, Tickets, etc.
-    await prisma.event.delete({
-      where: { id: params.id },
-    })
+    const { id } = await params
+    // Delete dependents first to avoid FK violations
+    await prisma.ticket.deleteMany({ where: { eventId: id } })
+    await prisma.ticketType.deleteMany({ where: { eventId: id } })
+    await prisma.event.delete({ where: { id } })
 
     return new NextResponse(null, { status: 204 })
-  } catch (error) {
-    console.error(`Error deleting event ${params.id}:`, error)
+  } catch (error: any) {
+    if (error?.code === "P2003") {
+      return new NextResponse(
+        JSON.stringify({
+          error:
+            "Impossible de supprimer l'événement car des éléments y sont encore liés.",
+        }),
+        { status: 409 }
+      )
+    }
+    console.error(`Error deleting event:`, error)
     return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), { status: 500 })
   }
 }

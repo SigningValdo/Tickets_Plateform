@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Filter, Download } from "lucide-react";
+import Link from "next/link";
+import { Filter, Download, MoreVertical, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -12,14 +13,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog";
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import QRCode from "react-qr-code";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminTicketsPage() {
   const [showEdit, setShowEdit] = useState(false);
   const [editTicket, setEditTicket] = useState<any>(null);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<any>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -34,6 +45,7 @@ export default function AdminTicketsPage() {
   const [filtreEvent, setFiltreEvent] = useState<string>("all");
   const [filtreType, setFiltreType] = useState<string>("all");
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  const { toast } = useToast();
 
   // Pour les filtres dynamiques
   const [events, setEvents] = useState<
@@ -114,6 +126,30 @@ export default function AdminTicketsPage() {
       })
       .finally(() => setLoading(false));
   }, [page, limit, filtreStatus, filtreEvent, filtreType, debouncedQuery]);
+
+  async function handleConfirmDelete() {
+    if (!toDelete) return;
+    try {
+      const res = await fetch(`/api/admin/tickets/${toDelete.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(await res.text());
+      setTickets(prev => prev.filter(t => t.id !== toDelete.id));
+      toast({ title: "Billet supprimé" });
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Une erreur est survenue";
+      toast({ title: "Erreur", description: message, variant: "destructive" });
+    } finally {
+      setDeleteOpen(false);
+      setToDelete(null);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        <Loader2 className="h-5 w-5 mr-2 animate-spin" /> Chargement des billets...
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -306,76 +342,34 @@ export default function AdminTicketsPage() {
                             <option value="INVALID">Invalide</option>
                           </select>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {ticket.qrCode}
-                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
-                          <Dialog>
-                            <DialogTrigger>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-purple-600 mr-2"
-                                onClick={() => {
-                                  setSelectedTicket(ticket);
-                                  setShowDetail(true);
-                                }}
-                              >
-                                Détails
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-5 w-5" />
                               </Button>
-                            </DialogTrigger>
-                            <DialogContent className="p-0">
-                              <div className="p-5 flex flex-col justify-center items-center">
-                                <h3 className="font-bold text-xl mb-5">
-                                  QRCODE
-                                </h3>
-                                <QRCode value={ticket.qrCode} />
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-yellow-600 mr-2"
-                            onClick={() => {
-                              setEditTicket(ticket);
-                              setShowEdit(true);
-                            }}
-                          >
-                            Modifier
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-600"
-                            onClick={async () => {
-                              if (
-                                confirm(
-                                  "Supprimer ce billet ? Cette action est irréversible."
-                                )
-                              ) {
-                                try {
-                                  const res = await fetch(
-                                    `/api/admin/tickets/${ticket.id}`,
-                                    { method: "DELETE" }
-                                  );
-                                  if (!res.ok)
-                                    throw new Error(await res.text());
-                                  setTickets((prev) =>
-                                    prev.filter((t) => t.id !== ticket.id)
-                                  );
-                                  alert("Billet supprimé avec succès.");
-                                } catch (e: any) {
-                                  alert(
-                                    "Erreur lors de la suppression : " +
-                                      (e.message || e)
-                                  );
-                                }
-                              }
-                            }}
-                          >
-                            Supprimer
-                          </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuItem>
+                                <Link href={`/admin/tickets/${ticket.id}`}>
+                                  Détails
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Link
+                                  href={`/admin/events/${ticket.eventId}/edit`}
+                                >
+                                  Modifier
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="text-red-600"
+                                onClick={() => { setToDelete(ticket); setDeleteOpen(true) }}
+                              >
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
                     ))}
@@ -628,7 +622,7 @@ export default function AdminTicketsPage() {
 
         <div className="mt-6 flex justify-between items-center">
           <div className="text-sm text-gray-500">
-            Affichage de 5 billets sur 5
+            Affichage de 5 événements sur 5
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" disabled>
@@ -639,6 +633,13 @@ export default function AdminTicketsPage() {
             </Button>
           </div>
         </div>
+        <ConfirmDeleteDialog
+          open={deleteOpen}
+          onOpenChange={setDeleteOpen}
+          title="Supprimer le billet"
+          description={`Voulez-vous supprimer le billet "${toDelete?.id ?? ""}" ? Cette action est irréversible.`}
+          onConfirm={handleConfirmDelete}
+        />
       </main>
     </div>
   );

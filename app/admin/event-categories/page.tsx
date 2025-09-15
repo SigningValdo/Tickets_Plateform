@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { PlusCircle, Filter, Loader2 } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog"
 
 interface EventCategory {
   id: string
@@ -30,22 +31,28 @@ export default function AdminEventCategoriesPage() {
   const [dateFilter, setDateFilter] = useState("")
   const { toast } = useToast()
   const queryClient = useQueryClient()
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [toDelete, setToDelete] = useState<EventCategory | null>(null)
 
   const { data: categories, isLoading, error } = useQuery<EventCategory[]>({
     queryKey: ["event-categories"],
     queryFn: fetchCategories,
   })
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Supprimer cette catégorie ?")) return
-    const res = await fetch(`/api/admin/event-categories/${id}`, { method: "DELETE" })
+  const handleConfirmDelete = async () => {
+    if (!toDelete) return
+    const res = await fetch(`/api/admin/event-categories/${toDelete.id}`, { method: "DELETE" })
     if (!res.ok) {
       const err = await res.json().catch(() => ({}))
-      toast({ title: "Erreur", description: err.message || "Suppression impossible.", variant: "destructive" })
+      toast({ title: "Erreur", description: err.error || err.message || "Suppression impossible.", variant: "destructive" })
+      setDeleteOpen(false)
+      setToDelete(null)
       return
     }
     toast({ title: "Catégorie supprimée" })
     queryClient.invalidateQueries({ queryKey: ["event-categories"] })
+    setDeleteOpen(false)
+    setToDelete(null)
   }
 
   const filtered = categories || []
@@ -154,7 +161,7 @@ export default function AdminEventCategoriesPage() {
                         <Link href={`/admin/event-categories/${cat.id}/edit`}>
                           <Button size="sm" variant="outline">Éditer</Button>
                         </Link>
-                        <Button size="sm" variant="destructive" onClick={() => handleDelete(cat.id)}>
+                        <Button size="sm" variant="destructive" onClick={() => { setToDelete(cat); setDeleteOpen(true) }}>
                           Supprimer
                         </Button>
                       </div>
@@ -192,6 +199,13 @@ export default function AdminEventCategoriesPage() {
           </div>
         </div>
       </main>
+      <ConfirmDeleteDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Supprimer la catégorie"
+        description={`Voulez-vous supprimer "${toDelete?.name ?? ""}" ? Cette action est irréversible.`}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   )
 }

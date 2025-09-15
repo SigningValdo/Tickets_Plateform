@@ -3,9 +3,12 @@ import prisma from "@/lib/db";
 import { OrderStatus } from "@/lib/generated/prisma";
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  console.log(body);
-  const orderId = body.orderId;
+  const url = new URL(req.url);
+  const queryOrderId = url.searchParams.get("orderId");
+  const body = await req.json().catch(() => ({}));
+  console.log("Webhook payload:", body);
+  const bodyOrderId = body?.orderId || body?.customer_meta?.orderId;
+  const orderId = queryOrderId || bodyOrderId;
   const order = await prisma.order.findUnique({
     where: { id: orderId },
   });

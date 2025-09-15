@@ -20,6 +20,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log("NuqsAdapter:", NuqsAdapter);
   return (
     <html lang="fr" suppressHydrationWarning>
       <body className={inter.className}>

@@ -189,13 +189,13 @@ export default function EditEventCategoryPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="mb-6">
-        <Link
+        {/* <Link
           href="/admin/event-categories"
           className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à la liste des catégories
-        </Link>
+        </Link> */}
         <h1 className="text-3xl font-bold tracking-tight">
           Modifier la catégorie
         </h1>

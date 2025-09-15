@@ -37,28 +37,30 @@ export const placeMobileMoneyPayment = async ({
   const options = {
     method: "POST",
     headers: {
-      Authorization: process.env.NOTCHPAY_KEY!,
+      Authorization: `Bearer ${process.env.NOTCHPAY_KEY!}`,
       "Content-Type": "application/json",
     },
-    body: `{"amount":${amount},"currency":"XAF","email":"${email}","phone":${phone},"customer":"cus_123456789","description":"Paiement pour commande","reference":"${reference}","callback":"${callback}","locked_currency":"XAF","locked_channel":"cm.mtn","locked_country":"CM","items":[{}],"shipping":{},"address":{},"customer_meta":{"orderId": "${orderId}"}}`,
-    // body: JSON.stringify({
-    //   amount,
-    //   currency,
-    //   email,
-    //   phone,
-    //   customer: [customer],
-    //   description,
-    //   reference,
-    //   callback,
-    //   locked_currency,
-    //   locked_channel: [locked_channel],
-    //   locked_country,
-    //   items,
-    //   shipping,
-    //   address,
-    //   customer_meta,
-    // }),
-  };
+    body: JSON.stringify({
+      amount,
+      currency,
+      email,
+      phone,
+      customer,
+      description,
+      reference,
+      callback,
+      locked_currency,
+      locked_channel,
+      locked_country,
+      items,
+      shipping,
+      address,
+      customer_meta: {
+        ...(customer_meta || {}),
+        orderId,
+      },
+    }),
+  } as RequestInit;
 
   try {
     const response = await fetch(url, options);

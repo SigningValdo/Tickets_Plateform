@@ -1,33 +1,50 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
     message: "Le nom doit contenir au moins 2 caractères.",
   }),
   description: z.string().optional(),
-  color: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
-    message: "La couleur doit être au format hexadécimal (ex: #ff0000)",
-  }).optional(),
-})
+  color: z
+    .string()
+    .regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/, {
+      message: "La couleur doit être au format hexadécimal (ex: #ff0000)",
+    })
+    .optional(),
+});
 
 export default function CreateEventCategoryPage() {
-  const router = useRouter()
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
+  const router = useRouter();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,7 +53,7 @@ export default function CreateEventCategoryPage() {
       description: "",
       color: "#3b82f6", // Default blue color
     },
-  })
+  });
 
   const mutation = useMutation({
     mutationFn: async (values: z.infer<typeof formSchema>) => {
@@ -46,42 +63,46 @@ export default function CreateEventCategoryPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(values),
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Une erreur est survenue")
+        const error = await response.json();
+        throw new Error(error.message || "Une erreur est survenue");
       }
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
       toast({
         title: "Catégorie créée",
         description: "La catégorie a été créée avec succès.",
-      })
-      queryClient.invalidateQueries({ queryKey: ["event-categories"] })
-      router.push("/admin/event-categories")
+      });
+      queryClient.invalidateQueries({ queryKey: ["event-categories"] });
+      router.push("/admin/event-categories");
     },
     onError: (error: Error) => {
       toast({
         title: "Erreur",
-        description: error.message || "Une erreur est survenue lors de la création de la catégorie.",
+        description:
+          error.message ||
+          "Une erreur est survenue lors de la création de la catégorie.",
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    mutation.mutate(values)
+    mutation.mutate(values);
   }
 
   return (
     <div className="container mx-auto py-10">
       <div className="mb-6">
-        <Link href="/admin/event-categories" className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4">
+        {/* <Link href="/admin/event-categories" className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour à la liste des catégories
-        </Link>
-        <h1 className="text-3xl font-bold tracking-tight">Nouvelle catégorie</h1>
+        </Link> */}
+        <h1 className="text-3xl font-bold tracking-tight">
+          Nouvelle catégorie
+        </h1>
         <p className="text-muted-foreground">
           Créez une nouvelle catégorie pour organiser vos événements
         </p>
@@ -91,7 +112,8 @@ export default function CreateEventCategoryPage() {
         <CardHeader>
           <CardTitle>Détails de la catégorie</CardTitle>
           <CardDescription>
-            Remplissez les informations de la catégorie. Les champs marqués d'un astérisque (*) sont obligatoires.
+            Remplissez les informations de la catégorie. Les champs marqués d'un
+            astérisque (*) sont obligatoires.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -105,7 +127,10 @@ export default function CreateEventCategoryPage() {
                     <FormItem>
                       <FormLabel>Nom de la catégorie *</FormLabel>
                       <FormControl>
-                        <Input placeholder="Ex: Musique, Sport, Conférence..." {...field} />
+                        <Input
+                          placeholder="Ex: Musique, Sport, Conférence..."
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>
                         Le nom qui sera affiché pour cette catégorie.
@@ -122,24 +147,27 @@ export default function CreateEventCategoryPage() {
                     <FormItem>
                       <FormLabel>Couleur</FormLabel>
                       <div className="flex items-center gap-2">
-                        <div 
-                          className="w-8 h-8 rounded-md border" 
+                        <div
+                          className="w-8 h-8 rounded-md border"
                           style={{ backgroundColor: field.value }}
                         />
                         <FormControl>
                           <div className="flex items-center gap-2">
                             <span>#</span>
-                            <Input 
-                              className="w-24" 
-                              placeholder="3b82f6" 
-                              value={field.value?.replace('#', '')} 
-                              onChange={(e) => field.onChange('#' + e.target.value)}
+                            <Input
+                              className="w-24"
+                              placeholder="3b82f6"
+                              value={field.value?.replace("#", "")}
+                              onChange={(e) =>
+                                field.onChange("#" + e.target.value)
+                              }
                             />
                           </div>
                         </FormControl>
                       </div>
                       <FormDescription>
-                        La couleur associée à cette catégorie (format hexadécimal).
+                        La couleur associée à cette catégorie (format
+                        hexadécimal).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -193,5 +221,5 @@ export default function CreateEventCategoryPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,7 +1,7 @@
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { placeMobileMoneyPayment } from "@/lib/mobile-money";
+import { initOrangeWebPayment } from "@/lib/orange-money";
 
 export const POST = async (req: Request) => {
   const body = (await req.json()) as {
@@ -10,6 +10,7 @@ export const POST = async (req: Request) => {
     phone: string;
     address: string;
     tickets: { quantity: number; ticketTypeId: string }[];
+    paymentMethod?: "orange" | "mtn"; // optional payment method selector
   };
 
   const schema = z.object({
@@ -23,6 +24,7 @@ export const POST = async (req: Request) => {
         ticketTypeId: z.string(),
       })
     ),
+    paymentMethod: z.enum(["orange", "mtn"]).optional(),
   });
 
   const result = schema.safeParse(body);
@@ -47,10 +49,12 @@ export const POST = async (req: Request) => {
     });
   }
 
-  const total = result.data.tickets.reduce(
-    (acc, ticket) => acc + ticket.quantity,
-    0
-  );
+  // Compute total amount based on ticket prices
+  const total = result.data.tickets.reduce((acc, ticket) => {
+    const tt = ticketsTypes.find((t) => t.id === ticket.ticketTypeId);
+    const price = tt?.price ?? 0;
+    return acc + price * ticket.quantity;
+  }, 0);
 
   if (total <= 0) {
     return new NextResponse(JSON.stringify({ error: "Invalid request body" }), {
@@ -90,68 +94,14 @@ export const POST = async (req: Request) => {
     },
   });
 
+  // SIMULATION ONLY: always short-circuit and return orderId without calling any PSP
+  return NextResponse.json({ redirectUrl: null, orderId: order.id, simulated: true });
+  /*
+  // Real payment flow (disabled while simulating)
   try {
-    const payment = await placeMobileMoneyPayment({
-      orderId: order.id,
-      amount: total,
-      currency: "XOF",
-      email: result.data.email,
-      phone: result.data.phone,
-      customer: result.data.name,
-      description: "Payment for tickets",
-      reference: order.id,
-      callback: "http://localhost:3000/api/webhook",
-      locked_currency: "XOF",
-      locked_channel: "mobile_money",
-      locked_country: "CM",
-      items: result.data.tickets.map((ticket) => ({
-        name: ticket.ticketTypeId,
-        quantity: ticket.quantity,
-        price: ticketsTypes.find(
-          (ticketType) => ticketType.id === ticket.ticketTypeId
-        )?.price,
-      })),
-      shipping: {
-        name: "Shipping",
-        price: 0,
-      },
-      address: {
-        street: result.data.address,
-        city: "Yaoundé",
-        state: "Yaoundé",
-        country: "CM",
-        zip: "12345",
-      },
-      customer_meta: {
-        name: result.data.name,
-        email: result.data.email,
-        phone: result.data.phone,
-      },
-    });
-
-    if (!payment) {
-      return new NextResponse(JSON.stringify({ error: "Payment failed" }), {
-        status: 500,
-      });
-    }
-
-    console.log({ payment });
-
-    const redirectUrl = payment.authorization_url;
-    if (!redirectUrl) {
-      return new NextResponse(JSON.stringify({ error: "Payment failed" }), {
-        status: 500,
-      });
-    }
-
-    return NextResponse.redirect(new URL(redirectUrl, req.url));
-  } catch (error) {
-    console.error("Error creating order:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      {
-        status: 500,
-      }
-    );
+    // ... Orange Money implementation here ...
+  } catch (error: any) {
+    // ... error handling ...
   }
+  */
 };

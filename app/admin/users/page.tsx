@@ -53,6 +53,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function AdminUsersPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -80,6 +82,9 @@ export default function AdminUsersPage() {
   const [limit, setLimit] = useState(20);
   const [total, setTotal] = useState(0);
   const router = useRouter();
+  const { toast } = useToast();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toDelete, setToDelete] = useState<User | null>(null);
 
   // Fonction pour mettre à jour le statut d'un utilisateur
   const updateUserStatus = async (
@@ -157,6 +162,22 @@ export default function AdminUsersPage() {
       })
       .finally(() => setLoading(false));
   }, [page, limit, filtreRole, filtreStatus, debouncedQuery]);
+
+  async function handleConfirmDelete() {
+    if (!toDelete) return;
+    try {
+      const res = await fetch(`/api/admin/users/${toDelete.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error(await res.text());
+      setUsers(prev => prev.filter(u => u.id !== toDelete.id));
+      toast({ title: "Utilisateur supprimé" });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Une erreur est survenue";
+      toast({ title: "Erreur", description: message, variant: "destructive" });
+    } finally {
+      setDeleteOpen(false);
+      setToDelete(null);
+    }
+  }
 
   if (loading) {
     return (
@@ -430,39 +451,7 @@ export default function AdminUsersPage() {
                               )}
                               <DropdownMenuItem
                                 className="text-red-600 cursor-pointer"
-                                onClick={async () => {
-                                  if (
-                                    confirm(
-                                      "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible."
-                                    )
-                                  ) {
-                                    try {
-                                      const res = await fetch(
-                                        `/api/admin/users/${user.id}`,
-                                        {
-                                          method: "DELETE",
-                                        }
-                                      );
-                                      if (!res.ok)
-                                        throw new Error(await res.text());
-                                      setUsers(
-                                        users.filter((u) => u.id !== user.id)
-                                      );
-                                      alert("Utilisateur supprimé avec succès");
-                                    } catch (error) {
-                                      console.error(
-                                        "Erreur lors de la suppression:",
-                                        error
-                                      );
-                                      alert(
-                                        "Erreur lors de la suppression: " +
-                                          (error instanceof Error
-                                            ? error.message
-                                            : "Une erreur est survenue")
-                                      );
-                                    }
-                                  }
-                                }}
+                                onClick={() => { setToDelete(user); setDeleteOpen(true); }}
                               >
                                 Supprimer
                               </DropdownMenuItem>
@@ -492,6 +481,13 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </main>
+      <ConfirmDeleteDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title="Supprimer l'utilisateur"
+        description={`Voulez-vous supprimer "${toDelete?.name ?? ""}" ? Cette action est irréversible.`}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
