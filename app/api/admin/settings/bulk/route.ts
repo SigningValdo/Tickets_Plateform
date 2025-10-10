@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { authOptions } from '../../../auth/[...nextauth]/route';
+import prisma from '@/lib/db';
 import { settingSchema } from '@/lib/validations/setting';
+import { z } from 'zod';
 
 export async function PUT(request: Request) {
   try {
@@ -18,20 +19,40 @@ export async function PUT(request: Request) {
     if (!Array.isArray(updates)) {
       return new NextResponse('Données invalides', { status: 400 });
     }
+    if (updates.length === 0) {
+      return new NextResponse('Aucune mise à jour fournie', { status: 400 });
+    }
 
-    // Valider chaque mise à jour
-    for (const update of updates) {
-      try {
-        settingSchema.partial().parse(update);
-      } catch (error) {
-        console.error('Erreur de validation:', error);
-        return new NextResponse(`Données invalides: ${error}`, { status: 400 });
-      }
+    // Schéma strict pour les mises à jour en masse: id requis + value (mêmes contraintes que le schéma principal)
+    const bulkUpdateSchema = z.object({
+      id: z.string(),
+      value: settingSchema.shape.value,
+    });
+    const parsed = z.array(bulkUpdateSchema).safeParse(updates);
+    if (!parsed.success) {
+      console.error('Erreur de validation:', parsed.error.flatten());
+      return new NextResponse('Données invalides', { status: 400 });
+    }
+    const validUpdates = parsed.data;
+
+    // Vérifier que tous les IDs existent avant la transaction
+    const ids = validUpdates.map((u) => u.id);
+    const existing = await prisma.setting.findMany({
+      where: { id: { in: ids } },
+      select: { id: true },
+    });
+    const existingIds = new Set(existing.map((e) => e.id));
+    const missingIds = ids.filter((id) => !existingIds.has(id));
+    if (missingIds.length > 0) {
+      return NextResponse.json(
+        { message: 'Paramètres non trouvés', missingIds },
+        { status: 404 }
+      );
     }
 
     // Mettre à jour les paramètres dans une transaction
     const results = await prisma.$transaction(
-      updates.map((update) =>
+      validUpdates.map((update) =>
         prisma.setting.update({
           where: { id: update.id },
           data: {
@@ -48,3 +69,4 @@ export async function PUT(request: Request) {
     return new NextResponse('Erreur interne du serveur', { status: 500 });
   }
 }
+
