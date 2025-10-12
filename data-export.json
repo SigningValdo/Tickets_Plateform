@@ -1,0 +1,574 @@
+{
+  "categories": [
+    {
+      "id": "cmgmztzgf0001e6nbpf1f0n5x",
+      "name": "Concerts",
+      "description": "concerts"
+    },
+    {
+      "id": "cmgmztzgk0002e6nbs8yyzpio",
+      "name": "Théâtre",
+      "description": "theatre"
+    },
+    {
+      "id": "cmgmztzgm0003e6nb9kodmjrh",
+      "name": "Conférences",
+      "description": "conferences"
+    },
+    {
+      "id": "cmgmztzgp0004e6nb0bxdmblb",
+      "name": "Gastronomie",
+      "description": "food"
+    },
+    {
+      "id": "cmgmztzgr0005e6nbtrh452pk",
+      "name": "Spectacles",
+      "description": "shows"
+    },
+    {
+      "id": "cmgmztzgt0006e6nbrcb7d7m6",
+      "name": "Cinéma",
+      "description": "cinema"
+    },
+    {
+      "id": "cmgmztzgv0007e6nbu9vu0d0q",
+      "name": "Ateliers",
+      "description": "workshops"
+    },
+    {
+      "id": "cmgmztzgy0008e6nbumjbqgt8",
+      "name": "Festivals",
+      "description": "festivals"
+    },
+    {
+      "id": "cmgmztzh00009e6nbsrx1k0dd",
+      "name": "Expositions",
+      "description": "expositions"
+    },
+    {
+      "id": "cmgmztzh2000ae6nbcen2rjf4",
+      "name": "Sports",
+      "description": "sports"
+    }
+  ],
+  "users": [
+    {
+      "id": "cmgmztzg80000e6nbcnufqtso",
+      "name": "Admin User",
+      "email": "admin@example.com",
+      "emailVerified": null,
+      "image": null,
+      "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+      "role": "ADMIN",
+      "createdAt": "2025-10-12T00:56:08.888Z",
+      "updatedAt": "2025-10-12T00:56:08.888Z",
+      "status": "ACTIVE"
+    }
+  ],
+  "events": [
+    {
+      "id": "cmgmztzh9000ce6nbkf52a5ca",
+      "title": "Festival de Jazz",
+      "description": "Billets pour Festival de Jazz.",
+      "date": "2024-06-15T00:00:00.000Z",
+      "location": "Palais de la Culture, Abidjan",
+      "address": "Palais de la Culture, Abidjan",
+      "city": "Abidjan",
+      "country": "N/A",
+      "organizer": "E-Tickets",
+      "imageUrl": "/placeholder.svg?height=400&width=600",
+      "status": "ACTIVE",
+      "authorId": "cmgmztzg80000e6nbcnufqtso",
+      "categoryId": "cmgmztzgf0001e6nbpf1f0n5x",
+      "createdAt": "2025-10-12T00:56:08.925Z",
+      "updatedAt": "2025-10-12T00:56:08.925Z",
+      "category": {
+        "id": "cmgmztzgf0001e6nbpf1f0n5x",
+        "name": "Concerts",
+        "description": "concerts"
+      },
+      "ticketTypes": [
+        {
+          "id": "cmgmztzhb000ee6nbgljbbkko",
+          "name": "Standard",
+          "price": 15000,
+          "quantity": 100,
+          "eventId": "cmgmztzh9000ce6nbkf52a5ca",
+          "createdAt": "2025-10-12T00:56:08.927Z",
+          "updatedAt": "2025-10-12T00:56:08.927Z"
+        }
+      ],
+      "author": {
+        "id": "cmgmztzg80000e6nbcnufqtso",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "emailVerified": null,
+        "image": null,
+        "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+        "role": "ADMIN",
+        "createdAt": "2025-10-12T00:56:08.888Z",
+        "updatedAt": "2025-10-12T00:56:08.888Z",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "id": "cmgmztzhe000ge6nbmpfdhihk",
+      "title": "Conférence Tech Innovation",
+      "description": "Billets pour Conférence Tech Innovation.",
+      "date": "2024-06-22T00:00:00.000Z",
+      "location": "Centre de Conférences, Dakar",
+      "address": "Centre de Conférences, Dakar",
+      "city": "Dakar",
+      "country": "N/A",
+      "organizer": "E-Tickets",
+      "imageUrl": "/placeholder.svg?height=400&width=600",
+      "status": "ACTIVE",
+      "authorId": "cmgmztzg80000e6nbcnufqtso",
+      "categoryId": "cmgmztzgm0003e6nb9kodmjrh",
+      "createdAt": "2025-10-12T00:56:08.931Z",
+      "updatedAt": "2025-10-12T00:56:08.931Z",
+      "category": {
+        "id": "cmgmztzgm0003e6nb9kodmjrh",
+        "name": "Conférences",
+        "description": "conferences"
+      },
+      "ticketTypes": [
+        {
+          "id": "cmgmztzhg000ie6nbef8fkpww",
+          "name": "Standard",
+          "price": 5000,
+          "quantity": 100,
+          "eventId": "cmgmztzhe000ge6nbmpfdhihk",
+          "createdAt": "2025-10-12T00:56:08.933Z",
+          "updatedAt": "2025-10-12T00:56:08.933Z"
+        }
+      ],
+      "author": {
+        "id": "cmgmztzg80000e6nbcnufqtso",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "emailVerified": null,
+        "image": null,
+        "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+        "role": "ADMIN",
+        "createdAt": "2025-10-12T00:56:08.888Z",
+        "updatedAt": "2025-10-12T00:56:08.888Z",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "id": "cmgmztzhj000ke6nbnki7pg7s",
+      "title": "Exposition d'Art Contemporain",
+      "description": "Billets pour Exposition d'Art Contemporain.",
+      "date": "2024-07-10T00:00:00.000Z",
+      "location": "Galerie Nationale, Lomé",
+      "address": "Galerie Nationale, Lomé",
+      "city": "Lomé",
+      "country": "N/A",
+      "organizer": "E-Tickets",
+      "imageUrl": "/placeholder.svg?height=400&width=600",
+      "status": "ACTIVE",
+      "authorId": "cmgmztzg80000e6nbcnufqtso",
+      "categoryId": "cmgmztzh00009e6nbsrx1k0dd",
+      "createdAt": "2025-10-12T00:56:08.935Z",
+      "updatedAt": "2025-10-12T00:56:08.935Z",
+      "category": {
+        "id": "cmgmztzh00009e6nbsrx1k0dd",
+        "name": "Expositions",
+        "description": "expositions"
+      },
+      "ticketTypes": [
+        {
+          "id": "cmgmztzhl000me6nb1ieij99g",
+          "name": "Standard",
+          "price": 2000,
+          "quantity": 100,
+          "eventId": "cmgmztzhj000ke6nbnki7pg7s",
+          "createdAt": "2025-10-12T00:56:08.937Z",
+          "updatedAt": "2025-10-12T00:56:08.937Z"
+        }
+      ],
+      "author": {
+        "id": "cmgmztzg80000e6nbcnufqtso",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "emailVerified": null,
+        "image": null,
+        "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+        "role": "ADMIN",
+        "createdAt": "2025-10-12T00:56:08.888Z",
+        "updatedAt": "2025-10-12T00:56:08.888Z",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "id": "cmgmztzhn000oe6nbznd1cfa6",
+      "title": "Concert de Musique Classique",
+      "description": "Billets pour Concert de Musique Classique.",
+      "date": "2024-08-05T00:00:00.000Z",
+      "location": "Opéra National, Rabat",
+      "address": "Opéra National, Rabat",
+      "city": "Rabat",
+      "country": "N/A",
+      "organizer": "E-Tickets",
+      "imageUrl": "/placeholder.svg?height=400&width=600",
+      "status": "UPCOMING",
+      "authorId": "cmgmztzg80000e6nbcnufqtso",
+      "categoryId": "cmgmztzgf0001e6nbpf1f0n5x",
+      "createdAt": "2025-10-12T00:56:08.940Z",
+      "updatedAt": "2025-10-12T00:56:08.940Z",
+      "category": {
+        "id": "cmgmztzgf0001e6nbpf1f0n5x",
+        "name": "Concerts",
+        "description": "concerts"
+      },
+      "ticketTypes": [
+        {
+          "id": "cmgmztzhp000qe6nberext9he",
+          "name": "Standard",
+          "price": 10000,
+          "quantity": 100,
+          "eventId": "cmgmztzhn000oe6nbznd1cfa6",
+          "createdAt": "2025-10-12T00:56:08.941Z",
+          "updatedAt": "2025-10-12T00:56:08.941Z"
+        }
+      ],
+      "author": {
+        "id": "cmgmztzg80000e6nbcnufqtso",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "emailVerified": null,
+        "image": null,
+        "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+        "role": "ADMIN",
+        "createdAt": "2025-10-12T00:56:08.888Z",
+        "updatedAt": "2025-10-12T00:56:08.888Z",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "id": "cmgmztzhs000se6nbbafd5f51",
+      "title": "Tournoi de Football Caritatif",
+      "description": "Billets pour Tournoi de Football Caritatif.",
+      "date": "2024-08-12T00:00:00.000Z",
+      "location": "Stade Municipal, Douala",
+      "address": "Stade Municipal, Douala",
+      "city": "Douala",
+      "country": "N/A",
+      "organizer": "E-Tickets",
+      "imageUrl": "/placeholder.svg?height=400&width=600",
+      "status": "UPCOMING",
+      "authorId": "cmgmztzg80000e6nbcnufqtso",
+      "categoryId": "cmgmztzh2000ae6nbcen2rjf4",
+      "createdAt": "2025-10-12T00:56:08.944Z",
+      "updatedAt": "2025-10-12T00:56:08.944Z",
+      "category": {
+        "id": "cmgmztzh2000ae6nbcen2rjf4",
+        "name": "Sports",
+        "description": "sports"
+      },
+      "ticketTypes": [
+        {
+          "id": "cmgmztzht000ue6nb3pxfcqik",
+          "name": "Standard",
+          "price": 3000,
+          "quantity": 100,
+          "eventId": "cmgmztzhs000se6nbbafd5f51",
+          "createdAt": "2025-10-12T00:56:08.946Z",
+          "updatedAt": "2025-10-12T00:56:08.946Z"
+        }
+      ],
+      "author": {
+        "id": "cmgmztzg80000e6nbcnufqtso",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "emailVerified": null,
+        "image": null,
+        "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+        "role": "ADMIN",
+        "createdAt": "2025-10-12T00:56:08.888Z",
+        "updatedAt": "2025-10-12T00:56:08.888Z",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "id": "cmgmztzhw000we6nb6ghqikq1",
+      "title": "Salon du Livre Africain",
+      "description": "Billets pour Salon du Livre Africain.",
+      "date": "2024-08-20T00:00:00.000Z",
+      "location": "Centre Culturel, Bamako",
+      "address": "Centre Culturel, Bamako",
+      "city": "Bamako",
+      "country": "N/A",
+      "organizer": "E-Tickets",
+      "imageUrl": "/placeholder.svg?height=400&width=600",
+      "status": "UPCOMING",
+      "authorId": "cmgmztzg80000e6nbcnufqtso",
+      "categoryId": "cmgmztzh00009e6nbsrx1k0dd",
+      "createdAt": "2025-10-12T00:56:08.948Z",
+      "updatedAt": "2025-10-12T00:56:08.948Z",
+      "category": {
+        "id": "cmgmztzh00009e6nbsrx1k0dd",
+        "name": "Expositions",
+        "description": "expositions"
+      },
+      "ticketTypes": [
+        {
+          "id": "cmgmztzhy000ye6nbdjdvphur",
+          "name": "Standard",
+          "price": 0,
+          "quantity": 100,
+          "eventId": "cmgmztzhw000we6nb6ghqikq1",
+          "createdAt": "2025-10-12T00:56:08.950Z",
+          "updatedAt": "2025-10-12T00:56:08.950Z"
+        }
+      ],
+      "author": {
+        "id": "cmgmztzg80000e6nbcnufqtso",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "emailVerified": null,
+        "image": null,
+        "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+        "role": "ADMIN",
+        "createdAt": "2025-10-12T00:56:08.888Z",
+        "updatedAt": "2025-10-12T00:56:08.888Z",
+        "status": "ACTIVE"
+      }
+    },
+    {
+      "id": "cmgmztzi00010e6nb2j7dir4k",
+      "title": "Festival de Cinéma",
+      "description": "Billets pour Festival de Cinéma.",
+      "date": "2024-09-01T00:00:00.000Z",
+      "location": "Cinémathèque, Tunis",
+      "address": "Cinémathèque, Tunis",
+      "city": "Tunis",
+      "country": "N/A",
+      "organizer": "E-Tickets",
+      "imageUrl": "/placeholder.svg?height=400&width=600",
+      "status": "UPCOMING",
+      "authorId": "cmgmztzg80000e6nbcnufqtso",
+      "categoryId": "cmgmztzgt0006e6nbrcb7d7m6",
+      "createdAt": "2025-10-12T00:56:08.953Z",
+      "updatedAt": "2025-10-12T00:56:08.953Z",
+      "category": {
+        "id": "cmgmztzgt0006e6nbrcb7d7m6",
+        "name": "Cinéma",
+        "description": "cinema"
+      },
+      "ticketTypes": [
+        {
+          "id": "cmgmztzi20012e6nbjmqlnv5x",
+          "name": "Standard",
+          "price": 5000,
+          "quantity": 100,
+          "eventId": "cmgmztzi00010e6nb2j7dir4k",
+          "createdAt": "2025-10-12T00:56:08.955Z",
+          "updatedAt": "2025-10-12T00:56:08.955Z"
+        }
+      ],
+      "author": {
+        "id": "cmgmztzg80000e6nbcnufqtso",
+        "name": "Admin User",
+        "email": "admin@example.com",
+        "emailVerified": null,
+        "image": null,
+        "password": "$2b$10$a4Mv4dW57zH4UWmy2kWhFOX1wEEO5yMw8r5VKeuZjy4MjLDWNC8GO",
+        "role": "ADMIN",
+        "createdAt": "2025-10-12T00:56:08.888Z",
+        "updatedAt": "2025-10-12T00:56:08.888Z",
+        "status": "ACTIVE"
+      }
+    }
+  ],
+  "ticketTypes": [
+    {
+      "id": "cmgmztzhb000ee6nbgljbbkko",
+      "name": "Standard",
+      "price": 15000,
+      "quantity": 100,
+      "eventId": "cmgmztzh9000ce6nbkf52a5ca",
+      "createdAt": "2025-10-12T00:56:08.927Z",
+      "updatedAt": "2025-10-12T00:56:08.927Z",
+      "event": {
+        "id": "cmgmztzh9000ce6nbkf52a5ca",
+        "title": "Festival de Jazz",
+        "description": "Billets pour Festival de Jazz.",
+        "date": "2024-06-15T00:00:00.000Z",
+        "location": "Palais de la Culture, Abidjan",
+        "address": "Palais de la Culture, Abidjan",
+        "city": "Abidjan",
+        "country": "N/A",
+        "organizer": "E-Tickets",
+        "imageUrl": "/placeholder.svg?height=400&width=600",
+        "status": "ACTIVE",
+        "authorId": "cmgmztzg80000e6nbcnufqtso",
+        "categoryId": "cmgmztzgf0001e6nbpf1f0n5x",
+        "createdAt": "2025-10-12T00:56:08.925Z",
+        "updatedAt": "2025-10-12T00:56:08.925Z"
+      }
+    },
+    {
+      "id": "cmgmztzhg000ie6nbef8fkpww",
+      "name": "Standard",
+      "price": 5000,
+      "quantity": 100,
+      "eventId": "cmgmztzhe000ge6nbmpfdhihk",
+      "createdAt": "2025-10-12T00:56:08.933Z",
+      "updatedAt": "2025-10-12T00:56:08.933Z",
+      "event": {
+        "id": "cmgmztzhe000ge6nbmpfdhihk",
+        "title": "Conférence Tech Innovation",
+        "description": "Billets pour Conférence Tech Innovation.",
+        "date": "2024-06-22T00:00:00.000Z",
+        "location": "Centre de Conférences, Dakar",
+        "address": "Centre de Conférences, Dakar",
+        "city": "Dakar",
+        "country": "N/A",
+        "organizer": "E-Tickets",
+        "imageUrl": "/placeholder.svg?height=400&width=600",
+        "status": "ACTIVE",
+        "authorId": "cmgmztzg80000e6nbcnufqtso",
+        "categoryId": "cmgmztzgm0003e6nb9kodmjrh",
+        "createdAt": "2025-10-12T00:56:08.931Z",
+        "updatedAt": "2025-10-12T00:56:08.931Z"
+      }
+    },
+    {
+      "id": "cmgmztzhl000me6nb1ieij99g",
+      "name": "Standard",
+      "price": 2000,
+      "quantity": 100,
+      "eventId": "cmgmztzhj000ke6nbnki7pg7s",
+      "createdAt": "2025-10-12T00:56:08.937Z",
+      "updatedAt": "2025-10-12T00:56:08.937Z",
+      "event": {
+        "id": "cmgmztzhj000ke6nbnki7pg7s",
+        "title": "Exposition d'Art Contemporain",
+        "description": "Billets pour Exposition d'Art Contemporain.",
+        "date": "2024-07-10T00:00:00.000Z",
+        "location": "Galerie Nationale, Lomé",
+        "address": "Galerie Nationale, Lomé",
+        "city": "Lomé",
+        "country": "N/A",
+        "organizer": "E-Tickets",
+        "imageUrl": "/placeholder.svg?height=400&width=600",
+        "status": "ACTIVE",
+        "authorId": "cmgmztzg80000e6nbcnufqtso",
+        "categoryId": "cmgmztzh00009e6nbsrx1k0dd",
+        "createdAt": "2025-10-12T00:56:08.935Z",
+        "updatedAt": "2025-10-12T00:56:08.935Z"
+      }
+    },
+    {
+      "id": "cmgmztzhp000qe6nberext9he",
+      "name": "Standard",
+      "price": 10000,
+      "quantity": 100,
+      "eventId": "cmgmztzhn000oe6nbznd1cfa6",
+      "createdAt": "2025-10-12T00:56:08.941Z",
+      "updatedAt": "2025-10-12T00:56:08.941Z",
+      "event": {
+        "id": "cmgmztzhn000oe6nbznd1cfa6",
+        "title": "Concert de Musique Classique",
+        "description": "Billets pour Concert de Musique Classique.",
+        "date": "2024-08-05T00:00:00.000Z",
+        "location": "Opéra National, Rabat",
+        "address": "Opéra National, Rabat",
+        "city": "Rabat",
+        "country": "N/A",
+        "organizer": "E-Tickets",
+        "imageUrl": "/placeholder.svg?height=400&width=600",
+        "status": "UPCOMING",
+        "authorId": "cmgmztzg80000e6nbcnufqtso",
+        "categoryId": "cmgmztzgf0001e6nbpf1f0n5x",
+        "createdAt": "2025-10-12T00:56:08.940Z",
+        "updatedAt": "2025-10-12T00:56:08.940Z"
+      }
+    },
+    {
+      "id": "cmgmztzht000ue6nb3pxfcqik",
+      "name": "Standard",
+      "price": 3000,
+      "quantity": 100,
+      "eventId": "cmgmztzhs000se6nbbafd5f51",
+      "createdAt": "2025-10-12T00:56:08.946Z",
+      "updatedAt": "2025-10-12T00:56:08.946Z",
+      "event": {
+        "id": "cmgmztzhs000se6nbbafd5f51",
+        "title": "Tournoi de Football Caritatif",
+        "description": "Billets pour Tournoi de Football Caritatif.",
+        "date": "2024-08-12T00:00:00.000Z",
+        "location": "Stade Municipal, Douala",
+        "address": "Stade Municipal, Douala",
+        "city": "Douala",
+        "country": "N/A",
+        "organizer": "E-Tickets",
+        "imageUrl": "/placeholder.svg?height=400&width=600",
+        "status": "UPCOMING",
+        "authorId": "cmgmztzg80000e6nbcnufqtso",
+        "categoryId": "cmgmztzh2000ae6nbcen2rjf4",
+        "createdAt": "2025-10-12T00:56:08.944Z",
+        "updatedAt": "2025-10-12T00:56:08.944Z"
+      }
+    },
+    {
+      "id": "cmgmztzhy000ye6nbdjdvphur",
+      "name": "Standard",
+      "price": 0,
+      "quantity": 100,
+      "eventId": "cmgmztzhw000we6nb6ghqikq1",
+      "createdAt": "2025-10-12T00:56:08.950Z",
+      "updatedAt": "2025-10-12T00:56:08.950Z",
+      "event": {
+        "id": "cmgmztzhw000we6nb6ghqikq1",
+        "title": "Salon du Livre Africain",
+        "description": "Billets pour Salon du Livre Africain.",
+        "date": "2024-08-20T00:00:00.000Z",
+        "location": "Centre Culturel, Bamako",
+        "address": "Centre Culturel, Bamako",
+        "city": "Bamako",
+        "country": "N/A",
+        "organizer": "E-Tickets",
+        "imageUrl": "/placeholder.svg?height=400&width=600",
+        "status": "UPCOMING",
+        "authorId": "cmgmztzg80000e6nbcnufqtso",
+        "categoryId": "cmgmztzh00009e6nbsrx1k0dd",
+        "createdAt": "2025-10-12T00:56:08.948Z",
+        "updatedAt": "2025-10-12T00:56:08.948Z"
+      }
+    },
+    {
+      "id": "cmgmztzi20012e6nbjmqlnv5x",
+      "name": "Standard",
+      "price": 5000,
+      "quantity": 100,
+      "eventId": "cmgmztzi00010e6nb2j7dir4k",
+      "createdAt": "2025-10-12T00:56:08.955Z",
+      "updatedAt": "2025-10-12T00:56:08.955Z",
+      "event": {
+        "id": "cmgmztzi00010e6nb2j7dir4k",
+        "title": "Festival de Cinéma",
+        "description": "Billets pour Festival de Cinéma.",
+        "date": "2024-09-01T00:00:00.000Z",
+        "location": "Cinémathèque, Tunis",
+        "address": "Cinémathèque, Tunis",
+        "city": "Tunis",
+        "country": "N/A",
+        "organizer": "E-Tickets",
+        "imageUrl": "/placeholder.svg?height=400&width=600",
+        "status": "UPCOMING",
+        "authorId": "cmgmztzg80000e6nbcnufqtso",
+        "categoryId": "cmgmztzgt0006e6nbrcb7d7m6",
+        "createdAt": "2025-10-12T00:56:08.953Z",
+        "updatedAt": "2025-10-12T00:56:08.953Z"
+      }
+    }
+  ],
+  "orders": [],
+  "tickets": [],
+  "settings": [],
+  "reports": [],
+  "exportedAt": "2025-10-12T00:56:13.687Z"
+}
