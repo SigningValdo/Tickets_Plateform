@@ -85,12 +85,12 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-purple-600">E-Tickets</h1>
+            <h1 className="text-3xl font-bold text-fanzone-orange">E-Tickets</h1>
           </Link>
           <h2 className="mt-6 text-2xl font-bold text-gray-900">Créez votre compte</h2>
           <p className="mt-2 text-gray-600">
             Ou{" "}
-            <Link href="/auth/login" className="text-purple-600 hover:text-purple-500">
+            <Link href="/auth/login" className="text-fanzone-orange hover:text-purple-500">
               connectez-vous à votre compte existant
             </Link>
           </p>
@@ -182,18 +182,18 @@ export default function RegisterPage() {
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   J'accepte les{" "}
-                  <Link href="/terms" className="text-purple-600 hover:text-purple-500">
+                  <Link href="/terms" className="text-fanzone-orange hover:text-purple-500">
                     conditions d'utilisation
                   </Link>{" "}
                   et la{" "}
-                  <Link href="/privacy" className="text-purple-600 hover:text-purple-500">
+                  <Link href="/privacy" className="text-fanzone-orange hover:text-purple-500">
                     politique de confidentialité
                   </Link>
                 </label>
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90" disabled={isLoading}>
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

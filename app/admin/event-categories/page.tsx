@@ -71,7 +71,7 @@ export default function AdminEventCategoriesPage() {
             <p className="text-gray-500">Créez, modifiez et gérez les catégories d'événements</p>
           </div>
           <Link href="/admin/event-categories/create">
-            <Button className="bg-purple-600 hover:bg-purple-700">
+            <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90">
               <PlusCircle className="h-4 w-4 mr-2" />
               Créer une catégorie
             </Button>

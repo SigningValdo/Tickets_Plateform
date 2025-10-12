@@ -21,14 +21,14 @@ export default function NotFound() {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block mb-6">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets</span>
             </div>
           </Link>
           
-          <div className="text-8xl font-bold text-purple-600 mb-4">404</div>
+          <div className="text-8xl font-bold text-fanzone-orange mb-4">404</div>
           
           <CardTitle className="text-3xl font-bold text-gray-900 mb-2">
             Page introuvable
@@ -53,7 +53,7 @@ export default function NotFound() {
           <div className="grid grid-cols-2 gap-4">
             <Link href="/events" className="block">
               <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <Ticket className="h-8 w-8 text-purple-600 mb-2" />
+                <Ticket className="h-8 w-8 text-fanzone-orange mb-2" />
                 <h5 className="font-medium text-gray-900">Événements</h5>
                 <p className="text-sm text-gray-600">Découvrir tous les événements</p>
               </div>
@@ -61,7 +61,7 @@ export default function NotFound() {
             
             <Link href="/about" className="block">
               <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <Search className="h-8 w-8 text-purple-600 mb-2" />
+                <Search className="h-8 w-8 text-fanzone-orange mb-2" />
                 <h5 className="font-medium text-gray-900">À propos</h5>
                 <p className="text-sm text-gray-600">En savoir plus sur nous</p>
               </div>
@@ -71,7 +71,7 @@ export default function NotFound() {
 
         <CardFooter className="flex flex-col space-y-3">
           <Link href="/" className="w-full">
-            <Button className="w-full bg-purple-600 hover:bg-purple-700">
+            <Button className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90">
               <Home className="mr-2 h-4 w-4" />
               Retour à l'accueil
             </Button>
@@ -90,7 +90,7 @@ export default function NotFound() {
         <div className="text-center pb-6">
           <p className="text-sm text-gray-500">
             Besoin d'aide ?{" "}
-            <Link href="/contact" className="text-purple-600 hover:text-purple-500">
+            <Link href="/contact" className="text-fanzone-orange hover:text-purple-500">
               Contactez notre support
             </Link>
           </p>

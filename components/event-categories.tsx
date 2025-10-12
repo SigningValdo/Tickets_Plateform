@@ -85,7 +85,7 @@ export default function EventCategories() {
             href={`/events?category=${slug}`}
             className="flex flex-col items-center p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
           >
-            <div className="bg-purple-100 p-3 rounded-full mb-3 text-purple-600">
+            <div className="bg-purple-100 p-3 rounded-full mb-3 text-fanzone-orange">
               {icon}
             </div>
             <span className="text-sm font-medium text-gray-700">

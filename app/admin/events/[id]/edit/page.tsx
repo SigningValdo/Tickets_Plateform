@@ -641,7 +641,7 @@ export default function EditEventPage() {
             </Button>
             <Button
               type="submit"
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-fanzone-orange hover:bg-fanzone-orange/90"
               disabled={saving}
             >
               {saving ? (

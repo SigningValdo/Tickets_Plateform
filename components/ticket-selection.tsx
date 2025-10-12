@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Minus, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { TicketType } from "@/lib/generated/prisma";
+import { TicketType } from "@prisma/client";
 import { BuyTicketModal } from "./buy-ticket-modal";
 
 interface TicketSelectionProps {
@@ -75,7 +75,7 @@ export default function TicketSelection({
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-medium">{ticket.name}</h3>
-                <p className="text-purple-600 font-bold">
+                <p className="text-fanzone-orange font-bold">
                   {ticket.price.toLocaleString()} FCFA
                 </p>
                 <p className="text-sm text-gray-500">
@@ -132,7 +132,7 @@ export default function TicketSelection({
         }))}
       >
         <Button
-          className="w-full bg-purple-600 hover:bg-purple-700 mt-4"
+          className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90 mt-4"
           disabled={totalTickets === 0}
         >
           <ShoppingCart className="h-4 w-4 mr-2" />

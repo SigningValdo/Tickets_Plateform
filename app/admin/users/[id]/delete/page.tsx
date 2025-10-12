@@ -165,7 +165,7 @@ export default function DeleteUserPage() {
         <div className="mb-6">
           <Link href="/admin/dashboard" className="inline-block mb-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets Admin</span>
@@ -279,7 +279,7 @@ export default function DeleteUserPage() {
               </div>
               
               <div className="text-center p-3 bg-purple-50 rounded-lg">
-                <p className="text-xl font-bold text-purple-600">{formatCurrency(userData.totalSpent)}</p>
+                <p className="text-xl font-bold text-fanzone-orange">{formatCurrency(userData.totalSpent)}</p>
                 <p className="text-sm text-purple-800">Total dépensé</p>
               </div>
               
@@ -357,7 +357,7 @@ export default function DeleteUserPage() {
         {/* Liens utiles */}
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>
-            Besoin d'aide ? <Link href="/contact" className="text-purple-600 hover:underline">Contactez le support</Link>
+            Besoin d'aide ? <Link href="/contact" className="text-fanzone-orange hover:underline">Contactez le support</Link>
           </p>
         </div>
       </div>

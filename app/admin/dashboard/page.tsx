@@ -48,7 +48,7 @@ export default function AdminDashboardPage() {
                 </p>
               </div>
               <div className="bg-purple-100 p-3 rounded-full">
-                <DollarSign className="h-6 w-6 text-purple-600" />
+                <DollarSign className="h-6 w-6 text-fanzone-orange" />
               </div>
             </div>
           </CardContent>
@@ -132,7 +132,7 @@ export default function AdminDashboardPage() {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-purple-600 h-2 rounded-full"
+                    className="bg-fanzone-orange h-2 rounded-full"
                     style={{ width: "45%" }}
                   ></div>
                 </div>
@@ -193,7 +193,7 @@ export default function AdminDashboardPage() {
       {/* <div className="mb-6 flex justify-between items-center">
         <h2 className="text-xl font-bold">Événements récents</h2>
         <Link href="/admin/events/create">
-          <Button className="bg-purple-600 hover:bg-purple-700">
+          <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90">
             <PlusCircle className="h-4 w-4 mr-2" />
             Créer un événement
           </Button>

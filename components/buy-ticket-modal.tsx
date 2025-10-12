@@ -121,7 +121,7 @@ export const BuyTicketModal = ({
     if (mutation.isPending) {
       return (
         <div className="flex items-center justify-center p-6">
-          <Loader2 className="animate-spin text-purple-600 h-12 w-12" />
+          <Loader2 className="animate-spin text-fanzone-orange h-12 w-12" />
         </div>
       );
     }

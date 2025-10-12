@@ -63,7 +63,7 @@ export default function EventDetailPage({
         />
         <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
           <div className="container mx-auto px-4 py-6">
-            <Badge className="mb-2 bg-purple-600">
+            <Badge className="mb-2 bg-fanzone-orange">
               {event?.category?.name}
             </Badge>
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
@@ -218,7 +218,7 @@ export default function EventDetailPage({
                   <h2 className="text-xl font-bold mb-4">
                     Réserver vos billets
                   </h2>
-                  <p className="text-purple-600 font-bold text-lg mb-6">
+                  <p className="text-fanzone-orange font-bold text-lg mb-6">
                     {event?.status}
                   </p>
 

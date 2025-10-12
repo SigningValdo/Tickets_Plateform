@@ -70,7 +70,7 @@ export default function AdminLayout({
           }`}
         >
           <div className="flex items-center justify-between p-4 border-b">
-            <Link href="/" className="text-xl font-bold text-purple-600">
+            <Link href="/" className="text-xl font-bold text-fanzone-orange">
               E-Tickets Admin
             </Link>
             <button onClick={() => setSidebarOpen(false)}>
@@ -82,7 +82,7 @@ export default function AdminLayout({
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex items-center space-x-3 text-purple-600 bg-purple-50 px-3 py-2 rounded-md"
+                className="flex items-center space-x-3 text-fanzone-orange bg-purple-50 px-3 py-2 rounded-md"
               >
                 <link.icon className="h-5 w-5" />
                 <span>{link.label}</span>
@@ -105,7 +105,7 @@ export default function AdminLayout({
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r">
           <div className="flex items-center h-16 px-4 border-b">
-            <Link href="/" className="text-xl font-bold text-purple-600">
+            <Link href="/" className="text-xl font-bold text-fanzone-orange">
               E-Tickets Admin
             </Link>
           </div>
@@ -117,7 +117,7 @@ export default function AdminLayout({
                 className={cn(
                   "flex items-center space-x-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100",
                   {
-                    "text-purple-600 bg-purple-50": link.href === pathname,
+                    "text-fanzone-orange bg-purple-50": link.href === pathname,
                   }
                 )}
               >
@@ -157,7 +157,7 @@ export default function AdminLayout({
                 <Input placeholder="Rechercher..." className="pl-9 w-64 h-9" />
               </div>
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
+                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-fanzone-orange font-medium">
                   AD
                 </div>
                 <span className="text-sm font-medium">Admin</span>

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../../auth/[...nextauth]/route";
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/db";
-import { TicketStatus } from "@/lib/generated/prisma";
+import { TicketStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export const POST = async (req: NextRequest) => {

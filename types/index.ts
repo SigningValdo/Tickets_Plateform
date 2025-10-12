@@ -1,6 +1,6 @@
-import { Event, EventCategory, TicketType } from "@/lib/generated/prisma"
+import { Event, EventCategory, TicketType } from "@prisma/client";
 
 export type EventAndCategory = Event & {
-  category: EventCategory,
-  ticketTypes: TicketType[]
-}
+  category: EventCategory;
+  ticketTypes: TicketType[];
+};

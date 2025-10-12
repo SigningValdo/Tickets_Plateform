@@ -10,7 +10,7 @@ import { Toaster } from "sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "E-Tickets - Plateforme de Billetterie en Ligne",
+  title: "FANZONE TICKETS - Plateforme de Billetterie en Ligne",
   description: "Achetez des billets pour vos événements préférés",
   generator: "v0.dev",
 };

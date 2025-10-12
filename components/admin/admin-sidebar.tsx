@@ -56,7 +56,7 @@ export function AdminSidebar({ className = '', onNavigate }: AdminSidebarProps) 
     <div className={`flex flex-col h-full ${className}`}>
       <div className="flex-1 py-4">
         <div className="px-4 mb-6">
-          <h1 className="text-xl font-bold text-purple-600">E-Tickets Admin</h1>
+          <h1 className="text-xl font-bold text-fanzone-orange">E-Tickets Admin</h1>
         </div>
         
         <nav className="space-y-1 px-2">
@@ -69,7 +69,7 @@ export function AdminSidebar({ className = '', onNavigate }: AdminSidebarProps) 
                 onClick={handleClick}
                 className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isItemActive
-                    ? 'bg-purple-50 text-purple-600'
+                    ? 'bg-purple-50 text-fanzone-orange'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >

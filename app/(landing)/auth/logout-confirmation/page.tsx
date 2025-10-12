@@ -54,7 +54,7 @@ export default function LogoutConfirmationPage() {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block mb-4">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets</span>
@@ -118,7 +118,7 @@ export default function LogoutConfirmationPage() {
         <div className="text-center pb-6">
           <p className="text-sm text-gray-500">
             Besoin d'aide ?{" "}
-            <Link href="/contact" className="text-purple-600 hover:text-purple-500">
+            <Link href="/contact" className="text-fanzone-orange hover:text-purple-500">
               Contactez-nous
             </Link>
           </p>

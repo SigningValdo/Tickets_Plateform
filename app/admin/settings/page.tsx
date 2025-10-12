@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AdminSidebar } from "@/components/admin/admin-sidebar";
 import { SettingsGroup } from "@/components/admin/settings-group";
-import { Setting } from "@/lib/generated/prisma";
+import { Setting } from "@prisma/client";
 
 export default function AdminSettingsPage() {
   const { toast } = useToast();
@@ -86,6 +86,7 @@ export default function AdminSettingsPage() {
             ) : (
               <SettingsGroup
                 initialSettings={settings}
+                // @ts-ignore
                 onSettingUpdated={handleSettingUpdated}
                 onSettingDeleted={handleSettingDeleted}
                 onSettingCreated={handleSettingCreated}

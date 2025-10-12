@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { OrderStatus } from "@/lib/generated/prisma";
+import { OrderStatus } from "@prisma/client";
 
 export async function POST(req: Request) {
   const url = new URL(req.url);

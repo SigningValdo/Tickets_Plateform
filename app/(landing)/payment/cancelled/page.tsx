@@ -45,7 +45,7 @@ export default function PaymentCancelledPage() {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block mb-6">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets</span>
@@ -116,7 +116,7 @@ export default function PaymentCancelledPage() {
         <CardFooter className="flex flex-col space-y-3">
           <Button
             onClick={handleReturnToCheckout}
-            className="w-full bg-purple-600 hover:bg-purple-700"
+            className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
           >
             <ShoppingCart className="mr-2 h-4 w-4" />
             Reprendre l'achat
@@ -143,7 +143,7 @@ export default function PaymentCancelledPage() {
         <div className="text-center pb-6">
           <p className="text-sm text-gray-500">
             Questions sur le paiement ?{" "}
-            <Link href="/contact" className="text-purple-600 hover:text-purple-500">
+            <Link href="/contact" className="text-fanzone-orange hover:text-purple-500">
               Contactez notre support
             </Link>
           </p>

@@ -102,7 +102,7 @@ export default function ResetPasswordPage() {
           <CardHeader className="text-center">
             <Link href="/" className="inline-block">
               <div className="flex items-center justify-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">E</span>
                 </div>
                 <span className="text-xl font-bold text-gray-900">E-Tickets</span>
@@ -115,11 +115,11 @@ export default function ResetPasswordPage() {
           </CardHeader>
           <CardFooter className="flex flex-col space-y-4">
             <Link href="/auth/forgot-password" className="w-full">
-              <Button className="w-full bg-purple-600 hover:bg-purple-700">
+              <Button className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90">
                 Demander un nouveau lien
               </Button>
             </Link>
-            <Link href="/auth/login" className="text-purple-600 hover:text-purple-500">
+            <Link href="/auth/login" className="text-fanzone-orange hover:text-purple-500">
               Retour à la connexion
             </Link>
           </CardFooter>
@@ -135,7 +135,7 @@ export default function ResetPasswordPage() {
           <CardHeader className="text-center">
             <Link href="/" className="inline-block">
               <div className="flex items-center justify-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">E</span>
                 </div>
                 <span className="text-xl font-bold text-gray-900">E-Tickets</span>
@@ -160,7 +160,7 @@ export default function ResetPasswordPage() {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets</span>
@@ -228,7 +228,7 @@ export default function ResetPasswordPage() {
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
-              className="w-full bg-purple-600 hover:bg-purple-700"
+              className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -240,7 +240,7 @@ export default function ResetPasswordPage() {
                 "Réinitialiser le mot de passe"
               )}
             </Button>
-            <Link href="/auth/login" className="text-purple-600 hover:text-purple-500">
+            <Link href="/auth/login" className="text-fanzone-orange hover:text-purple-500">
               Retour à la connexion
             </Link>
           </CardFooter>

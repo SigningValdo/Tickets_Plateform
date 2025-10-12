@@ -89,22 +89,22 @@ export default function AccountTicketsPage() {
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-purple-600">E-Tickets</span>
+            <span className="text-2xl font-bold text-fanzone-orange">E-Tickets</span>
           </Link>
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/events" className="text-gray-600 hover:text-purple-600">
+            <Link href="/events" className="text-gray-600 hover:text-fanzone-orange">
               Événements
             </Link>
-            <Link href="/account/tickets" className="text-purple-600 font-medium">
+            <Link href="/account/tickets" className="text-fanzone-orange font-medium">
               Mes billets
             </Link>
-            <Link href="/account/profile" className="text-gray-600 hover:text-purple-600">
+            <Link href="/account/profile" className="text-gray-600 hover:text-fanzone-orange">
               Mon profil
             </Link>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
+              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-fanzone-orange font-medium">
                 JD
               </div>
               <span className="text-sm font-medium hidden sm:inline-block">Jean Dupont</span>
@@ -186,7 +186,7 @@ export default function AccountTicketsPage() {
                           fill
                           className="object-cover"
                         />
-                        <Badge className="absolute top-2 right-2 bg-purple-600">{ticket.ticketType}</Badge>
+                        <Badge className="absolute top-2 right-2 bg-fanzone-orange">{ticket.ticketType}</Badge>
                       </div>
                       <CardContent className="flex-1 p-6">
                         <div className="flex flex-col h-full justify-between">
@@ -215,7 +215,7 @@ export default function AccountTicketsPage() {
                           </div>
 
                           <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
-                            <span className="font-bold text-purple-600 text-lg">{ticket.price}</span>
+                            <span className="font-bold text-fanzone-orange text-lg">{ticket.price}</span>
                             <div className="flex flex-wrap gap-2">
                               <Button variant="outline" size="sm" className="flex items-center">
                                 <Download className="h-4 w-4 mr-2" />
@@ -226,7 +226,7 @@ export default function AccountTicketsPage() {
                                 Partager
                               </Button>
                               <Button
-                                className="bg-purple-600 hover:bg-purple-700"
+                                className="bg-fanzone-orange hover:bg-fanzone-orange/90"
                                 onClick={() => handleViewTicket(ticket.id)}
                               >
                                 Voir le billet
@@ -258,7 +258,7 @@ export default function AccountTicketsPage() {
                           fill
                           className="object-cover filter grayscale"
                         />
-                        <Badge className="absolute top-2 right-2 bg-purple-600">{ticket.ticketType}</Badge>
+                        <Badge className="absolute top-2 right-2 bg-fanzone-orange">{ticket.ticketType}</Badge>
                       </div>
                       <CardContent className="flex-1 p-6">
                         <div className="flex flex-col h-full justify-between">

@@ -161,7 +161,7 @@ export default function AdminTicketsPage() {
               Consultez et gérez tous les billets vendus
             </p>
           </div>
-          <Button className="bg-purple-600 hover:bg-purple-700">
+          <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90">
             <Download className="h-4 w-4 mr-2" />
             Exporter les données
           </Button>
@@ -446,7 +446,7 @@ export default function AdminTicketsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-purple-600"
+                              className="text-fanzone-orange"
                             >
                               Détails
                             </Button>
@@ -526,7 +526,7 @@ export default function AdminTicketsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-purple-600"
+                              className="text-fanzone-orange"
                             >
                               Détails
                             </Button>
@@ -606,7 +606,7 @@ export default function AdminTicketsPage() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="text-purple-600"
+                              className="text-fanzone-orange"
                             >
                               Détails
                             </Button>

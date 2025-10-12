@@ -212,7 +212,7 @@ export default function AdminUsersPage() {
               Exporter
             </Button>
             <Button
-              className="bg-purple-600 hover:bg-purple-700"
+              className="bg-fanzone-orange hover:bg-fanzone-orange/90"
               onClick={() => {
                 router.push("/admin/users/create");
               }}
@@ -317,7 +317,7 @@ export default function AdminUsersPage() {
                               />
                             ) : (
                               <div className="h-10 w-10 flex-shrink-0 mr-3 bg-purple-100 rounded-full flex items-center justify-center">
-                                <span className="font-medium text-purple-600">
+                                <span className="font-medium text-fanzone-orange">
                                   {user.name
                                     .split(" ")
                                     .map((n: string) => n[0])

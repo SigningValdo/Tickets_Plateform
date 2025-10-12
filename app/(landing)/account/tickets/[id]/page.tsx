@@ -48,7 +48,7 @@ export default function TicketDetailPage({
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-fanzone-orange" />
       </div>
     )
   }
@@ -75,22 +75,22 @@ export default function TicketDetailPage({
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-purple-600">E-Tickets</span>
+            <span className="text-2xl font-bold text-fanzone-orange">E-Tickets</span>
           </Link>
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/events" className="text-gray-600 hover:text-purple-600">
+            <Link href="/events" className="text-gray-600 hover:text-fanzone-orange">
               Événements
             </Link>
-            <Link href="/account/tickets" className="text-purple-600 font-medium">
+            <Link href="/account/tickets" className="text-fanzone-orange font-medium">
               Mes billets
             </Link>
-            <Link href="/account/profile" className="text-gray-600 hover:text-purple-600">
+            <Link href="/account/profile" className="text-gray-600 hover:text-fanzone-orange">
               Mon profil
             </Link>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
+              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-fanzone-orange font-medium">
                 JD
               </div>
               <span className="text-sm font-medium hidden sm:inline-block">Jean Dupont</span>
@@ -104,7 +104,7 @@ export default function TicketDetailPage({
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href="/account/tickets" className="flex items-center text-purple-600 hover:text-purple-700">
+          <Link href="/account/tickets" className="flex items-center text-fanzone-orange hover:text-purple-700">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à mes billets
           </Link>
@@ -117,13 +117,13 @@ export default function TicketDetailPage({
           </div>
 
           <Card className="overflow-hidden mb-6 border-2 border-purple-200">
-            <div className="bg-purple-600 text-white p-4">
+            <div className="bg-fanzone-orange text-white p-4">
               <div className="flex justify-between items-center">
                 <div>
                   <h2 className="font-bold text-lg">Billet électronique</h2>
                   <p className="text-sm text-purple-200">Référence: {ticket.qrCode}</p>
                 </div>
-                <Badge className="bg-white text-purple-600">{ticket.status === "upcoming" ? "Valide" : "Expiré"}</Badge>
+                <Badge className="bg-white text-fanzone-orange">{ticket.status === "upcoming" ? "Valide" : "Expiré"}</Badge>
               </div>
             </div>
 
@@ -202,7 +202,7 @@ export default function TicketDetailPage({
           </Card>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <Button onClick={handleDownloadTicket} className="flex-1 bg-purple-600 hover:bg-purple-700">
+            <Button onClick={handleDownloadTicket} className="flex-1 bg-fanzone-orange hover:bg-fanzone-orange/90">
               <Download className="h-4 w-4 mr-2" />
               Télécharger le billet
             </Button>

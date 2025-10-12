@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Event, TicketType, EventStatus } from "@/lib/generated/prisma";
+import { Event, TicketType, EventStatus } from "@prisma/client";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";

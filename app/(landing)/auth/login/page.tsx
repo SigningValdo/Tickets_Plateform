@@ -57,7 +57,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-purple-600">E-Tickets</h1>
+            <h1 className="text-3xl font-bold text-fanzone-orange">E-Tickets</h1>
           </Link>
           <h2 className="mt-6 text-2xl font-bold text-gray-900">
             Connectez-vous à votre compte
@@ -66,7 +66,7 @@ export default function LoginPage() {
             Ou{" "}
             <Link
               href="/auth/register"
-              className="text-purple-600 hover:text-purple-500"
+              className="text-fanzone-orange hover:text-purple-500"
             >
               créez un nouveau compte
             </Link>
@@ -98,7 +98,7 @@ export default function LoginPage() {
                   <Label htmlFor="password">Mot de passe</Label>
                   <Link
                     href="/auth/forgot-password"
-                    className="text-sm text-purple-600 hover:text-purple-500"
+                    className="text-sm text-fanzone-orange hover:text-purple-500"
                   >
                     Mot de passe oublié?
                   </Link>
@@ -129,7 +129,7 @@ export default function LoginPage() {
             <CardFooter>
               <Button
                 type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
                 disabled={isLoading}
               >
                 {isLoading ? (

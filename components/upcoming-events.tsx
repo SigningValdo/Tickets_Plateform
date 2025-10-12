@@ -70,7 +70,7 @@ export default function UpcomingEvents() {
             <Card className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="relative h-40">
                 <Image src={event.imageUrl || "/placeholder.svg"} alt={event.title} fill className="object-cover" />
-                <Badge className="absolute top-2 right-2 bg-purple-600">{event.category?.name ?? "À venir"}</Badge>
+                <Badge className="absolute top-2 right-2 bg-fanzone-orange">{event.category?.name ?? "À venir"}</Badge>
               </div>
               <CardContent className="p-3">
                 <h3 className="font-bold text-base mb-2 line-clamp-1">{event.title}</h3>
@@ -82,7 +82,7 @@ export default function UpcomingEvents() {
                   <MapPin className="h-3 w-3 mr-1" />
                   <span className="text-xs line-clamp-1">{event.location}</span>
                 </div>
-                <div className="font-bold text-purple-600 text-sm">
+                <div className="font-bold text-fanzone-orange text-sm">
                   {minPrice !== undefined ? `${minPrice.toLocaleString("fr-FR")} FCFA` : ""}
                 </div>
               </CardContent>

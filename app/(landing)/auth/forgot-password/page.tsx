@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-purple-600">E-Tickets</h1>
+            <h1 className="text-3xl font-bold text-fanzone-orange">E-Tickets</h1>
           </Link>
           <h2 className="mt-6 text-2xl font-bold text-gray-900">Mot de passe oublié</h2>
           <p className="mt-2 text-gray-600">Entrez votre adresse email pour recevoir un lien de réinitialisation</p>
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isSubmitting}>
+                  <Button type="submit" className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -122,7 +122,7 @@ export default function ForgotPasswordPage() {
                   Essayer avec une autre adresse
                 </Button>
                 <Link href="/auth/login" className="w-full">
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700">Retour à la connexion</Button>
+                  <Button className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90">Retour à la connexion</Button>
                 </Link>
               </CardFooter>
             </>
@@ -132,7 +132,7 @@ export default function ForgotPasswordPage() {
         <div className="text-center">
           <p className="text-sm text-gray-600">
             Vous vous souvenez de votre mot de passe ?{" "}
-            <Link href="/auth/login" className="text-purple-600 hover:text-purple-500">
+            <Link href="/auth/login" className="text-fanzone-orange hover:text-purple-500">
               Connectez-vous
             </Link>
           </p>

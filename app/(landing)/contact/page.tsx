@@ -64,7 +64,7 @@ export default function ContactPage() {
             <Card>
               <CardContent className="p-6 flex flex-col items-center text-center">
                 <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <Mail className="h-6 w-6 text-purple-600" />
+                  <Mail className="h-6 w-6 text-fanzone-orange" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">Email</h3>
                 <p className="text-gray-600 mb-4">
@@ -72,7 +72,7 @@ export default function ContactPage() {
                 </p>
                 <a
                   href="mailto:contact@e-tickets.com"
-                  className="text-purple-600 font-medium"
+                  className="text-fanzone-orange font-medium"
                 >
                   contact@e-tickets.com
                 </a>
@@ -82,7 +82,7 @@ export default function ContactPage() {
             <Card>
               <CardContent className="p-6 flex flex-col items-center text-center">
                 <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <Phone className="h-6 w-6 text-purple-600" />
+                  <Phone className="h-6 w-6 text-fanzone-orange" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">Téléphone</h3>
                 <p className="text-gray-600 mb-4">
@@ -90,7 +90,7 @@ export default function ContactPage() {
                 </p>
                 <a
                   href="tel:+123456789"
-                  className="text-purple-600 font-medium"
+                  className="text-fanzone-orange font-medium"
                 >
                   +123 456 789
                 </a>
@@ -100,11 +100,11 @@ export default function ContactPage() {
             <Card>
               <CardContent className="p-6 flex flex-col items-center text-center">
                 <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <MapPin className="h-6 w-6 text-purple-600" />
+                  <MapPin className="h-6 w-6 text-fanzone-orange" />
                 </div>
                 <h3 className="text-lg font-bold mb-2">Adresse</h3>
                 <p className="text-gray-600 mb-4">Venez nous rencontrer</p>
-                <address className="text-purple-600 font-medium not-italic">
+                <address className="text-fanzone-orange font-medium not-italic">
                   123 Avenue Principale
                   <br />
                   Abidjan, Côte d'Ivoire
@@ -183,7 +183,7 @@ export default function ContactPage() {
                 </div>
                 <Button
                   type="submit"
-                  className="bg-purple-600 hover:bg-purple-700 w-full"
+                  className="bg-fanzone-orange hover:bg-fanzone-orange/90 w-full"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

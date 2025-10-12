@@ -30,7 +30,7 @@ export default function Error({ error, reset }: ErrorProps) {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block mb-6">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets</span>
@@ -120,7 +120,7 @@ export default function Error({ error, reset }: ErrorProps) {
         <div className="text-center pb-6">
           <p className="text-sm text-gray-500">
             Problème persistant ?{" "}
-            <Link href="/contact" className="text-purple-600 hover:text-purple-500">
+            <Link href="/contact" className="text-fanzone-orange hover:text-purple-500">
               Contactez notre support technique
             </Link>
           </p>

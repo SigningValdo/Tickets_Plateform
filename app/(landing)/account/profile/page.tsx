@@ -89,22 +89,22 @@ export default function ProfilePage() {
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-purple-600">E-Tickets</span>
+            <span className="text-2xl font-bold text-fanzone-orange">E-Tickets</span>
           </Link>
           <div className="hidden md:flex items-center space-x-6">
-            <Link href="/events" className="text-gray-600 hover:text-purple-600">
+            <Link href="/events" className="text-gray-600 hover:text-fanzone-orange">
               Événements
             </Link>
-            <Link href="/account/tickets" className="text-gray-600 hover:text-purple-600">
+            <Link href="/account/tickets" className="text-gray-600 hover:text-fanzone-orange">
               Mes billets
             </Link>
-            <Link href="/account/profile" className="text-purple-600 font-medium">
+            <Link href="/account/profile" className="text-fanzone-orange font-medium">
               Mon profil
             </Link>
           </div>
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-medium">
+              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-fanzone-orange font-medium">
                 JD
               </div>
               <span className="text-sm font-medium hidden sm:inline-block">
@@ -129,7 +129,7 @@ export default function ProfilePage() {
             <Card>
               <CardContent className="p-6">
                 <div className="flex flex-col items-center text-center mb-6">
-                  <div className="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 text-2xl font-bold mb-4">
+                  <div className="w-24 h-24 rounded-full bg-purple-100 flex items-center justify-center text-fanzone-orange text-2xl font-bold mb-4">
                     {userData.firstName.charAt(0)}
                     {userData.lastName.charAt(0)}
                   </div>
@@ -230,7 +230,7 @@ export default function ProfilePage() {
                         <Textarea id="bio" name="bio" value={userData.bio} onChange={handleInputChange} rows={4} />
                       </div>
 
-                      <Button type="submit" className="bg-purple-600 hover:bg-purple-700" disabled={isSubmitting}>
+                      <Button type="submit" className="bg-fanzone-orange hover:bg-fanzone-orange/90" disabled={isSubmitting}>
                         {isSubmitting ? (
                           <>
                             <svg
@@ -283,7 +283,7 @@ export default function ProfilePage() {
                         <Label htmlFor="confirmPassword">Confirmer le nouveau mot de passe</Label>
                         <Input id="confirmPassword" type="password" required />
                       </div>
-                      <Button type="submit" className="bg-purple-600 hover:bg-purple-700" disabled={isSubmitting}>
+                      <Button type="submit" className="bg-fanzone-orange hover:bg-fanzone-orange/90" disabled={isSubmitting}>
                         {isSubmitting ? (
                           <>
                             <svg

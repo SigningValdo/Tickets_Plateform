@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Plus, Settings as SettingsIcon } from 'lucide-react';
-import { SettingItem } from './setting-item';
-import { Setting } from '@/lib/generated/prisma';
-import { CreateSettingDialog } from './create-setting-dialog';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Plus, Settings as SettingsIcon } from "lucide-react";
+import { SettingItem } from "./setting-item";
+import { Setting } from "@prisma/client";
+import { CreateSettingDialog } from "./create-setting-dialog";
 
 const groupLabels = {
-  general: 'Général',
-  notifications: 'Notifications',
-  payments: 'Paiements',
-  security: 'Sécurité',
+  general: "Général",
+  notifications: "Notifications",
+  payments: "Paiements",
+  security: "Sécurité",
 } as const;
 
 type GroupKey = keyof typeof groupLabels;
@@ -25,7 +25,7 @@ interface SettingsGroupProps {
 export function SettingsGroup({ initialSettings }: SettingsGroupProps) {
   const [settings, setSettings] = useState<Setting[]>(initialSettings);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [activeGroup, setActiveGroup] = useState<GroupKey>('general');
+  const [activeGroup, setActiveGroup] = useState<GroupKey>("general");
 
   const groupedSettings = settings.reduce<Record<GroupKey, Setting[]>>(
     (acc, setting) => {

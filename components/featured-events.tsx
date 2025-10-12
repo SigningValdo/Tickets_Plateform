@@ -65,7 +65,7 @@ export default function FeaturedEvents() {
           <Card className="overflow-hidden hover:shadow-lg transition-shadow">
             <div className="relative h-48">
               <Image src={event.imageUrl || "/placeholder.svg"} alt={event.title} fill className="object-cover" />
-              <Badge className="absolute top-2 right-2 bg-purple-600">{event.category?.name ?? "En vedette"}</Badge>
+              <Badge className="absolute top-2 right-2 bg-fanzone-orange">{event.category?.name ?? "En vedette"}</Badge>
             </div>
             <CardContent className="p-4">
               <h3 className="font-bold text-lg mb-2 line-clamp-1">{event.title}</h3>
@@ -78,8 +78,8 @@ export default function FeaturedEvents() {
                 <span className="text-sm line-clamp-1">{event.location}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="font-bold text-purple-600">&nbsp;</span>
-                <Badge variant="outline" className="border-purple-200 text-purple-600">
+                <span className="font-bold text-fanzone-orange">&nbsp;</span>
+                <Badge variant="outline" className="border-purple-200 text-fanzone-orange">
                   En vedette
                 </Badge>
               </div>

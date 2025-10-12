@@ -148,7 +148,7 @@ export default function CheckoutPage() {
   if (!event) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-fanzone-orange" />
       </div>
     )
   }
@@ -158,14 +158,14 @@ export default function CheckoutPage() {
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-purple-600">E-Tickets</span>
+            <span className="text-2xl font-bold text-fanzone-orange">E-Tickets</span>
           </Link>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/events/${event.id}`} className="flex items-center text-purple-600 hover:text-purple-700">
+          <Link href={`/events/${event.id}`} className="flex items-center text-fanzone-orange hover:text-purple-700">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à l'événement
           </Link>
@@ -245,7 +245,7 @@ export default function CheckoutPage() {
                           )}
                         />
 
-                        <Button type="submit" className="w-full bg-purple-600 hover:bg-purple-700" disabled={isLoading}>
+                        <Button type="submit" className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90" disabled={isLoading}>
                           {isLoading ? (
                             <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

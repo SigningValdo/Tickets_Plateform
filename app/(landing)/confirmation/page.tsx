@@ -91,7 +91,7 @@ export default function ConfirmationPage() {
   if (isLoading || !event) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-purple-600 mb-4" />
+        <Loader2 className="h-12 w-12 animate-spin text-fanzone-orange mb-4" />
         <p className="text-gray-600">Génération de votre billet...</p>
       </div>
     )
@@ -102,7 +102,7 @@ export default function ConfirmationPage() {
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-2xl font-bold text-purple-600">E-Tickets</span>
+            <span className="text-2xl font-bold text-fanzone-orange">E-Tickets</span>
           </Link>
         </div>
       </header>
@@ -120,7 +120,7 @@ export default function ConfirmationPage() {
           </div>
 
           <Card className="overflow-hidden mb-6 border-2 border-purple-200">
-            <div className="bg-purple-600 text-white p-4">
+            <div className="bg-fanzone-orange text-white p-4">
               <h2 className="font-bold text-lg">Billet électronique</h2>
               <p className="text-sm text-purple-200">Référence: {reference}</p>
             </div>
@@ -167,7 +167,7 @@ export default function ConfirmationPage() {
           </Card>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
-            <Button onClick={handleDownloadTicket} className="flex-1 bg-purple-600 hover:bg-purple-700">
+            <Button onClick={handleDownloadTicket} className="flex-1 bg-fanzone-orange hover:bg-fanzone-orange/90">
               <Download className="h-4 w-4 mr-2" />
               Télécharger le billet
             </Button>
@@ -179,7 +179,7 @@ export default function ConfirmationPage() {
 
           <div className="text-center">
             <Link href="/account/tickets">
-              <Button variant="link" className="text-purple-600">
+              <Button variant="link" className="text-fanzone-orange">
                 Voir tous mes billets
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>

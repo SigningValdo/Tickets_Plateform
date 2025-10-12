@@ -64,7 +64,7 @@ export default function AdminEventsPage() {
             </p>
           </div>
           <Link href="/admin/events/create">
-            <Button className="bg-purple-600 hover:bg-purple-700">
+            <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90">
               <PlusCircle className="h-4 w-4 mr-2" />
               Créer un événement
             </Button>

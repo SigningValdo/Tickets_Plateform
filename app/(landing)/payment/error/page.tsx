@@ -103,7 +103,7 @@ export default function PaymentErrorPage() {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block mb-6">
             <div className="flex items-center justify-center space-x-2">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets</span>
@@ -187,7 +187,7 @@ export default function PaymentErrorPage() {
           {errorInfo.canRetry && (
             <Button
               onClick={handleRetryPayment}
-              className="w-full bg-purple-600 hover:bg-purple-700"
+              className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
             >
               <RefreshCw className="mr-2 h-4 w-4" />
               Réessayer le paiement
@@ -215,7 +215,7 @@ export default function PaymentErrorPage() {
         <div className="text-center pb-6">
           <p className="text-sm text-gray-500">
             Besoin d'aide ?{" "}
-            <Link href="/contact" className="text-purple-600 hover:text-purple-500">
+            <Link href="/contact" className="text-fanzone-orange hover:text-purple-500">
               Contactez notre support
             </Link>
           </p>

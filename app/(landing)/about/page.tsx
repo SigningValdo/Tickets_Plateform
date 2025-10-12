@@ -102,7 +102,7 @@ export default function AboutPage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-purple-600"
+                    className="text-fanzone-orange"
                   >
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
                   </svg>
@@ -129,7 +129,7 @@ export default function AboutPage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-purple-600"
+                    className="text-fanzone-orange"
                   >
                     <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
                   </svg>
@@ -156,7 +156,7 @@ export default function AboutPage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-purple-600"
+                    className="text-fanzone-orange"
                   >
                     <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.25" />
                     <path d="M21 3v9h-9" />
@@ -197,7 +197,7 @@ export default function AboutPage() {
             Rejoignez les milliers d'organisateurs qui font confiance à
             E-Tickets pour la gestion de leur billetterie.
           </p>
-          <Button className="bg-purple-600 hover:bg-purple-700 text-lg px-8 py-6 h-auto">
+          <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90 text-lg px-8 py-6 h-auto">
             Devenir organisateur
           </Button>
         </section>

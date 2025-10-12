@@ -102,7 +102,7 @@ export default function EmailVerificationPage() {
           <>
             <CardHeader className="text-center">
               <div className="flex justify-center mb-4">
-                <Loader2 className="h-16 w-16 text-purple-600 animate-spin" />
+                <Loader2 className="h-16 w-16 text-fanzone-orange animate-spin" />
               </div>
               <CardTitle className="text-2xl font-bold text-gray-900">Vérification en cours</CardTitle>
               <CardDescription className="text-gray-600">
@@ -126,7 +126,7 @@ export default function EmailVerificationPage() {
             </CardHeader>
             <CardFooter className="flex justify-center">
               <Link href="/auth/login">
-                <Button className="bg-purple-600 hover:bg-purple-700">
+                <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90">
                   Se connecter maintenant
                 </Button>
               </Link>
@@ -149,7 +149,7 @@ export default function EmailVerificationPage() {
             <CardFooter className="flex flex-col space-y-4">
               <Button
                 onClick={resendVerificationEmail}
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
                 disabled={isResending}
               >
                 {isResending ? (
@@ -164,7 +164,7 @@ export default function EmailVerificationPage() {
                   </>
                 )}
               </Button>
-              <Link href="/auth/login" className="text-purple-600 hover:text-purple-500">
+              <Link href="/auth/login" className="text-fanzone-orange hover:text-purple-500">
                 Retour à la connexion
               </Link>
             </CardFooter>
@@ -188,7 +188,7 @@ export default function EmailVerificationPage() {
               {email && (
                 <Button
                   onClick={resendVerificationEmail}
-                  className="w-full bg-purple-600 hover:bg-purple-700"
+                  className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
                   disabled={isResending}
                 >
                   {isResending ? (
@@ -209,7 +209,7 @@ export default function EmailVerificationPage() {
                   Créer un nouveau compte
                 </Button>
               </Link>
-              <Link href="/auth/login" className="text-purple-600 hover:text-purple-500">
+              <Link href="/auth/login" className="text-fanzone-orange hover:text-purple-500">
                 Retour à la connexion
               </Link>
             </CardFooter>
@@ -224,7 +224,7 @@ export default function EmailVerificationPage() {
         <div className="text-center pt-6">
           <Link href="/" className="inline-block">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">E</span>
               </div>
               <span className="text-xl font-bold text-gray-900">E-Tickets</span>
