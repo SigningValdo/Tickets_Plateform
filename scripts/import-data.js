@@ -44,15 +44,53 @@ async function importData() {
     // Import des événements
     console.log("🎫 Import des événements...");
     for (const event of data.events) {
+      const {
+        id,
+        title,
+        description,
+        date,
+        location,
+        address,
+        city,
+        country,
+        organizer,
+        imageUrl,
+        status,
+        createdAt,
+        updatedAt,
+      } = event;
       await prisma.event.upsert({
-        where: { id: event.id },
+        where: { id },
         update: {
-          ...event,
+          title,
+          description,
+          date,
+          location,
+          address,
+          city,
+          country,
+          organizer,
+          imageUrl,
+          status,
+          createdAt,
+          updatedAt,
           category: { connect: { id: event.category.id } },
           author: { connect: { id: event.author.id } },
         },
         create: {
-          ...event,
+          id,
+          title,
+          description,
+          date,
+          location,
+          address,
+          city,
+          country,
+          organizer,
+          imageUrl,
+          status,
+          createdAt,
+          updatedAt,
           category: { connect: { id: event.category.id } },
           author: { connect: { id: event.author.id } },
         },
@@ -63,14 +101,24 @@ async function importData() {
     // Import des types de tickets
     console.log("🎟️ Import des types de tickets...");
     for (const ticketType of data.ticketTypes) {
+      const { id, name, price, quantity, createdAt, updatedAt } = ticketType;
       await prisma.ticketType.upsert({
-        where: { id: ticketType.id },
+        where: { id },
         update: {
-          ...ticketType,
+          name,
+          price,
+          quantity,
+          createdAt,
+          updatedAt,
           event: { connect: { id: ticketType.event.id } },
         },
         create: {
-          ...ticketType,
+          id,
+          name,
+          price,
+          quantity,
+          createdAt,
+          updatedAt,
           event: { connect: { id: ticketType.event.id } },
         },
       });
@@ -91,16 +139,42 @@ async function importData() {
     // Import des tickets
     console.log("🎫 Import des tickets...");
     for (const ticket of data.tickets) {
+      const {
+        id,
+        qrCode,
+        status,
+        createdAt,
+        updatedAt,
+        name,
+        email,
+        phone,
+        address,
+      } = ticket;
       await prisma.ticket.upsert({
-        where: { id: ticket.id },
+        where: { id },
         update: {
-          ...ticket,
+          qrCode,
+          status,
+          createdAt,
+          updatedAt,
+          name,
+          email,
+          phone,
+          address,
           event: { connect: { id: ticket.event.id } },
           ticketType: { connect: { id: ticket.ticketType.id } },
           order: { connect: { id: ticket.order.id } },
         },
         create: {
-          ...ticket,
+          id,
+          qrCode,
+          status,
+          createdAt,
+          updatedAt,
+          name,
+          email,
+          phone,
+          address,
           event: { connect: { id: ticket.event.id } },
           ticketType: { connect: { id: ticket.ticketType.id } },
           order: { connect: { id: ticket.order.id } },

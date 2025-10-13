@@ -2,11 +2,17 @@ const { PrismaClient } = require("@prisma/client");
 const fs = require("fs");
 const path = require("path");
 
-const prisma = new PrismaClient();
+// Allow exporting from a specific source DB independent of the app datasource
+// Defaults to the local SQLite file used previously
+const SOURCE_DATABASE_URL =
+  process.env.SOURCE_DATABASE_URL || "file:./prisma/dev.db";
+
+const prisma = new PrismaClient({ datasourceUrl: SOURCE_DATABASE_URL });
 
 async function exportData() {
   try {
-    console.log("🔄 Export des données de la base locale...");
+    console.log("🔄 Export des données de la base source...");
+    console.log(`🔗 SOURCE_DATABASE_URL=${SOURCE_DATABASE_URL}`);
 
     // Export des catégories
     const categories = await prisma.eventCategory.findMany();
