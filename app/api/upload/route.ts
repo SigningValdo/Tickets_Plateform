@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import fs from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: Request) {
   // Optionnel: restreindre aux admins connectés
@@ -21,26 +26,35 @@ export async function POST(req: Request) {
     const file = form.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: "Aucun fichier reçu" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Aucun fichier reçu" },
+        { status: 400 }
+      );
     }
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = path.join(process.cwd(), "public", "uploads");
-    await fs.mkdir(uploadsDir, { recursive: true });
+    // Upload direct vers Cloudinary
+    const uploadResult = await new Promise<{ secure_url: string }>(
+      (resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { folder: process.env.CLOUDINARY_FOLDER || "tickets-platform" },
+          (error, result) => {
+            if (error || !result) return reject(error);
+            resolve({ secure_url: result.secure_url });
+          }
+        );
+        uploadStream.end(buffer);
+      }
+    );
 
-    const safeName = file.name.replace(/[^a-zA-Z0-9_.-]/g, "_");
-    const fileName = `${Date.now()}-${safeName}`;
-    const filePath = path.join(uploadsDir, fileName);
-
-    await fs.writeFile(filePath, buffer);
-
-    // URL publique servie par Next depuis /public
-    const url = `/uploads/${fileName}`;
-    return NextResponse.json({ url });
+    return NextResponse.json({ url: uploadResult.secure_url });
   } catch (e) {
     console.error("Upload error:", e);
-    return NextResponse.json({ error: "Erreur lors de l'upload" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur lors de l'upload" },
+      { status: 500 }
+    );
   }
 }
