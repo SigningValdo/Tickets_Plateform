@@ -13,6 +13,7 @@
     "import-data": "node scripts/import-data.js",
     "migrate:deploy": "prisma migrate deploy",
     "db:push": "prisma db push",
+    "migrate:images": "node scripts/migrate-images.js",
     "vercel-build": "prisma generate && prisma db push && next build"
   },
   "dependencies": {
