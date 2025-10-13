@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { OrderStatus } from "@prisma/client";
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   const url = new URL(req.url);
   const queryOrderId = url.searchParams.get("orderId");

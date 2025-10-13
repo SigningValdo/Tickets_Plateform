@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
+export const runtime = "nodejs";
+
 // GET /api/admin/users/[id] : détail user (admin only)
 export async function GET(
   _req: Request,
@@ -109,7 +111,7 @@ export async function GET(
       );
     }
 
-    // Formatage de la réponse en fonction des données disponibles
+    // Formatage de la réponse avec les champs existants
     const response = {
       id: user.id,
       name: user.name,
@@ -120,14 +122,6 @@ export async function GET(
       emailVerified: user.emailVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      stats: {
-        totalTickets: user._count?.tickets || 0,
-        totalOrders: user._count?.orders || 0,
-        recentTickets: user.tickets?.length || 0,
-        recentOrders: user.orders?.length || 0,
-      },
-      recentTickets: user.tickets || [],
-      recentOrders: user.orders || [],
     };
 
     return new NextResponse(JSON.stringify(response), {
@@ -400,29 +394,10 @@ export async function DELETE(
       );
     }
 
-    // Vérifier si l'utilisateur a des tickets associés
-    const ticketsCount = await prisma.ticket.count({
-      where: { userId: params.id },
-    });
-
-    if (ticketsCount > 0) {
-      return new NextResponse(
-        JSON.stringify({
-          error: "Action non autorisée",
-          details: `Impossible de supprimer cet utilisateur car il a ${ticketsCount} billet(s) associé(s).`,
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-    }
-
     // Suppression de l'utilisateur
     await prisma.user.delete({
       where: { id: params.id },
     });
-
     return new NextResponse(
       JSON.stringify({
         success: true,

@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
+export const runtime = "nodejs";
+
 // GET /api/admin/users : liste tous les users (admin only)
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);

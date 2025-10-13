@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
+
+export const runtime = "nodejs";
+
 // import moment from "moment"
 
 export async function GET(req: Request) {

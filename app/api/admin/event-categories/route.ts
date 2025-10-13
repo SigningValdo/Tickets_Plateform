@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
+export const runtime = "nodejs";
+
 // GET: Liste toutes les catégories
 export async function GET() {
   const categories = await prisma.eventCategory.findMany({

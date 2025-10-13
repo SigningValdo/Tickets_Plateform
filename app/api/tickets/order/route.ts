@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { initOrangeWebPayment } from "@/lib/orange-money";
 
+export const runtime = "nodejs";
+
 export const POST = async (req: Request) => {
   const body = (await req.json()) as {
     name: string;

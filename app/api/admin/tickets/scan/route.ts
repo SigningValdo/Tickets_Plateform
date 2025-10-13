@@ -5,6 +5,8 @@ import prisma from "@/lib/db";
 import { TicketStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
+export const runtime = "nodejs";
+
 export const POST = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
 

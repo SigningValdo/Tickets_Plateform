@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
+export const runtime = "nodejs";
+
 // GET /api/admin/tickets/[id] : détail ticket (admin only)
 export async function GET(
   _req: Request,

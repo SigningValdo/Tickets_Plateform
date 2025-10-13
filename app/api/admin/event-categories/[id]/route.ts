@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
 
+export const runtime = "nodejs";
+
 // PUT: Modifier une catégorie (admin seulement)
 export async function PUT(
   req: Request,
