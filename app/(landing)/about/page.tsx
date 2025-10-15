@@ -37,9 +37,9 @@ export default function AboutPage() {
               </div>
               <div className="max-w-[600px] text-lg">
                 <p className="mb-6">
-                  Chez FanZone Tickets, notre mission est de transformer
-                  l'expérience événementielle au Cameroun. Nous nous engageons à
-                  :
+                  Chez <strong>FanZone Tickets</strong>, notre mission est de
+                  transformer l'expérience événementielle au Cameroun. Nous nous
+                  engageons à :
                 </p>
                 <ul className="space-y-2 mb-6 max-w-[450px]">
                   <li>
@@ -114,16 +114,16 @@ export default function AboutPage() {
             <div className="prose grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="max-w-[600px]">
                 <p>
-                  FanZone Tickets est née en 2025 d'une vision audacieuse :
-                  transformer l'expérience événementielle au Cameroun. Face aux
-                  défis rencontrés par les organisateurs et les participants
-                  dans le processus d'achat de billets, nous avons compris qu'il
-                  était essentiel de créer une plateforme adaptée aux besoins
-                  spécifiques du marché local.
+                  <strong>FanZone Tickets</strong> est née en 2025 d'une vision
+                  audacieuse : transformer l'expérience événementielle au
+                  Cameroun. Face aux défis rencontrés par les organisateurs et
+                  les participants dans le processus d'achat de billets, nous
+                  avons compris qu'il était essentiel de créer une plateforme
+                  adaptée aux besoins spécifiques du marché local.
                 </p>
                 <p className="mb-6">
-                  L'idée de FanZone Tickets a émergé en réponse aux
-                  préoccupations exprimées par de nombreux organisateurs
+                  L'idée de <strong>FanZone Tickets</strong> a émergé en réponse
+                  aux préoccupations exprimées par de nombreux organisateurs
                   d'événements concernant la fraude, la complexité de gestion
                   des ventes et l'accès limité à des solutions de billetterie
                   modernes.
@@ -164,8 +164,8 @@ export default function AboutPage() {
               </div>
               <div className="max-w-[600px]">
                 <p className="mb-4">
-                  <strong>FanZone Tickets</strong> a été officiellement lancée
-                  en 2025 et a rapidement attiré l'attention des organisateurs
+                  <strong>FanZone Tickets</strong> a été officiellement lancé en
+                  2025 et a rapidement attiré l'attention des organisateurs
                   d'événements et du public. Grâce à sa simplicité
                   d'utilisation, sa sécurité et ses fonctionnalités innovantes,
                   notre plateforme est devenue un outil essentiel pour gérer
@@ -332,8 +332,8 @@ export default function AboutPage() {
                 </h3>
                 <p className="text-gray-600">
                   Que vous organisiez un concert, une conférence, un festival ou
-                  un événement sportif, FanZone Tickets s'adapte à vos besoins
-                  spécifiques.
+                  un événement sportif, <strong>FanZone Tickets</strong>{" "}
+                  s'adapte à vos besoins spécifiques.
                 </p>
               </CardContent>
             </Card>
@@ -391,8 +391,10 @@ export default function AboutPage() {
             Prêt à organiser votre événement ?
           </h2>
           <p className="text-xl text-gray-600 mb-6">
-            Rejoignez les milliers d'organisateurs qui font confiance à FanZone
-            Tickets pour la gestion de leur billetterie au Cameroun.
+            Rejoignez les milliers d'organisateurs qui font confiance à{" "}
+            <strong>FanZone Tickets</strong> pour la gestion de leur billetterie
+            au Cameroun. Tickets pour la gestion de leur billetterie au
+            Cameroun.
           </p>
           <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90 text-lg px-8 py-6 h-auto">
             Devenir organisateur
