@@ -85,10 +85,35 @@ export function SiteFooter() {
               Nous contacter
             </h4>
             <ul className="space-y-2">
-              <li className="text-gray-300">
-                Email: contact@fanzonetickets.com
+              <li className="text-gray-300 ">
+                Email:{" "}
+                <a
+                  href="mailto:fanszonetickets@gmail.com"
+                  className="hover:text-fanzone-orange transition-colors"
+                >
+                  fanszonetickets@gmail.com
+                </a>
               </li>
-              <li className="text-gray-300">Téléphone: +123 456 789</li>
+              <li className="text-gray-300 ">
+                Téléphone:{" "}
+                <a
+                  href="tel:+237676766471"
+                  className="hover:text-fanzone-orange transition-colors"
+                >
+                  6 76 76 64 71 / 694 59 30 08
+                </a>
+              </li>
+              <li className="text-gray-300 ">
+                Adresse:{" "}
+                <a
+                  href="https://maps.app.goo.gl/H6h3Q7DPhMh1NwWd7"
+                  className="hover:text-fanzone-orange transition-colors"
+                >
+                  Mimboman, DOVV OPEP
+                  <br />
+                  Yaoundé, Cameroun
+                </a>
+              </li>
             </ul>
           </div>
         </div>

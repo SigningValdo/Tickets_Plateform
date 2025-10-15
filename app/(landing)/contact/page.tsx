@@ -71,10 +71,10 @@ export default function ContactPage() {
                   Pour toute question ou demande d'information
                 </p>
                 <a
-                  href="mailto:contact@e-tickets.com"
+                  href="mailto:fanszonetickets@gmail.com"
                   className="text-fanzone-orange font-medium"
                 >
-                  contact@e-tickets.com
+                  fanszonetickets@gmail.com
                 </a>
               </CardContent>
             </Card>
@@ -92,7 +92,7 @@ export default function ContactPage() {
                   href="tel:+123456789"
                   className="text-fanzone-orange font-medium"
                 >
-                  +123 456 789
+                  6 76 76 64 71 / 694 59 30 08
                 </a>
               </CardContent>
             </Card>
@@ -105,9 +105,9 @@ export default function ContactPage() {
                 <h3 className="text-lg font-bold mb-2">Adresse</h3>
                 <p className="text-gray-600 mb-4">Venez nous rencontrer</p>
                 <address className="text-fanzone-orange font-medium not-italic">
-                  123 Avenue Principale
+                  Mimboman, DOVV OPEP
                   <br />
-                  Abidjan, Côte d'Ivoire
+                  Yaoundé, Cameroun
                 </address>
               </CardContent>
             </Card>
