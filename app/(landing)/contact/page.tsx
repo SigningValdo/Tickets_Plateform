@@ -51,7 +51,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <main className="container mx-auto px-4 py-12">
-        <section className="max-w-5xl mx-auto mb-16">
+        <section className="mx-auto mb-16">
           <h1 className="text-4xl font-bold mb-6 text-center">
             Contactez-nous
           </h1>
@@ -277,10 +277,18 @@ export default function ContactPage() {
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto mb-16">
+        <section className="mx-auto mb-16">
           <h2 className="text-2xl font-bold mb-6">Notre emplacement</h2>
           <div className="h-96 bg-gray-200 rounded-xl flex items-center justify-center">
-            <p className="text-gray-500">Carte interactive ici</p>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3980.7619490893007!2d11.570066576602091!3d3.861182796112591!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bc5512d0916e1%3A0xfdb220eb93b060ec!2sD%C3%94VV%20Mimboman!5e0!3m2!1sfr!2scm!4v1760502834065!5m2!1sfr!2scm"
+              width="100%"
+              height="100%"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
           </div>
         </section>
       </main>

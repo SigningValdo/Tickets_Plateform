@@ -3,166 +3,118 @@ import { Button } from "@/components/ui/button";
 
 export default function RefundPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-justify">
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold mb-6">
             Politique de Remboursement
           </h1>
           <p className="text-gray-500 mb-8">
-            Dernière mise à jour : 1 mai 2024
+            Dernière mise à jour : 1 janvier 2025
           </p>
 
-          <div className="prose max-w-none">
-            <h2>1. Introduction</h2>
+          <div className="prose max-w-none [&_span]:font-bold [&_h2]:font-bold [&_ul]:list-disc [&_ul]:list-inside space-y-5">
             <p>
-              Cette Politique de Remboursement définit les conditions dans
-              lesquelles les remboursements peuvent être effectués pour les
-              billets achetés sur la plateforme E-Tickets. Veuillez lire
-              attentivement cette politique avant d'acheter des billets.
+              Chez <span>FanZone Tickets</span>, nous nous engageons à offrir
+              une expérience utilisateur transparente et équitable. Cette
+              politique de remboursement décrit les conditions dans lesquelles
+              les remboursements peuvent être accordés pour les billets achetés
+              sur notre plateforme.
             </p>
 
-            <h2>2. Principes généraux</h2>
-            <p>
-              E-Tickets agit en tant qu'intermédiaire entre les Organisateurs
-              d'événements et les Acheteurs de billets. Les conditions de
-              remboursement peuvent varier selon les événements et sont
-              généralement définies par les Organisateurs.
-            </p>
-            <p>
-              Sauf indication contraire spécifiée pour un événement particulier,
-              les principes suivants s'appliquent.
-            </p>
-
-            <h2>3. Annulation d'un événement</h2>
-            <p>
-              En cas d'annulation complète d'un événement par l'Organisateur :
-            </p>
+            <h2>1. Billets Non Remboursables</h2>
             <ul>
-              <li>Les Acheteurs seront informés par email dès que possible.</li>
               <li>
-                Un remboursement complet du prix du billet sera effectué
-                automatiquement dans un délai de 14 jours ouvrables, via le même
-                moyen de paiement que celui utilisé pour l'achat.
-              </li>
-              <li>
-                Les frais de service peuvent être non remboursables, selon la
-                politique de l'Organisateur.
+                Tous les billets achetés sur <span>FanZone Tickets</span> sont
+                généralement non remboursables. Veuillez vérifier les détails de
+                chaque événement, car des conditions particulières peuvent
+                s'appliquer.
               </li>
             </ul>
 
-            <h2>4. Report d'un événement</h2>
-            <p>En cas de report d'un événement à une date ultérieure :</p>
+            <h2>2. Annulation d'Événement</h2>
             <ul>
               <li>
-                Les billets restent généralement valables pour la nouvelle date.
+                En cas d'annulation d'un événement, nous procéderons au
+                remboursement intégral du prix du billet (hors frais de service
+                éventuels) aux acheteurs.
               </li>
               <li>
-                Si vous ne pouvez pas assister à l'événement à la nouvelle date,
-                vous pouvez demander un remboursement dans un délai de 14 jours
-                suivant l'annonce du report.
-              </li>
-              <li>
-                Après ce délai, les demandes de remboursement seront soumises à
-                l'approbation de l'Organisateur et pourront être refusées.
+                Le remboursement sera effectué dans un délai raisonnable après
+                l'annulation et sera crédité sur le mode de paiement utilisé
+                lors de l'achat.
               </li>
             </ul>
 
-            <h2>5. Changement significatif</h2>
-            <p>
-              En cas de changement significatif dans la programmation d'un
-              événement (par exemple, changement d'artiste principal, de lieu) :
-            </p>
+            <h2>3. Changement de Date ou de Lieu</h2>
             <ul>
               <li>
-                L'Organisateur peut, à sa discrétion, offrir un remboursement
-                partiel ou total.
+                Si un événement change de date ou de lieu, nous informerons tous
+                les acheteurs. Les billets resteront valides pour la nouvelle
+                date ou le nouveau lieu.
               </li>
               <li>
-                Les demandes de remboursement doivent être soumises dans un
-                délai de 7 jours suivant l'annonce du changement.
+                Les acheteurs auront la possibilité de demander un remboursement
+                si la nouvelle date ou le nouveau lieu ne leur convient pas. Les
+                demandes de remboursement doivent être soumises dans un délai
+                spécifié (généralement 7 jours) après l'annonce du changement.
               </li>
             </ul>
 
-            <h2>6. Annulation par l'Acheteur</h2>
-            <p>
-              En règle générale, les billets ne sont pas remboursables en cas
-              d'annulation par l'Acheteur, sauf :
-            </p>
+            <h2>4. Procédure de Demande de Remboursement</h2>
             <ul>
               <li>
-                Si l'Organisateur a spécifiquement prévu cette possibilité dans
-                ses conditions.
+                Pour demander un remboursement, veuillez contacter notre service
+                client à l'adresse fanszonetickets@gmail.com en précisant votre
+                numéro de commande et la raison de votre demande.
               </li>
               <li>
-                Si vous avez souscrit à une assurance annulation au moment de
-                l'achat (si disponible).
+                Les demandes seront examinées au cas par cas et une réponse vous
+                sera fournie dans les meilleurs délais.
               </li>
             </ul>
 
-            <h2>7. Billets non utilisés</h2>
-            <p>
-              Les billets non utilisés ne sont généralement pas remboursables,
-              quelle que soit la raison (maladie, empêchement personnel, etc.),
-              sauf si une assurance annulation a été souscrite.
-            </p>
-
-            <h2>8. Procédure de remboursement</h2>
-            <p>
-              Pour demander un remboursement dans les cas où cela est possible :
-            </p>
-            <ol>
-              <li>Connectez-vous à votre compte E-Tickets.</li>
-              <li>Accédez à la section "Mes billets".</li>
-              <li>
-                Sélectionnez le billet concerné et cliquez sur "Demander un
-                remboursement".
-              </li>
-              <li>Suivez les instructions pour compléter votre demande.</li>
-            </ol>
-            <p>
-              Vous pouvez également contacter notre service client à l'adresse
-              support@e-tickets.com en précisant votre numéro de commande et le
-              motif de votre demande.
-            </p>
-
-            <h2>9. Délais de remboursement</h2>
-            <p>Lorsqu'un remboursement est approuvé :</p>
+            <h2>5. Exceptions</h2>
             <ul>
               <li>
-                Pour les paiements par carte bancaire : le remboursement est
-                généralement traité dans un délai de 5 à 14 jours ouvrables.
+                Les remboursements ne seront pas accordés pour les billets
+                achetés auprès de revendeurs non autorisés ou pour les billets
+                perdus ou volés.
               </li>
               <li>
-                Pour les paiements par mobile money : le remboursement est
-                généralement traité dans un délai de 2 à 5 jours ouvrables.
+                Nous ne sommes pas responsables des frais d'hébergement, de
+                transport ou d'autres dépenses engagés en raison de changements
+                d'événements ou d'annulations.
               </li>
             </ul>
+
+            <h2>6. Modification de la Politique</h2>
             <p>
-              Les délais peuvent varier en fonction des institutions financières
-              impliquées.
+              Nous nous réservons le droit de modifier cette politique de
+              remboursement à tout moment. Les utilisateurs seront informés de
+              toute mise à jour, et l'utilisation continue de la plateforme
+              constituera une acceptation des nouvelles conditions.
             </p>
 
-            <h2>10. Cas particuliers</h2>
+            <h2>7. Contact</h2>
             <p>
-              Dans certains cas exceptionnels (force majeure, problèmes
-              techniques majeurs), des conditions spécifiques de remboursement
-              peuvent être appliquées. Ces conditions seront communiquées aux
-              Acheteurs concernés.
-            </p>
-
-            <h2>11. Modifications de cette politique</h2>
-            <p>
-              Nous nous réservons le droit de modifier cette Politique de
-              Remboursement à tout moment. Les modifications prendront effet dès
-              leur publication sur notre plateforme.
-            </p>
-
-            <h2>12. Contact</h2>
-            <p>
-              Pour toute question concernant cette Politique de Remboursement,
-              veuillez nous contacter à l'adresse suivante :
-              support@e-tickets.com.
+              Siège social : Mimboman, DOVV OPEP
+              <br />
+              Email :{" "}
+              <a
+                className="text-fanzone-orange"
+                href="mailto:fanszonetickets@gmail.com"
+              >
+                fanszonetickets@gmail.com
+              </a>
+              <br />
+              Web :{" "}
+              <a
+                className="text-fanzone-orange"
+                href="https://fanszonetickets.cm"
+              >
+                fanszonetickets.cm
+              </a>
             </p>
           </div>
         </div>

@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <Image
-              src="/logo.jpeg"
+              src="/logo.png"
               alt="FANZONE TICKETS"
               width={200}
               height={100}
