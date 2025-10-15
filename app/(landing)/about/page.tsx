@@ -35,7 +35,7 @@ export default function AboutPage() {
                   className="rounded-lg w-full h-full object-cover"
                 />
               </div>
-              <div className="w-[600px] text-lg">
+              <div className="max-w-[600px] text-lg">
                 <p className="mb-6">
                   Chez FanZone Tickets, notre mission est de transformer
                   l'expérience événementielle au Cameroun. Nous nous engageons à
