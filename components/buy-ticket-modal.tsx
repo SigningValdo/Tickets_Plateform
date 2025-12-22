@@ -21,14 +21,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "./ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { Button } from "./ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import { Loader2, CheckCircle } from "lucide-react";
+import { Loader2, CreditCard, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { useState } from "react";
 
@@ -40,10 +33,8 @@ export const BuyTicketModal = ({
   selectedTickets: { ticketTypeId: string; quantity: number }[];
 }) => {
   const [open, setOpen] = useState(false);
-  const [processingOpen, setProcessingOpen] = useState(false);
-  const [processingStage, setProcessingStage] = useState<
-    "processing" | "success"
-  >("processing");
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
   const mutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch("/api/tickets/order", {
@@ -55,45 +46,33 @@ export const BuyTicketModal = ({
       });
       const result = await response.json();
       if (!response.ok) {
-        throw new Error("Une erreur est survenue");
+        throw new Error(result.error || "Une erreur est survenue");
       }
       return result;
     },
     onSuccess: (res: any) => {
-      const simulate = process.env.NEXT_PUBLIC_SIMULATE_PAYMENT === "true";
+      // Fermer la modal et afficher le loader de redirection
+      setOpen(false);
+      setIsRedirecting(true);
 
-      const go = () => {
-        if (res?.redirectUrl && !simulate) {
-          window.location.href = res.redirectUrl as string;
-          return;
-        }
-        if (res?.orderId) {
-          window.location.href = `/confirmation?orderId=${res.orderId}`;
-          return;
-        }
-        toast.success("Commande effectuée avec succès");
-        form.reset();
-        setOpen(false);
-        setProcessingOpen(false);
-      };
-
-      // Afficher le loader (processing) pendant 5s, puis afficher le succès ~1.2s avant redirection
-      setTimeout(() => {
-        setProcessingStage("success");
-        setTimeout(go, 1200);
-      }, 5000);
+      // Redirection vers Notchpay ou page de confirmation
+      if (res?.redirectUrl) {
+        window.location.href = res.redirectUrl;
+      } else if (res?.orderId) {
+        // Mode simulation
+        window.location.href = `/confirmation?orderId=${res.orderId}`;
+      }
     },
-    onError: (error) => {
+    onError: (error: Error) => {
       toast.error(error.message || "Une erreur est survenue");
-      setProcessingOpen(false);
     },
   });
+
   const schema = z.object({
-    name: z.string(),
-    email: z.string(),
-    phone: z.string(),
-    address: z.string(),
-    paymentMethod: z.enum(["orange", "mtn"]).default("orange"),
+    name: z.string().min(2, "Le nom est requis"),
+    email: z.string().email("Email invalide"),
+    phone: z.string().min(9, "Numéro de téléphone invalide"),
+    address: z.string().min(3, "L'adresse est requise"),
   });
 
   const form = useForm<z.infer<typeof schema>>({
@@ -103,166 +82,149 @@ export const BuyTicketModal = ({
       email: "",
       phone: "",
       address: "",
-      paymentMethod: "orange",
     },
   });
 
   const onSubmit = (data: z.infer<typeof schema>) => {
-    setProcessingStage("processing");
-    setProcessingOpen(true);
     mutation.mutate({
       ...data,
       tickets: selectedTickets,
-      paymentMethod: data.paymentMethod,
     });
   };
 
-  const renderForm = () => {
-    if (mutation.isPending) {
-      return (
-        <div className="flex items-center justify-center p-6">
-          <Loader2 className="animate-spin text-fanzone-orange h-12 w-12" />
-        </div>
-      );
-    }
-
+  // Afficher le loader de redirection en plein écran
+  if (isRedirecting) {
     return (
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nom</FormLabel>
-                <FormControl>
-                  <Input placeholder="Mballa Stephane" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="mballa@exemple.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input placeholder="+237 65 55 55 55" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="Place du Marché Efoulan" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="paymentMethod"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Moyen de paiement</FormLabel>
-                <FormControl>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="orange">Orange Money</SelectItem>
-                      <SelectItem value="mtn">MTN MoMo</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={mutation.isPending}>
-            Payer
-          </Button>
-        </form>
-      </Form>
+      <>
+        {children}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-white rounded-lg p-8 flex flex-col items-center gap-4 max-w-sm mx-4">
+            <Loader2 className="h-12 w-12 animate-spin text-fanzone-orange" />
+            <div className="text-center">
+              <h3 className="font-semibold text-lg">Redirection en cours...</h3>
+              <p className="text-gray-600 text-sm mt-1">
+                Vous allez être redirigé vers la page de paiement sécurisé
+              </p>
+            </div>
+          </div>
+        </div>
+      </>
     );
-  };
+  }
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>{children}</DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Buy Ticket</DialogTitle>
-          </DialogHeader>
-          {renderForm()}
-        </DialogContent>
-      </Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-xl">Finaliser votre commande</DialogTitle>
+        </DialogHeader>
 
-      {/* Modal de traitement du paiement (simulation ou redirection réelle) */}
-      <Dialog open={processingOpen} onOpenChange={setProcessingOpen}>
-        <DialogContent className="p-0 overflow-hidden">
-          {/* Fond avec image selon moyen de paiement */}
-          <PaymentBackdrop method={form.watch("paymentMethod")} />
-          <div className="relative z-10 p-6 flex flex-col items-center justify-center text-center gap-3 bg-black/40 text-white">
-            {processingStage === "processing" ? (
-              <>
-                <Loader2 className="h-10 w-10 animate-spin" />
-                <p className="text-sm">Traitement du paiement…</p>
-              </>
-            ) : (
-              <>
-                <div className="text-green-400">
-                  <CheckCircle className="h-10 w-10" />
-                </div>
-                <p className="text-sm">Paiement effectué avec succès</p>
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom complet</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Ex: Jean Dupont"
+                      {...field}
+                      disabled={mutation.isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="votre@email.com"
+                      {...field}
+                      disabled={mutation.isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Téléphone</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="+237 6XX XXX XXX"
+                      {...field}
+                      disabled={mutation.isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Adresse</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Votre adresse"
+                      {...field}
+                      disabled={mutation.isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Info paiement sécurisé */}
+            <div className="bg-gray-50 rounded-lg p-3 flex items-start gap-3">
+              <Shield className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-gray-600">
+                <p className="font-medium text-gray-800">Paiement sécurisé</p>
+                <p>Vous serez redirigé vers Notchpay pour effectuer votre paiement en toute sécurité.</p>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
+              disabled={mutation.isPending}
+            >
+              {mutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Traitement en cours...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Procéder au paiement
+                </>
+              )}
+            </Button>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 };
-
-// Composant d'arrière-plan du paiement selon le moyen choisi
-function PaymentBackdrop({ method }: { method?: "orange" | "mtn" }) {
-  const isOrange = method !== "mtn"; // orange par défaut
-  const bg = isOrange
-    ? "bg-gradient-to-br from-orange-500 via-orange-600 to-orange-800"
-    : "bg-gradient-to-br from-yellow-400 via-yellow-500 to-yellow-700";
-  const label = isOrange ? "Orange Money" : "MTN MoMo";
-  return (
-    <div className={`relative h-56 sm:h-64 ${bg}`}>
-      <div className="absolute inset-0 opacity-15 bg-[radial-gradient(circle_at_20%_20%,_white,_transparent_40%),_radial-gradient(circle_at_80%_30%,_white,_transparent_35%)]" />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-white/70 text-xl font-semibold drop-shadow">
-          {label}
-        </span>
-      </div>
-    </div>
-  );
-}

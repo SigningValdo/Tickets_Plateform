@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/db";
+import { sanitizeEventData } from "@/lib/sanitize";
 
 export const runtime = "nodejs";
 
@@ -65,8 +66,27 @@ export async function POST(req: Request) {
     });
   }
 
+  let body: unknown;
   try {
-    const body = await req.json();
+    body = await req.json();
+  } catch {
+    return NextResponse.json(
+      { error: "Invalid JSON body" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // Sanitize and validate input
+    const sanitized = sanitizeEventData(body);
+
+    if (!sanitized) {
+      return NextResponse.json(
+        { error: "Données invalides. Veuillez vérifier tous les champs obligatoires." },
+        { status: 400 }
+      );
+    }
+
     const {
       title,
       description,
@@ -79,46 +99,13 @@ export async function POST(req: Request) {
       imageUrl,
       categoryId,
       ticketTypes,
-    } = body;
-
-    // Validation stricte des champs obligatoires
-    if (
-      !title ||
-      !description ||
-      !date ||
-      !location ||
-      !address ||
-      !city ||
-      !country ||
-      !organizer ||
-      !categoryId ||
-      !ticketTypes ||
-      !Array.isArray(ticketTypes) ||
-      ticketTypes.length === 0
-    ) {
-      return new NextResponse(
-        JSON.stringify({
-          error: "Tous les champs obligatoires doivent être renseignés.",
-        }),
-        { status: 400 }
-      );
-    }
-
-    if (
-      !categoryId ||
-      typeof categoryId !== "string" ||
-      categoryId.length < 10
-    ) {
-      return new NextResponse(JSON.stringify({ error: "Catégorie invalide" }), {
-        status: 400,
-      });
-    }
+    } = sanitized;
 
     const newEvent = await prisma.event.create({
       data: {
         title,
         description,
-        date: new Date(date),
+        date,
         location,
         address,
         city,
@@ -126,12 +113,12 @@ export async function POST(req: Request) {
         organizer,
         imageUrl,
         authorId: session.user.id,
-        categoryId: String(categoryId),
+        categoryId,
         ticketTypes: {
-          create: ticketTypes.map((tt: any) => ({
+          create: ticketTypes.map((tt) => ({
             name: tt.name,
-            price: parseFloat(tt.price),
-            quantity: parseInt(tt.quantity, 10),
+            price: tt.price,
+            quantity: tt.quantity,
           })),
         },
       },

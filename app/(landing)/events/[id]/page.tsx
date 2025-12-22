@@ -12,20 +12,23 @@ import EventMap from "@/components/event-map";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { EventAndCategory } from "@/types";
+import { use } from "react";
 
 export default function EventDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
+
   const {
     data: event,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["event", params.id],
+    queryKey: ["event", id],
     queryFn: async (): Promise<EventAndCategory | null> =>
-      fetch(`/api/admin/events/${params.id}`).then((res) => res.json()),
+      fetch(`/api/events/${id}`).then((res) => res.json()),
   });
 
   if (isLoading) {
