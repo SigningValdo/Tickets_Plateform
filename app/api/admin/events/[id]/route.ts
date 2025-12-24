@@ -45,12 +45,72 @@ export async function PUT(req: Request, { params }: Params) {
     const body = await req.json()
     const { ticketTypes, ...eventData } = body
     const { id } = await params
+
+    // Convert date string to Date object if provided
+    if (eventData.date && typeof eventData.date === "string") {
+      eventData.date = new Date(eventData.date)
+    }
+
+    // Update event data
     const updatedEvent = await prisma.event.update({
       where: { id },
       data: eventData,
     })
 
-    return NextResponse.json(updatedEvent)
+    // Update ticket types if provided
+    if (ticketTypes && Array.isArray(ticketTypes)) {
+      // Get existing ticket types for this event
+      const existingTicketTypes = await prisma.ticketType.findMany({
+        where: { eventId: id },
+      })
+
+      const existingIds = existingTicketTypes.map((tt) => tt.id)
+      const incomingIds = ticketTypes.filter((tt: any) => tt.id && !tt.id.toString().match(/^\d+$/)).map((tt: any) => tt.id)
+
+      // Delete ticket types that are no longer in the list
+      const toDelete = existingIds.filter((existingId) => !incomingIds.includes(existingId))
+      if (toDelete.length > 0) {
+        await prisma.ticketType.deleteMany({
+          where: { id: { in: toDelete } },
+        })
+      }
+
+      // Update or create ticket types
+      for (const tt of ticketTypes) {
+        const ticketData = {
+          name: tt.name,
+          price: parseFloat(tt.price) || 0,
+          quantity: parseInt(tt.quantity) || 0,
+        }
+
+        // Check if it's an existing ticket type (has a valid cuid) or a new one
+        const isNewTicket = !tt.id || tt.id.toString().match(/^\d+$/)
+
+        if (isNewTicket) {
+          // Create new ticket type
+          await prisma.ticketType.create({
+            data: {
+              ...ticketData,
+              eventId: id,
+            },
+          })
+        } else {
+          // Update existing ticket type
+          await prisma.ticketType.update({
+            where: { id: tt.id },
+            data: ticketData,
+          })
+        }
+      }
+    }
+
+    // Fetch updated event with ticket types
+    const result = await prisma.event.findUnique({
+      where: { id },
+      include: { ticketTypes: true, category: true },
+    })
+
+    return NextResponse.json(result)
   } catch (error) {
     console.error(`Error updating event`, error)
     return new NextResponse(JSON.stringify({ error: "Internal Server Error" }), { status: 500 })
