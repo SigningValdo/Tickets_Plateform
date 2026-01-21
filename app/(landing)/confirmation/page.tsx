@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -27,7 +27,7 @@ const events = [
   // Autres événements...
 ]
 
-export default function ConfirmationPage() {
+function ConfirmationContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -205,5 +205,18 @@ export default function ConfirmationPage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function ConfirmationPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-fanzone-orange mb-4" />
+        <p className="text-gray-600">Chargement...</p>
+      </div>
+    }>
+      <ConfirmationContent />
+    </Suspense>
   )
 }

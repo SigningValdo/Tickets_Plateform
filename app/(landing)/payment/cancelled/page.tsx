@@ -2,15 +2,15 @@
 
 import type React from "react"
 
-import { useEffect, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { XCircle, ArrowLeft, ShoppingCart, Clock } from "lucide-react"
+import { XCircle, ArrowLeft, ShoppingCart, Clock, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-export default function PaymentCancelledPage() {
+function PaymentCancelledContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [eventId, setEventId] = useState<string | null>(null)
@@ -150,5 +150,30 @@ export default function PaymentCancelledPage() {
         </div>
       </Card>
     </div>
+  )
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-lg">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <Loader2 className="h-16 w-16 text-gray-400 animate-spin" />
+          </div>
+          <CardTitle className="text-2xl font-bold text-gray-900 mb-2">
+            Chargement...
+          </CardTitle>
+        </CardHeader>
+      </Card>
+    </div>
+  )
+}
+
+export default function PaymentCancelledPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <PaymentCancelledContent />
+    </Suspense>
   )
 }
