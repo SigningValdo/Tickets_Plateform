@@ -1,5 +1,7 @@
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { initNotchpayPayment } from "@/lib/notchpay";
 import { sanitizeOrderData } from "@/lib/sanitize";
 import { applyRateLimit, rateLimiters } from "@/lib/rate-limit";
@@ -12,6 +14,10 @@ export const POST = async (req: Request) => {
   if (rateLimitResponse) {
     return rateLimitResponse;
   }
+
+  // Get authenticated user (optional - guests can also buy)
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id || null;
 
   let body: unknown;
   try {
@@ -67,6 +73,7 @@ export const POST = async (req: Request) => {
   const order = await prisma.order.create({
     data: {
       totalAmount: total,
+      userId: userId,
       tickets: {
         create: tickets
           .map((ticket) =>

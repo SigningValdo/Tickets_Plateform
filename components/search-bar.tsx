@@ -2,20 +2,28 @@
 
 import type React from "react";
 import { useQueryState } from "nuqs";
-
+import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 export function SearchBar() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useQueryState("search", {
     defaultValue: "",
   });
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/events?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <form
-      onSubmit={(e) => e.preventDefault()}
-      className="flex w-full shadow-lg"
+      onSubmit={handleSubmit}
+      className="flex w-full shadow-lg rounded-xl overflow-hidden bg-white/95 backdrop-blur-sm"
     >
       <div className="relative flex-grow">
         <Search
@@ -27,12 +35,12 @@ export function SearchBar() {
           placeholder="Rechercher des événements, lieux, artistes..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 py-6 rounded-l-md w-full border-r-0 fanzone-body border-fanzone-gray/20 focus:border-fanzone-orange focus:ring-fanzone-orange"
+          className="pl-10 py-6 rounded-l-xl w-full border-0 bg-transparent fanzone-body focus:ring-0 focus-visible:ring-0"
         />
       </div>
       <Button
         type="submit"
-        className="bg-fanzone-orange hover:bg-fanzone-orange/90 h-[50px] rounded-l-none px-8 fanzone-body font-medium"
+        className="bg-fanzone-orange hover:bg-fanzone-orange/90 h-[50px] rounded-l-none rounded-r-xl px-8 fanzone-body font-medium"
       >
         Rechercher
       </Button>

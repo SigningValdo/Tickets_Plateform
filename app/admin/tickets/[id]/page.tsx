@@ -16,6 +16,8 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Copy, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { CameroonFlag } from "@/components/cameroon-flag";
+import { FecafootBadge } from "@/components/fecafoot-badge";
 
 interface TicketDetails {
   id: string;
@@ -270,8 +272,23 @@ export default function AdminTicketDetailsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent ref={pdfRef} className="border p-5 rounded-lg">
+            {/* En-tête avec drapeaux */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CameroonFlag width={36} height={24} />
+                <FecafootBadge size={32} />
+              </div>
+              <h2 className="text-lg font-bold text-center uppercase flex-1">
+                FANZONE TICKETS
+              </h2>
+              <div className="flex items-center gap-2">
+                <FecafootBadge size={32} />
+                <CameroonFlag width={36} height={24} />
+              </div>
+            </div>
+            <div className="border-b-2 border-green-700 mb-4" />
             <div className="flex items-center gap-4">
-              <div className="w-full max-w-md ">
+              <div className="w-full max-w-md">
                 {ticket.event?.imageUrl ? (
                   <div className="relative w-full max-w-md h-56 overflow-hidden rounded-md border">
                     <Image
@@ -288,7 +305,7 @@ export default function AdminTicketDetailsPage() {
                 )}
               </div>
               <div>
-                <div className="">
+                <div>
                   <h2 className="text-xl font-semibold">
                     {ticket.event.title}
                   </h2>
@@ -302,8 +319,21 @@ export default function AdminTicketDetailsPage() {
                 </div>
               </div>
             </div>
-            <div className="text-xs text-center mt-5 text-muted-foreground">
-              {ticket.qrCode}
+            {/* Pied de billet */}
+            <div className="border-t border-gray-200 mt-4 pt-3 flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <CameroonFlag width={16} height={10} />
+                <span className="text-xs text-muted-foreground">
+                  Solution camerounaise
+                </span>
+              </div>
+              <div className="text-xs text-center text-muted-foreground">
+                {ticket.qrCode}
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-muted-foreground">FECAFOOT</span>
+                <CameroonFlag width={16} height={10} />
+              </div>
             </div>
           </CardContent>
         </Card>

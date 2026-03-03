@@ -33,7 +33,7 @@ export function EventList() {
     queryKey: ["events", search, category, date, location, dateFilter],
     queryFn: async (): Promise<EventAndCategory[]> =>
       fetch(
-        `/api/admin/events?search=${search}&category=${category}&date=${date}&location=${location}&dateFilter=${dateFilter}`
+        `/api/admin/events?search=${search}&category=${category}&date=${date}&location=${location}&dateFilter=${dateFilter}`,
       ).then((res) => res.json()),
   });
 
@@ -93,10 +93,9 @@ export function EventList() {
               <div className="flex flex-col h-full justify-between">
                 <div>
                   <h3 className="font-bold text-xl mb-2">{event.title}</h3>
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {event.description}
-                  </p>
-
+                  <div
+                    dangerouslySetInnerHTML={{ __html: event.description }}
+                  ></div>
                   <div className="flex flex-wrap gap-4 mb-4">
                     <div className="flex items-center text-gray-500">
                       <Calendar className="h-4 w-4 mr-1" />

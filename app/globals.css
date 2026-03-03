@@ -139,6 +139,28 @@ body {
     z-index: 3;
     letter-spacing: -0.5px;
   }
+
+  /* Glass morphism */
+  .glass {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* Gradient overlay for event cards */
+  .event-card-gradient {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      rgba(0, 0, 0, 0.4) 40%,
+      rgba(0, 0, 0, 0) 100%
+    );
+  }
+
+  /* Fanzone Orange gradient */
+  .fanzone-gradient {
+    background: linear-gradient(135deg, #fb5e00 0%, #ff8534 100%);
+  }
 }
 
 @layer base {

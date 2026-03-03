@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Copy, Loader2 } from "lucide-react";
+import { CameroonFlag } from "@/components/cameroon-flag";
+import { FecafootBadge } from "@/components/fecafoot-badge";
 
 interface TicketDetails {
   id: string;
@@ -207,6 +209,21 @@ export default function UserTicketPage() {
             </CardDescription>
           </CardHeader>
           <CardContent ref={pdfRef} className="border p-5 rounded-lg">
+            {/* En-tête avec drapeaux */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <CameroonFlag width={36} height={24} />
+                <FecafootBadge size={32} />
+              </div>
+              <h2 className="text-lg font-bold text-center uppercase flex-1">
+                FANZONE TICKETS
+              </h2>
+              <div className="flex items-center gap-2">
+                <FecafootBadge size={32} />
+                <CameroonFlag width={36} height={24} />
+              </div>
+            </div>
+            <div className="border-b-2 border-green-700 mb-4" />
             <h2 className="text-xl text-center mb-5 uppercase font-semibold">
               {ticket.event.title}
             </h2>
@@ -244,8 +261,21 @@ export default function UserTicketPage() {
                 </div>
               </div>
             </div>
-            <div className="text-xs mt-5 text-center text-muted-foreground">
-              {ticket.qrCode}
+            {/* Pied de billet */}
+            <div className="border-t border-gray-200 mt-4 pt-3 flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <CameroonFlag width={16} height={10} />
+                <span className="text-xs text-muted-foreground">
+                  Solution camerounaise
+                </span>
+              </div>
+              <div className="text-xs text-center text-muted-foreground">
+                {ticket.qrCode}
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-muted-foreground">FECAFOOT</span>
+                <CameroonFlag width={16} height={10} />
+              </div>
             </div>
           </CardContent>
         </Card>

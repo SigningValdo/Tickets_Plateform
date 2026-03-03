@@ -2,10 +2,10 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +20,10 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,9 +40,8 @@ export default function LoginPage() {
       password: password,
     });
 
-    setIsLoading(false);
-
     if (result?.error) {
+      setIsLoading(false);
       toast.error("Erreur de connexion", {
         description: "Email ou mot de passe incorrect.",
       });
@@ -48,7 +49,23 @@ export default function LoginPage() {
       toast.success("Connexion réussie", {
         description: "Bienvenue ! Redirection en cours...",
       });
-      router.push("/admin/dashboard");
+
+      // If there's a callback URL, use it
+      if (callbackUrl) {
+        router.push(callbackUrl);
+        return;
+      }
+
+      // Fetch the session to get user role
+      const sessionRes = await fetch("/api/auth/session");
+      const session = await sessionRes.json();
+
+      // Redirect based on role
+      if (session?.user?.role === "ADMIN") {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/account");
+      }
     }
   };
 
@@ -168,5 +185,19 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <Loader2 className="h-8 w-8 animate-spin text-fanzone-orange" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 }

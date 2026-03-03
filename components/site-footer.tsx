@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
+import { CameroonFlag } from "@/components/cameroon-flag";
+import { FecafootBadge } from "@/components/fecafoot-badge";
 
 export function SiteFooter() {
   return (
@@ -16,9 +18,14 @@ export function SiteFooter() {
             <p className="text-gray-300 fanzone-body mb-4">
               Votre plateforme de billetterie en ligne sécurisée et fiable.
             </p>
-            <p className="text-fanzone-orange font-medium italic text-sm">
-              "Agility vos émotions, un ticket à la fois"
+            <p className="text-fanzone-orange font-medium italic text-sm mb-4">
+              &quot;Agility vos émotions, un ticket à la fois&quot;
             </p>
+            <div className="flex items-center gap-3">
+              <CameroonFlag width={36} height={24} />
+              <FecafootBadge size={36} />
+              <span className="text-xs text-gray-400">Solution camerounaise</span>
+            </div>
           </div>
           <div>
             <h4 className="font-bold mb-4 text-fanzone-orange">
@@ -118,10 +125,14 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="border-t border-gray-600 mt-8 pt-8 text-center text-gray-300">
-          <p>
-            &copy; {new Date().getFullYear()} FANZONE TICKETS. Tous droits
-            réservés.
-          </p>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <CameroonFlag width={20} height={13} />
+            <p>
+              &copy; {new Date().getFullYear()} FANZONE TICKETS. Tous droits
+              réservés. Made in Cameroun
+            </p>
+            <CameroonFlag width={20} height={13} />
+          </div>
         </div>
       </div>
     </footer>

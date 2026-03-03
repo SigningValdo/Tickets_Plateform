@@ -59,20 +59,35 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      // Dans une implémentation réelle, nous appellerions une API d'inscription
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+        }),
+      })
 
-      // Simuler une inscription réussie
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Erreur lors de l'inscription")
+      }
+
       toast({
         title: "Inscription réussie",
-        description: "Votre compte a été créé avec succès",
+        description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
       })
 
       router.push("/auth/login")
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Erreur d'inscription",
-        description: "Une erreur est survenue lors de l'inscription",
+        description: error.message || "Une erreur est survenue lors de l'inscription",
         variant: "destructive",
       })
     } finally {

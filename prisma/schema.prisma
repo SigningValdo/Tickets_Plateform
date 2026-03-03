@@ -9,10 +9,9 @@ generator client {
 }
 
 datasource db {
-  // provider = "sqlite"
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Role {
@@ -56,7 +55,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   events        Event[]
-  reports       Report[] // Rapports générés par l'utilisateur
+  orders        Order[]
+  reports       Report[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   status        UserStatus @default(ACTIVE)
@@ -142,6 +142,8 @@ model Order {
   id          String      @id @default(cuid())
   totalAmount Float
   status      OrderStatus @default(PENDING)
+  user        User?       @relation(fields: [userId], references: [id])
+  userId      String?
   tickets     Ticket[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
