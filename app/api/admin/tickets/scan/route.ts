@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/db";
 import { TicketStatus } from "@prisma/client";
@@ -11,51 +11,31 @@ export const POST = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   try {
     const body = await req.json();
-    const qrCode = JSON.parse(body).qrCode;
-    console.log("QR Code:", qrCode);
+    const qrCode = body.qrCode;
 
     // Add validation for qrCode
     if (!qrCode) {
-      return new NextResponse(
-        JSON.stringify({ error: "QR Code is required" }),
-        {
-          status: 400,
-        }
-      );
+      return NextResponse.json({ error: "QR Code is required" }, { status: 400 });
     }
 
-    console.log("Looking for ticket with QR code:", qrCode);
-
-    // First, let's check if the ticket exists at all
     const existingTicket = await prisma.ticket.findFirst({
       where: {
         qrCode,
       },
     });
 
-    console.log("Existing ticket:", existingTicket);
-
     if (!existingTicket) {
-      return new NextResponse(JSON.stringify({ error: "Ticket not found" }), {
-        status: 404,
-      });
+      return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
     // Check if ticket is already used
     if (existingTicket.status === TicketStatus.USED) {
-      return new NextResponse(
-        JSON.stringify({ error: "Le ticket a déjà été utilisé" }),
-        {
-          status: 400,
-        }
-      );
+      return NextResponse.json({ error: "Le ticket a déjà été utilisé" }, { status: 400 });
     }
 
     // Update the ticket status
@@ -70,40 +50,25 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    console.log("Updated ticket:", updatedTicket);
-
     // Revalidate the path to refresh cached data
     revalidatePath("/admin/tickets");
 
-    return new NextResponse(
-      JSON.stringify({
-        message: "Ticket scanned successfully",
-        ticket: {
-          id: updatedTicket.id,
-          status: updatedTicket.status,
-        },
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    return NextResponse.json({
+      message: "Ticket scanned successfully",
+      ticket: {
+        id: updatedTicket.id,
+        status: updatedTicket.status,
+      },
+    });
   } catch (error) {
     console.error("Error updating ticket status:", error);
 
-    return new NextResponse(
-      JSON.stringify({
-        error: "Internal server error",
-        details: error instanceof Error ? error.message : "Unknown error",
-      }),
+    return NextResponse.json(
       {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+        error: "Internal server error",
+        details: process.env.NODE_ENV === "development" && error instanceof Error ? error.message : undefined,
+      },
+      { status: 500 }
     );
   }
 };

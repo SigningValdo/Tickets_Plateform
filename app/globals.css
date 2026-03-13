@@ -3,14 +3,17 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Poppins', system-ui, sans-serif;
+  background-color: "#000"
 }
 
 @layer utilities {
+  .container {
+    @apply max-w-7xl mx-auto px-4;
+  }
   .text-balance {
     text-wrap: balance;
   }
-  
   /* FANZONE TICKETS - Couleurs personnalisées */
   .text-fanzone-orange {
     color: #fb5e00;
@@ -61,13 +64,13 @@ body {
   
   /* FANZONE TICKETS - Typographie */
   .fanzone-heading {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Poppins', system-ui, sans-serif;
     font-weight: 700;
     letter-spacing: -0.025em;
   }
   
   .fanzone-body {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Poppins', system-ui, sans-serif;
     font-weight: 400;
     line-height: 1.6;
   }
@@ -164,17 +167,17 @@ body {
 }
 
 @layer base {
-  :root {
+  /* :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    /* FANZONE TICKETS - Orange primary (#fb5e00) */
+    FANZONE TICKETS - Orange primary (#fb5e00)
     --primary: 20 100% 49%;
     --primary-foreground: 0 0% 98%;
-    /* FANZONE TICKETS - Gris secondary (#5e5e5e) */
+    FANZONE TICKETS - Gris secondary (#5e5e5e)
     --secondary: 0 0% 37%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 96.1%;
@@ -208,10 +211,10 @@ body {
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    /* FANZONE TICKETS - Orange primary en mode sombre */
+    FANZONE TICKETS - Orange primary en mode sombre
     --primary: 20 100% 60%;
     --primary-foreground: 0 0% 9%;
-    /* FANZONE TICKETS - Gris secondary en mode sombre */
+    FANZONE TICKETS - Gris secondary en mode sombre
     --secondary: 0 0% 25%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 14.9%;
@@ -236,14 +239,9 @@ body {
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 15%;
     --sidebar-ring: 20 100% 60%;
-  }
+  } */
+   input {
+    @apply border border-gris4 bg-bg outline-none;
+   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}

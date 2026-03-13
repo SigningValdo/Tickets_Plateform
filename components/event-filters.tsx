@@ -1,161 +1,152 @@
-"use client"
+"use client";
 
-import { useRouter, usePathname } from "next/navigation"
-import { Calendar, MapPin } from "lucide-react"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useQueryState } from "nuqs"
+import { useRouter, usePathname } from "next/navigation";
+import { Calendar as CalendarIcon, MapPin, RotateCcw } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useQueryState } from "nuqs";
 
-// Données simulées pour les filtres
-const categories = [
-  { id: "all", name: "Toutes les catégories" },
-  { id: "concerts", name: "Concerts" },
-  { id: "theatre", name: "Théâtre" },
-  { id: "conferences", name: "Conférences" },
-  { id: "food", name: "Gastronomie" },
-  { id: "shows", name: "Spectacles" },
-  { id: "cinema", name: "Cinéma" },
-  { id: "workshops", name: "Ateliers" },
-  { id: "festivals", name: "Festivals" },
-]
+const dateOptions = [
+  { value: "all", label: "Toutes les dates" },
+  { value: "today", label: "Aujourd'hui" },
+  { value: "weekend", label: "Ce weekend" },
+  { value: "month", label: "Ce mois" },
+  { value: "custom", label: "Date spécifique" },
+];
 
 const locations = [
   { id: "all", name: "Toutes les villes" },
-  { id: "abidjan", name: "Abidjan" },
-  { id: "dakar", name: "Dakar" },
-  { id: "lome", name: "Lomé" },
-  { id: "rabat", name: "Rabat" },
   { id: "douala", name: "Douala" },
-  { id: "bamako", name: "Bamako" },
-  { id: "tunis", name: "Tunis" },
-]
+  { id: "yaounde", name: "Yaoundé" },
+  { id: "bafoussam", name: "Bafoussam" },
+  { id: "bamenda", name: "Bamenda" },
+  { id: "garoua", name: "Garoua" },
+  { id: "maroua", name: "Maroua" },
+  { id: "bertoua", name: "Bertoua" },
+  { id: "ngaoundere", name: "Ngaoundéré" },
+  { id: "ebolowa", name: "Ebolowa" },
+  { id: "kribi", name: "Kribi" },
+  { id: "limbe", name: "Limbé" },
+  { id: "buea", name: "Buea" },
+];
 
 export function EventFilters() {
-  const router = useRouter()
-  const pathname = usePathname()
+  const router = useRouter();
+  const pathname = usePathname();
 
-  const [category, setCategory] = useQueryState("category", {
-    defaultValue: "all",
-  })
   const [date, setDate] = useQueryState("date", {
     defaultValue: "",
-  })
+  });
   const [location, setLocation] = useQueryState("location", {
     defaultValue: "all",
-  })
-  const [dateFilter, setDateFilter] = useQueryState(
-    "dateFilter",
-    {
-      defaultValue: "all",
-    },
-  )
-
+  });
+  const [dateFilter, setDateFilter] = useQueryState("dateFilter", {
+    defaultValue: "all",
+  });
 
   const resetFilters = () => {
-    setCategory("all")
-    setDate("")
-    setLocation("all")
-    setDateFilter("all")
-    router.push(pathname)
-  }
+    setDate("");
+    setLocation("all");
+    setDateFilter("all");
+    router.push(pathname);
+  };
 
   const handleDateFilterChange = (value: string) => {
-    const today = new Date()
+    const today = new Date();
 
     switch (value) {
       case "today":
-        setDate(today.toISOString().split("T")[0])
-        break
-      case "weekend":
-        const dayOfWeek = today.getDay()
-        const daysUntilWeekend = dayOfWeek === 6 ? 0 : 5 - dayOfWeek
-        const weekend = new Date(today)
-        weekend.setDate(today.getDate() + daysUntilWeekend)
-        setDate(weekend.toISOString().split("T")[0])
-        break
-      case "month":
-        const nextMonth = new Date(today)
-        nextMonth.setMonth(today.getMonth() + 1)
-        setDate(nextMonth.toISOString().split("T")[0])
-        break
+        setDate(today.toISOString().split("T")[0]);
+        break;
+      case "weekend": {
+        const dayOfWeek = today.getDay();
+        const daysUntilWeekend = dayOfWeek === 6 ? 0 : 5 - dayOfWeek;
+        const weekend = new Date(today);
+        weekend.setDate(today.getDate() + daysUntilWeekend);
+        setDate(weekend.toISOString().split("T")[0]);
+        break;
+      }
+      case "month": {
+        const nextMonth = new Date(today);
+        nextMonth.setMonth(today.getMonth() + 1);
+        setDate(nextMonth.toISOString().split("T")[0]);
+        break;
+      }
       case "custom":
-        // Keep the current date or set to empty
-        break
+        break;
       default:
-        setDate("")
+        setDate("");
     }
 
-    setDateFilter(value as any)
-  }
+    setDateFilter(value as any);
+  };
+
+  const hasActiveFilters = dateFilter !== "all" || location !== "all";
 
   return (
     <div className="space-y-6">
+      {/* Date filter */}
       <div>
-        <h3 className="font-medium mb-3 flex items-center">
-          <span className="mr-2">Catégories</span>
+        <h3 className="text-sm font-semibold text-black mb-3 flex items-center gap-2">
+          <div className="w-7 h-7 bg-green/10 rounded-2xl flex items-center justify-center">
+            <CalendarIcon className="h-3.5 w-3.5 text-green" />
+          </div>
+          Date
         </h3>
-        <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger>
-            <SelectValue placeholder="Sélectionner une catégorie" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map((cat) => (
-              <SelectItem key={cat.id} value={cat.id}>
-                {cat.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div>
-        <h3 className="font-medium mb-3 flex items-center">
-          <Calendar className="h-4 w-4 mr-2" />
-          <span>Date</span>
-        </h3>
-        <RadioGroup value={dateFilter} onValueChange={handleDateFilterChange} className="mb-3">
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="all" id="all" />
-            <Label htmlFor="all">Toutes les dates</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="today" id="today" />
-            <Label htmlFor="today">Aujourd'hui</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="weekend" id="weekend" />
-            <Label htmlFor="weekend">Ce weekend</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="month" id="month" />
-            <Label htmlFor="month">Ce mois</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="custom" id="custom" />
-            <Label htmlFor="custom">Date spécifique</Label>
-          </div>
-        </RadioGroup>
+        <div className="flex flex-wrap gap-2">
+          {dateOptions.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => handleDateFilterChange(option.value)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                dateFilter === option.value
+                  ? "bg-green text-white"
+                  : "bg-bg text-gris2 hover:bg-green/10 hover:text-green"
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
 
         {dateFilter === "custom" && (
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full" />
+          <div className="mt-3 relative">
+            <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gris2 pointer-events-none" />
+            <input
+              type="date"
+              value={date}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-full h-11 pl-11 pr-4 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors"
+            />
+          </div>
         )}
       </div>
 
+      {/* Location filter */}
       <div>
-        <h3 className="font-medium mb-3 flex items-center">
-          <MapPin className="h-4 w-4 mr-2" />
-          <span>Lieu</span>
+        <h3 className="text-sm font-semibold text-black mb-3 flex items-center gap-2">
+          <div className="w-7 h-7 rounded-2xl bg-green/10 flex items-center justify-center">
+            <MapPin className="h-3.5 w-3.5 text-green" />
+          </div>
+          Lieu
         </h3>
         <Select value={location} onValueChange={setLocation}>
-          <SelectTrigger>
+          <SelectTrigger className="rounded-xl border-gris4 bg-bg text-sm focus:border-green focus:ring-green">
             <SelectValue placeholder="Sélectionner une ville" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-xl bg-white">
             {locations.map((loc) => (
-              <SelectItem key={loc.id} value={loc.id}>
+              <SelectItem
+                key={loc.id}
+                value={loc.id}
+                className="rounded-lg text-sm"
+              >
                 {loc.name}
               </SelectItem>
             ))}
@@ -163,11 +154,16 @@ export function EventFilters() {
         </Select>
       </div>
 
-      <div className="space-y-2 pt-4">
-        <Button onClick={resetFilters} variant="outline" className="w-full">
-          Réinitialiser
-        </Button>
-      </div>
+      {/* Reset button */}
+      {hasActiveFilters && (
+        <button
+          onClick={resetFilters}
+          className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-red hover:bg-red/5 transition-colors"
+        >
+          <RotateCcw className="h-3.5 w-3.5" />
+          Réinitialiser les filtres
+        </button>
+      )}
     </div>
-  )
+  );
 }

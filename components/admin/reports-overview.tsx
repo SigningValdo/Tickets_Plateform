@@ -1,13 +1,10 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Button } from '@/components/ui/button';
-import { Download } from 'lucide-react';
+import { Download, Calendar, DollarSign, Users, BarChart3, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
 
-// Données factices pour les graphiques - À remplacer par des données réelles de l'API
-export const mockEventData = [
+const mockEventData = [
   { name: 'Jan', events: 3, tickets: 120 },
   { name: 'Fév', events: 2, tickets: 80 },
   { name: 'Mar', events: 5, tickets: 200 },
@@ -16,7 +13,7 @@ export const mockEventData = [
   { name: 'Juin', events: 6, tickets: 240 },
 ];
 
-export const mockSalesData = [
+const mockSalesData = [
   { name: 'Jan', sales: 2400, tickets: 120 },
   { name: 'Fév', sales: 1800, tickets: 80 },
   { name: 'Mar', sales: 5000, tickets: 200 },
@@ -25,21 +22,28 @@ export const mockSalesData = [
   { name: 'Juin', sales: 6000, tickets: 240 },
 ];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
+const COLORS = ['#008D50', '#3B82F6', '#EAB308', '#A855F7', '#80858E', '#008D50'];
 
-export const mockUserData = [
+const mockUserData = [
   { name: 'Nouveaux', value: 45 },
   { name: 'Actifs', value: 30 },
   { name: 'Inactifs', value: 25 },
 ];
 
+const eventCategoryData = [
+  { name: 'Culturels', value: 40 },
+  { name: 'Sportifs', value: 30 },
+  { name: 'Professionnels', value: 20 },
+  { name: 'Autres', value: 10 },
+];
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-3 border rounded shadow">
-        <p className="font-medium">{label}</p>
+      <div className="bg-white px-4 py-3 rounded-xl border border-gris4 shadow-lg">
+        <p className="text-sm font-medium text-navy mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
-          <p key={`tooltip-${index}`} style={{ color: entry.color }}>
+          <p key={`tooltip-${index}`} className="text-xs" style={{ color: entry.color }}>
             {entry.name}: {entry.value}
           </p>
         ))}
@@ -50,13 +54,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function ReportsOverview() {
-  // Fonction pour exporter les données en CSV
   const exportToCSV = (data: any[], filename: string) => {
     const csvContent = [
       Object.keys(data[0]).join(','),
       ...data.map(row => Object.values(row).join(','))
     ].join('\n');
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -69,165 +72,223 @@ export function ReportsOverview() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold tracking-tight">Rapports et analyses</h2>
-        <div className="flex space-x-2">
-          <Button variant="outline" size="sm" onClick={() => exportToCSV(mockEventData, 'evenements')}>
-            <Download className="mr-2 h-4 w-4" />
-            Exporter (CSV)
-          </Button>
-        </div>
+      {/* Export button */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => exportToCSV(mockEventData, 'evenements')}
+          className="inline-flex items-center gap-2 px-4 py-2.5 border border-gris4 text-navy text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors"
+        >
+          <Download className="h-4 w-4" />
+          Exporter (CSV)
+        </button>
       </div>
 
-      <Tabs defaultValue="events" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="events">Événements</TabsTrigger>
-          <TabsTrigger value="sales">Ventes</TabsTrigger>
-          <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+      <Tabs defaultValue="events" className="space-y-6">
+        <TabsList className="bg-bg border border-gris4/50 rounded-xl p-1">
+          <TabsTrigger
+            value="events"
+            className="rounded-lg text-sm data-[state=active]:bg-green/10 data-[state=active]:text-green data-[state=active]:shadow-none"
+          >
+            Événements
+          </TabsTrigger>
+          <TabsTrigger
+            value="sales"
+            className="rounded-lg text-sm data-[state=active]:bg-green/10 data-[state=active]:text-green data-[state=active]:shadow-none"
+          >
+            Ventes
+          </TabsTrigger>
+          <TabsTrigger
+            value="users"
+            className="rounded-lg text-sm data-[state=active]:bg-green/10 data-[state=active]:text-green data-[state=active]:shadow-none"
+          >
+            Utilisateurs
+          </TabsTrigger>
         </TabsList>
 
+        {/* --- Events Tab --- */}
         <TabsContent value="events" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Événements par mois</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="bg-white rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <BarChart3 className="h-5 w-5 text-green" />
+                <h3 className="text-sm font-semibold text-navy">Événements par mois</h3>
+              </div>
+              <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={mockEventData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar dataKey="events" fill="#8884d8" name="Événements" />
-                    <Bar dataKey="tickets" fill="#82ca9d" name="Billets vendus" />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ fontSize: '12px', color: '#80858E' }}
+                    />
+                    <Bar dataKey="events" fill="#008D50" name="Événements" radius={[6, 6, 0, 0]} />
+                    <Bar dataKey="tickets" fill="#3B82F6" name="Billets vendus" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Répartition des événements</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px] flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={250}>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <PieChartIcon className="h-5 w-5 text-green" />
+                <h3 className="text-sm font-semibold text-navy">Répartition des événements</h3>
+              </div>
+              <div className="h-[280px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
-                      data={[
-                        { name: 'Culturels', value: 40 },
-                        { name: 'Sportifs', value: 30 },
-                        { name: 'Professionnels', value: 20 },
-                        { name: 'Autres', value: 10 },
-                      ]}
+                      data={eventCategoryData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
+                      outerRadius={90}
+                      innerRadius={50}
+                      fill="#008D50"
                       dataKey="value"
                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      stroke="none"
                     >
-                      {mockEventData.map((entry, index) => (
+                      {eventCategoryData.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [value, 'Événements']} />
+                    <Tooltip
+                      formatter={(value) => [value, 'Événements']}
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #CFD4E4',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        padding: '8px 12px',
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
+        {/* --- Sales Tab --- */}
         <TabsContent value="sales" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Ventes mensuelles</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
+            <div className="bg-white rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <TrendingUp className="h-5 w-5 text-green" />
+                <h3 className="text-sm font-semibold text-navy">Ventes mensuelles</h3>
+              </div>
+              <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={mockSalesData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Line type="monotone" dataKey="sales" stroke="#8884d8" name="Chiffre d'affaires (€)" />
-                    <Line type="monotone" dataKey="tickets" stroke="#82ca9d" name="Billets vendus" />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ fontSize: '12px', color: '#80858E' }}
+                    />
+                    <Line type="monotone" dataKey="sales" stroke="#008D50" strokeWidth={2} dot={{ r: 4, fill: '#008D50' }} name="Chiffre d'affaires (FCFA)" />
+                    <Line type="monotone" dataKey="tickets" stroke="#3B82F6" strokeWidth={2} dot={{ r: 4, fill: '#3B82F6' }} name="Billets vendus" />
                   </LineChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Moyenne des ventes</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <DollarSign className="h-5 w-5 text-green" />
+                <h3 className="text-sm font-semibold text-navy">Moyenne des ventes</h3>
+              </div>
+              <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={mockSalesData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar dataKey="sales" fill="#8884d8" name="Ventes (€)" />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ fontSize: '12px', color: '#80858E' }}
+                    />
+                    <Bar dataKey="sales" fill="#008D50" name="Ventes (FCFA)" radius={[6, 6, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </TabsContent>
 
+        {/* --- Users Tab --- */}
         <TabsContent value="users" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Nouveaux utilisateurs</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
+            <div className="bg-white rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <Users className="h-5 w-5 text-green" />
+                <h3 className="text-sm font-semibold text-navy">Nouveaux utilisateurs</h3>
+              </div>
+              <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={mockEventData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Line type="monotone" dataKey="events" stroke="#8884d8" name="Nouveaux utilisateurs" />
+                    <Legend
+                      iconType="circle"
+                      iconSize={8}
+                      wrapperStyle={{ fontSize: '12px', color: '#80858E' }}
+                    />
+                    <Line type="monotone" dataKey="events" stroke="#008D50" strokeWidth={2} dot={{ r: 4, fill: '#008D50' }} name="Nouveaux utilisateurs" />
                   </LineChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle>Répartition des utilisateurs</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px] flex items-center justify-center">
-                <ResponsiveContainer width="100%" height={250}>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <PieChartIcon className="h-5 w-5 text-green" />
+                <h3 className="text-sm font-semibold text-navy">Répartition des utilisateurs</h3>
+              </div>
+              <div className="h-[280px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={mockUserData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      outerRadius={80}
-                      fill="#8884d8"
+                      outerRadius={90}
+                      innerRadius={50}
+                      fill="#008D50"
                       dataKey="value"
                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      stroke="none"
                     >
-                      {mockUserData.map((entry, index) => (
+                      {mockUserData.map((_entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [value, 'Utilisateurs']} />
+                    <Tooltip
+                      formatter={(value) => [value, 'Utilisateurs']}
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #CFD4E4',
+                        borderRadius: '12px',
+                        fontSize: '12px',
+                        padding: '8px 12px',
+                      }}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </TabsContent>
       </Tabs>

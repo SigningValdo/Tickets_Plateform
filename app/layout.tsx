@@ -1,5 +1,5 @@
 import type React from "react";
-import { Inter } from "next/font/google";
+import { Poppins } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import AuthProvider from "@/components/auth-provider";
 import QueryProvider from "@/components/query-provider";
@@ -7,7 +7,7 @@ import "./globals.css";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 
-const inter = Inter({ subsets: ["latin"] });
+const poppins = Poppins({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"] });
 
 export const metadata = {
   title: "FANZONE TICKETS - Plateforme de Billetterie en Ligne",
@@ -22,7 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={poppins.className}>
         <NuqsAdapter>
           <ThemeProvider
             attribute="class"

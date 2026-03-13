@@ -24,17 +24,12 @@ export async function GET(req: Request, { params }: Params) {
     });
 
     if (!event) {
-      return new NextResponse(JSON.stringify({ error: "Event not found" }), {
-        status: 404,
-      });
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
 
     return NextResponse.json(event);
   } catch (error) {
     console.error(`Error fetching event`, error);
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

@@ -81,9 +81,26 @@ export function sanitizeEmail(email: string): string {
 }
 
 /**
- * Sanitize phone number
- * - Removes non-numeric characters except + and spaces
- * - Validates basic format
+ * Regex for Cameroon phone numbers
+ * Accepts formats: 6XXXXXXXX, +2376XXXXXXXX, 2376XXXXXXXX
+ * with optional spaces/hyphens between digit groups
+ * Valid prefixes: 6 (mobile), 2 (fixed Douala/Yaoundé), 3 (fixed other)
+ */
+export const CM_PHONE_REGEX = /^(?:\+?237)?[623]\d{8}$/;
+
+/**
+ * Validate a Cameroon phone number
+ */
+export function isValidCameroonPhone(phone: string): boolean {
+  if (typeof phone !== "string") return false;
+  const digitsOnly = phone.replace(/[\s\-().]/g, "");
+  return CM_PHONE_REGEX.test(digitsOnly);
+}
+
+/**
+ * Sanitize phone number (Cameroon format)
+ * - Removes non-numeric characters except +
+ * - Validates Cameroon phone format
  */
 export function sanitizePhone(phone: string): string {
   if (typeof phone !== "string") return "";
@@ -91,9 +108,7 @@ export function sanitizePhone(phone: string): string {
   // Keep only digits, +, spaces, and hyphens
   const sanitized = phone.replace(/[^\d+\s-]/g, "").trim();
 
-  // Basic validation: at least 8 digits
-  const digitsOnly = sanitized.replace(/\D/g, "");
-  if (digitsOnly.length < 8 || digitsOnly.length > 15) {
+  if (!isValidCameroonPhone(sanitized)) {
     return "";
   }
 

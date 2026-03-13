@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Minus, ShoppingCart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Plus, Minus, ShoppingCart, Ticket } from "lucide-react";
 import { TicketType } from "@prisma/client";
 import { BuyTicketModal } from "./buy-ticket-modal";
 
@@ -13,11 +10,7 @@ interface TicketSelectionProps {
   eventId: string;
 }
 
-export default function TicketSelection({
-  tickets,
-  eventId,
-}: TicketSelectionProps) {
-  const router = useRouter();
+export default function TicketSelection({ tickets }: TicketSelectionProps) {
   const [selectedTickets, setSelectedTickets] = useState<
     Record<string, number>
   >({});
@@ -47,7 +40,7 @@ export default function TicketSelection({
 
   const totalTickets = Object.values(selectedTickets).reduce(
     (sum, count) => sum + count,
-    0
+    0,
   );
 
   const totalPrice = tickets.reduce((sum, ticket) => {
@@ -55,72 +48,82 @@ export default function TicketSelection({
     return sum + ticket.price * count;
   }, 0);
 
-  const handleCheckout = () => {
-    if (totalTickets === 0) return;
-
-    // Dans une implémentation réelle, nous stockerions les billets sélectionnés dans un état global ou un cookie
-    // Puis nous redirigerions vers la page de paiement
-    router.push(
-      `/checkout?eventId=${eventId}&tickets=${encodeURIComponent(
-        JSON.stringify(selectedTickets)
-      )}`
-    );
-  };
-
   return (
-    <div className="space-y-4">
-      {tickets.map((ticket) => (
-        <Card key={ticket.id} className="border border-gray-200">
-          <CardContent className="p-4">
+    <div className="space-y-3">
+      {tickets.map((ticket) => {
+        const count = selectedTickets[ticket.id] || 0;
+        const isSelected = count > 0;
+
+        return (
+          <div
+            key={ticket.id}
+            className={`rounded-xl border p-4 transition-colors ${
+              isSelected ? "border-green bg-green/5" : "border-gris4 bg-bg"
+            }`}
+          >
             <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-medium">{ticket.name}</h3>
-                <p className="text-fanzone-orange font-bold">
-                  {ticket.price.toLocaleString()} FCFA
-                </p>
-                <p className="text-sm text-gray-500">
-                  {ticket.quantity} disponibles
-                </p>
+              <div className="flex items-start gap-3">
+                {/* <div
+                  className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                    isSelected ? "bg-green/10" : "bg-gris4/30"
+                  }`}
+                >
+                  <Ticket
+                    className={`h-4 w-4 ${
+                      isSelected ? "text-green" : "text-gris2"
+                    }`}
+                  />
+                </div> */}
+                <div>
+                  <h3 className="text-sm font-semibold text-black">
+                    {ticket.name}
+                  </h3>
+                  <p className="text-green font-bold text-sm">
+                    {ticket.price === 0
+                      ? "Gratuit"
+                      : `${ticket.price.toLocaleString("fr-FR")} FCFA`}
+                  </p>
+                  <p className="text-xs text-gris2">
+                    {ticket.quantity} disponible{ticket.quantity > 1 ? "s" : ""}
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
+              <div className="flex items-center gap-2">
+                <button
                   onClick={() => decrementTicket(ticket.id)}
-                  disabled={(selectedTickets[ticket.id] || 0) === 0}
+                  disabled={count === 0}
+                  className="w-8 h-8 rounded-xl border border-gris4 flex items-center justify-center text-gris2 hover:border-green hover:text-green disabled:opacity-30 disabled:hover:border-gris4 disabled:hover:text-gris2 transition-colors"
                 >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                <span className="w-6 text-center">
-                  {selectedTickets[ticket.id] || 0}
+                  <Minus className="h-3.5 w-3.5" />
+                </button>
+                <span className="w-6 text-center text-sm font-semibold text-black">
+                  {count}
                 </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-8 w-8"
+                <button
                   onClick={() => incrementTicket(ticket.id)}
-                  disabled={
-                    (selectedTickets[ticket.id] || 0) >= ticket.quantity
-                  }
+                  disabled={count >= ticket.quantity}
+                  className="w-8 h-8 rounded-xl border border-gris4 flex items-center justify-center text-gris2 hover:border-green hover:text-green disabled:opacity-30 disabled:hover:border-gris4 disabled:hover:text-gris2 transition-colors"
                 >
-                  <Plus className="h-4 w-4" />
-                </Button>
+                  <Plus className="h-3.5 w-3.5" />
+                </button>
               </div>
             </div>
-          </CardContent>
-        </Card>
-      ))}
+          </div>
+        );
+      })}
 
       {totalTickets > 0 && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-md">
-          <div className="flex justify-between mb-2">
-            <span>Total billets:</span>
-            <span>{totalTickets}</span>
+        <div className="rounded-2xl bg-bg p-4 space-y-2">
+          <div className="flex justify-between text-sm text-gris2">
+            <span>
+              {totalTickets} billet{totalTickets > 1 ? "s" : ""}
+            </span>
           </div>
-          <div className="flex justify-between font-bold text-lg">
-            <span>Total:</span>
-            <span>{totalPrice.toLocaleString()} FCFA</span>
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-semibold text-black">Total</span>
+            <span className="text-lg font-bold text-green">
+              {totalPrice.toLocaleString("fr-FR")} FCFA
+            </span>
           </div>
         </div>
       )}
@@ -131,15 +134,15 @@ export default function TicketSelection({
           quantity: selectedTickets[key],
         }))}
       >
-        <Button
-          className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90 mt-4"
+        <button
           disabled={totalTickets === 0}
+          className="w-full inline-flex items-center justify-center gap-2 h-12 px-8 bg-green text-white font-medium rounded-2xl hover:bg-green/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <ShoppingCart className="h-4 w-4 mr-2" />
+          <ShoppingCart className="h-4 w-4" />
           {totalTickets > 0
             ? "Procéder au paiement"
             : "Sélectionnez des billets"}
-        </Button>
+        </button>
       </BuyTicketModal>
     </div>
   );

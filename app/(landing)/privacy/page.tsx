@@ -1,70 +1,105 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 text-justify">
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-6">
+    <div className="bg-bg">
+      {/* Hero banner */}
+      <section className="relative bg-navy text-white py-16 md:py-20 overflow-hidden">
+        <Image
+          src="/filigrame.png"
+          alt=""
+          fill
+          className="object-cover opacity-20"
+        />
+        <div className="relative container text-center">
+          <h1 className="text-3xl md:text-4xl font-bold">
             Politique de Confidentialité
           </h1>
-          <p className="text-gray-500 mb-8">
-            Dernière mise à jour : 1 janvier 2025
+        </div>
+      </section>
+
+      <div className="container py-12 md:py-16 max-w-4xl mx-auto space-y-6">
+        <p className="text-sm text-gris2">
+          Dernière mise à jour : 1 janvier 2025
+        </p>
+
+        {/* Intro */}
+        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+          <p className="text-sm text-gris2 leading-relaxed">
+            Chez <strong className="text-black">FanZone Tickets</strong>, nous
+            nous engageons à protéger la vie privée de nos utilisateurs. Cette
+            politique de confidentialité décrit comment nous collectons,
+            utilisons, et protégeons vos informations personnelles lorsque vous
+            utilisez notre plateforme.
           </p>
+        </div>
 
-          <div className="prose max-w-none [&_span]:font-bold [&_h2]:font-bold [&_ul]:list-disc [&_ul]:list-inside space-y-5">
-            <p>
-              Chez <span>FanZone Tickets</span>, nous nous engageons à protéger
-              la vie privée de nos utilisateurs. Cette politique de
-              confidentialité décrit comment nous collectons, utilisons, et
-              protégeons vos informations personnelles lorsque vous utilisez
-              notre plateforme.
-            </p>
+        {/* Sections 1 & 2 */}
+        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.04)] space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h2 className="text-base font-bold text-black mb-3">
+                1. Informations Collectées
+              </h2>
+              <p className="text-sm text-gris2 leading-relaxed mb-3">
+                Nous collectons diverses informations afin de vous fournir nos
+                services :
+              </p>
+              <ul className="space-y-2 text-sm text-gris2 leading-relaxed">
+                <li>
+                  <strong className="text-black">
+                    Informations personnelles :
+                  </strong>{" "}
+                  Nom, prénom, adresse e-mail, numéro de téléphone, et
+                  informations de paiement.
+                </li>
+                <li>
+                  <strong className="text-black">
+                    Informations d&apos;utilisation :
+                  </strong>{" "}
+                  Données sur votre interaction avec notre plateforme, y compris
+                  les pages visitées, le temps passé, et les événements
+                  consultés.
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-black mb-3">
+                2. Utilisation des Informations
+              </h2>
+              <p className="text-sm text-gris2 leading-relaxed mb-3">
+                Nous utilisons vos informations pour :
+              </p>
+              <ul className="space-y-2 text-sm text-gris2 leading-relaxed list-disc list-inside">
+                <li>
+                  Gérer votre compte et faciliter l&apos;achat de billets.
+                </li>
+                <li>
+                  Communiquer avec vous concernant votre commande, les mises à
+                  jour d&apos;événements, et le support client.
+                </li>
+                <li>
+                  Améliorer notre plateforme et personnaliser votre expérience
+                  utilisateur.
+                </li>
+                <li>
+                  Envoyer des promotions et des informations sur nos événements,
+                  si vous avez accepté de les recevoir.
+                </li>
+              </ul>
+            </div>
+          </div>
 
-            <h2>1. Informations Collectées</h2>
-            <p>
-              Nous collectons diverses informations afin de vous fournir nos
-              services :
-            </p>
-            <ul>
-              <li>
-                <strong>Informations personnelles :</strong> Nom, prénom,
-                adresse e-mail, numéro de téléphone, et informations de
-                paiement.
-              </li>
-              <li>
-                <strong>Informations d'utilisation :</strong> Données sur votre
-                interaction avec notre plateforme, y compris les pages visitées,
-                le temps passé, et les événements consultés.
-              </li>
-            </ul>
-
-            <h2>2. Utilisation des Informations</h2>
-            <p>Nous utilisons vos informations pour :</p>
-            <ul>
-              <li>Gérer votre compte et faciliter l'achat de billets.</li>
-              <li>
-                Communiquer avec vous concernant votre commande, les mises à
-                jour d'événements, et le support client.
-              </li>
-              <li>
-                Améliorer notre plateforme et personnaliser votre expérience
-                utilisateur.
-              </li>
-              <li>
-                Envoyer des promotions et des informations sur nos événements,
-                si vous avez accepté de les recevoir.
-              </li>
-            </ul>
-
-            <h2>3. Partage des Informations</h2>
-            <p>
+          <div>
+            <h2 className="text-base font-bold text-black mb-3">
+              3. Partage des Informations
+            </h2>
+            <p className="text-sm text-gris2 leading-relaxed mb-3">
               Nous ne vendons ni ne louons vos informations personnelles à des
               tiers. Vos informations peuvent être partagées dans les cas
               suivants :
             </p>
-            <ul>
+            <ul className="space-y-2 text-sm text-gris2 leading-relaxed list-disc list-inside">
               <li>
                 Avec des partenaires de paiement pour traiter vos transactions.
               </li>
@@ -72,21 +107,36 @@ export default function PrivacyPage() {
                 Avec des fournisseurs de services qui nous assistent dans nos
                 opérations (ex. : services de support client).
               </li>
-              <li>En cas d'obligation légale ou pour protéger nos droits.</li>
+              <li>
+                En cas d&apos;obligation légale ou pour protéger nos droits.
+              </li>
             </ul>
+          </div>
+        </div>
 
-            <h2>4. Sécurité des Données</h2>
-            <p>
+        {/* Sections 4, 5, 6 */}
+        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.04)] space-y-6">
+          <div>
+            <h2 className="text-base font-bold text-black mb-3">
+              4. Sécurité des Données
+            </h2>
+            <p className="text-sm text-gris2 leading-relaxed">
               Nous mettons en œuvre des mesures de sécurité techniques et
               organisationnelles pour protéger vos informations personnelles
               contre tout accès non autorisé, perte ou divulgation. Cependant,
               aucune méthode de transmission sur Internet ou de stockage
-              électronique n'est totalement sécurisée.
+              électronique n&apos;est totalement sécurisée.
             </p>
+          </div>
 
-            <h2>5. Vos Droits</h2>
-            <p>Vous avez le droit de :</p>
-            <ul>
+          <div>
+            <h2 className="text-base font-bold text-black mb-3">
+              5. Vos Droits
+            </h2>
+            <p className="text-sm text-gris2 leading-relaxed mb-3">
+              Vous avez le droit de :
+            </p>
+            <ul className="space-y-2 text-sm text-gris2 leading-relaxed list-disc list-inside">
               <li>
                 Accéder à vos informations personnelles et en demander la
                 correction.
@@ -99,37 +149,49 @@ export default function PrivacyPage() {
                 Refuser de recevoir des communications marketing à tout moment.
               </li>
             </ul>
+          </div>
 
-            <h2>6. Cookies</h2>
-            <p>
+          <div>
+            <h2 className="text-base font-bold text-black mb-3">6. Cookies</h2>
+            <p className="text-sm text-gris2 leading-relaxed">
               Nous utilisons des cookies pour améliorer votre expérience sur
               notre plateforme. Les cookies sont de petits fichiers texte
               stockés sur votre appareil. Vous pouvez gérer vos préférences de
               cookies dans les paramètres de votre navigateur.
             </p>
+          </div>
+        </div>
 
-            <h2>7. Modifications de la Politique</h2>
-            <p>
+        {/* Sections 7 & 8 */}
+        <div className="bg-white rounded-2xl p-6 md:p-8 shadow-[0_2px_20px_rgba(0,0,0,0.04)] space-y-6">
+          <div>
+            <h2 className="text-base font-bold text-black mb-3">
+              7. Modifications de la Politique
+            </h2>
+            <p className="text-sm text-gris2 leading-relaxed">
               Nous nous réservons le droit de modifier cette politique de
               confidentialité à tout moment. Les utilisateurs seront informés de
               tout changement, et votre utilisation continue de la plateforme
               constituera une acceptation des nouvelles conditions.
             </p>
+          </div>
 
-            <h2>8. Contact</h2>
-            <p>
+          <div>
+            <h2 className="text-base font-bold text-black mb-3">8. Contact</h2>
+            <p className="text-sm text-gris2 leading-relaxed">
               Pour toute question ou préoccupation concernant notre politique de
-              confidentialité, veuillez nous contacter à l'adresse suivante :
+              confidentialité, veuillez nous contacter à l&apos;adresse suivante
+              :{" "}
               <a
-                className="text-fanzone-orange"
-                href="mailto:fanszonetickets@gmail.com"
+                className="text-green hover:underline"
+                href="mailto:support@fanzonetickets.com"
               >
-                fanszonetickets@gmail.com
+                support@fanzonetickets.com
               </a>
             </p>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

@@ -3,15 +3,16 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ArrowLeft, Save, Loader2, Ticket, User, Calendar, Tag, CreditCard } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
+import Link from "next/link"
+import { ArrowLeft, Save, Loader2, Calendar, Tag, User } from "lucide-react"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
 
 interface Event {
@@ -28,7 +29,7 @@ interface TicketType {
   description: string
 }
 
-interface User {
+interface UserData {
   id: string
   name: string
   email: string
@@ -40,9 +41,9 @@ interface TicketFormData {
   ticketTypeId: string
   quantity: number
   totalPrice: number
-  status: 'pending' | 'confirmed' | 'cancelled' | 'used'
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed'
-  paymentMethod: 'card' | 'mobile_money' | 'cash' | 'bank_transfer' | 'free'
+  status: "pending" | "confirmed" | "cancelled" | "used"
+  paymentStatus: "pending" | "paid" | "refunded" | "failed"
+  paymentMethod: "card" | "mobile_money" | "cash" | "bank_transfer" | "free"
   notes: string
   sendConfirmationEmail: boolean
 }
@@ -51,62 +52,75 @@ export default function CreateTicketPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
-  
+
   const [saving, setSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [events, setEvents] = useState<Event[]>([])
   const [ticketTypes, setTicketTypes] = useState<TicketType[]>([])
-  const [users, setUsers] = useState<User[]>([])
-  const [selectedTicketType, setSelectedTicketType] = useState<TicketType | null>(null)
-  
+  const [users, setUsers] = useState<UserData[]>([])
+  const [selectedTicketType, setSelectedTicketType] =
+    useState<TicketType | null>(null)
+
   const [formData, setFormData] = useState<TicketFormData>({
-    eventId: '',
-    userId: '',
-    ticketTypeId: '',
+    eventId: "",
+    userId: "",
+    ticketTypeId: "",
     quantity: 1,
     totalPrice: 0,
-    status: 'confirmed',
-    paymentStatus: 'paid',
-    paymentMethod: 'card',
-    notes: '',
-    sendConfirmationEmail: true
+    status: "confirmed",
+    paymentStatus: "paid",
+    paymentMethod: "card",
+    notes: "",
+    sendConfirmationEmail: true,
   })
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Dans une implémentation réelle, nous appellerions des API pour récupérer les données
         await new Promise((resolve) => setTimeout(resolve, 1000))
-        
-        // Données simulées
+
         const mockEvents: Event[] = [
-          { id: '1', title: 'Concert de Jazz - Miles Davis Tribute', date: '2024-02-15', location: 'Palais des Congrès' },
-          { id: '2', title: 'Festival de Musique Africaine', date: '2024-03-20', location: 'Stade Ahmadou Ahidjo' },
-          { id: '3', title: 'Conférence Tech Innovate', date: '2024-04-10', location: 'Centre de Conférences' }
+          {
+            id: "1",
+            title: "Concert de Jazz - Miles Davis Tribute",
+            date: "2024-02-15",
+            location: "Palais des Congrès",
+          },
+          {
+            id: "2",
+            title: "Festival de Musique Africaine",
+            date: "2024-03-20",
+            location: "Stade Ahmadou Ahidjo",
+          },
+          {
+            id: "3",
+            title: "Conférence Tech Innovate",
+            date: "2024-04-10",
+            location: "Centre de Conférences",
+          },
         ]
-        
-        const mockUsers: User[] = [
-          { id: '1', name: 'Jean Dupont', email: 'jean.dupont@email.com' },
-          { id: '2', name: 'Marie Koné', email: 'marie.kone@email.com' },
-          { id: '3', name: 'Paul Biya', email: 'paul.biya@email.com' }
+
+        const mockUsers: UserData[] = [
+          { id: "1", name: "Jean Dupont", email: "jean.dupont@email.com" },
+          { id: "2", name: "Marie Koné", email: "marie.kone@email.com" },
+          { id: "3", name: "Paul Biya", email: "paul.biya@email.com" },
         ]
-        
+
         setEvents(mockEvents)
         setUsers(mockUsers)
-        
-        // Pré-remplir l'événement et l'utilisateur si fournis dans l'URL
-        const eventId = searchParams.get('event_id')
-        const userId = searchParams.get('user_id')
-        
+
+        const eventId = searchParams.get("event_id")
+        const userId = searchParams.get("user_id")
+
         if (eventId) {
-          setFormData(prev => ({ ...prev, eventId }))
+          setFormData((prev) => ({ ...prev, eventId }))
           await fetchTicketTypes(eventId)
         }
-        
+
         if (userId) {
-          setFormData(prev => ({ ...prev, userId }))
+          setFormData((prev) => ({ ...prev, userId }))
         }
-      } catch (error) {
+      } catch {
         toast({
           title: "Erreur",
           description: "Impossible de charger les données",
@@ -122,18 +136,31 @@ export default function CreateTicketPage() {
 
   const fetchTicketTypes = async (eventId: string) => {
     try {
-      // Dans une implémentation réelle, nous appellerions une API pour récupérer les types de billets
       await new Promise((resolve) => setTimeout(resolve, 500))
-      
-      // Données simulées
+
       const mockTicketTypes: TicketType[] = [
-        { id: '1', name: 'Standard', price: 15000, description: 'Accès standard à l\'événement' },
-        { id: '2', name: 'VIP', price: 25000, description: 'Accès VIP avec boissons incluses' },
-        { id: '3', name: 'Premium', price: 35000, description: 'Accès premium avec meet & greet' }
+        {
+          id: "1",
+          name: "Standard",
+          price: 15000,
+          description: "Accès standard à l'événement",
+        },
+        {
+          id: "2",
+          name: "VIP",
+          price: 25000,
+          description: "Accès VIP avec boissons incluses",
+        },
+        {
+          id: "3",
+          name: "Premium",
+          price: 35000,
+          description: "Accès premium avec meet & greet",
+        },
       ]
-      
+
       setTicketTypes(mockTicketTypes)
-    } catch (error) {
+    } catch {
       toast({
         title: "Erreur",
         description: "Impossible de charger les types de billets",
@@ -142,43 +169,51 @@ export default function CreateTicketPage() {
     }
   }
 
-  const handleInputChange = (field: keyof TicketFormData, value: string | number | boolean) => {
-    setFormData(prev => ({
+  const handleInputChange = (
+    field: keyof TicketFormData,
+    value: string | number | boolean
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }))
   }
 
   const handleEventChange = async (eventId: string) => {
-    handleInputChange('eventId', eventId)
-    handleInputChange('ticketTypeId', '')
+    handleInputChange("eventId", eventId)
+    handleInputChange("ticketTypeId", "")
     setSelectedTicketType(null)
     await fetchTicketTypes(eventId)
   }
 
   const handleTicketTypeChange = (ticketTypeId: string) => {
-    handleInputChange('ticketTypeId', ticketTypeId)
-    
-    const selectedType = ticketTypes.find(type => type.id === ticketTypeId)
+    handleInputChange("ticketTypeId", ticketTypeId)
+
+    const selectedType = ticketTypes.find((type) => type.id === ticketTypeId)
     setSelectedTicketType(selectedType || null)
-    
+
     if (selectedType) {
       const totalPrice = selectedType.price * formData.quantity
-      handleInputChange('totalPrice', totalPrice)
+      handleInputChange("totalPrice", totalPrice)
     }
   }
 
   const handleQuantityChange = (quantity: number) => {
-    handleInputChange('quantity', quantity)
-    
+    handleInputChange("quantity", quantity)
+
     if (selectedTicketType) {
       const totalPrice = selectedTicketType.price * quantity
-      handleInputChange('totalPrice', totalPrice)
+      handleInputChange("totalPrice", totalPrice)
     }
   }
 
   const validateForm = () => {
-    if (!formData.eventId || !formData.userId || !formData.ticketTypeId || formData.quantity <= 0) {
+    if (
+      !formData.eventId ||
+      !formData.userId ||
+      !formData.ticketTypeId ||
+      formData.quantity <= 0
+    ) {
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -192,7 +227,7 @@ export default function CreateTicketPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!validateForm()) {
       return
     }
@@ -200,19 +235,19 @@ export default function CreateTicketPage() {
     setSaving(true)
 
     try {
-      // Dans une implémentation réelle, nous appellerions une API pour créer le ticket
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       toast({
         title: "Ticket créé",
-        description: `Le ticket a été créé avec succès${formData.sendConfirmationEmail ? ' et un email de confirmation a été envoyé.' : '.'}`
+        description: `Le ticket a été créé avec succès${formData.sendConfirmationEmail ? " et un email de confirmation a été envoyé." : "."}`,
       })
 
-      router.push('/admin/tickets')
-    } catch (error) {
+      router.push("/admin/tickets")
+    } catch {
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création du ticket",
+        description:
+          "Une erreur est survenue lors de la création du ticket",
         variant: "destructive",
       })
     } finally {
@@ -221,278 +256,330 @@ export default function CreateTicketPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XAF',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "XAF",
+      minimumFractionDigits: 0,
     }).format(amount)
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Chargement des données...</p>
+          <Loader2 className="h-10 w-10 animate-spin text-green mx-auto mb-4" />
+          <p className="text-gris2 text-sm">Chargement des données...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <Link href="/admin/dashboard" className="inline-block mb-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-fanzone-orange rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">E</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">E-Tickets Admin</span>
-            </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/tickets"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-gris2 border border-gris4 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" /> Retour
           </Link>
-          
-          <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-navy">Créer un ticket</h1>
+            <p className="text-gris2 text-sm mt-0.5">
+              Ajouter un nouveau ticket manuellement
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Événement et type de billet */}
+        <div className="bg-white rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Calendar className="h-5 w-5 text-green" />
+            <h3 className="text-sm font-semibold text-navy">
+              Événement et type de billet
+            </h3>
+          </div>
+          <p className="text-xs text-gris2 mb-4">
+            Sélectionnez l&apos;événement et le type de billet
+          </p>
+          <div className="space-y-4">
             <div>
-              <Button
-                onClick={() => router.push('/admin/tickets')}
-                variant="outline"
-                className="mb-4"
+              <label className="block text-sm font-medium text-navy mb-1.5">
+                Événement *
+              </label>
+              <Select
+                value={formData.eventId}
+                onValueChange={handleEventChange}
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Retour aux tickets
-              </Button>
-              <h1 className="text-3xl font-bold text-gray-900">Créer un ticket</h1>
-              <p className="text-gray-600">Ajouter un nouveau ticket manuellement</p>
+                <SelectTrigger className="rounded-xl border-gris4 bg-bg text-sm focus:border-green focus:ring-1 focus:ring-green/20">
+                  <SelectValue placeholder="Sélectionner un événement" />
+                </SelectTrigger>
+                <SelectContent>
+                  {events.map((event) => (
+                    <SelectItem key={event.id} value={event.id}>
+                      {event.title} -{" "}
+                      {new Date(event.date).toLocaleDateString("fr-FR")} -{" "}
+                      {event.location}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">
+                Type de billet *
+              </label>
+              <Select
+                value={formData.ticketTypeId}
+                onValueChange={handleTicketTypeChange}
+                disabled={!formData.eventId || ticketTypes.length === 0}
+              >
+                <SelectTrigger className="rounded-xl border-gris4 bg-bg text-sm focus:border-green focus:ring-1 focus:ring-green/20">
+                  <SelectValue placeholder="Sélectionner un type de billet" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ticketTypes.map((type) => (
+                    <SelectItem key={type.id} value={type.id}>
+                      {type.name} - {formatCurrency(type.price)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {formData.eventId && ticketTypes.length === 0 && (
+                <p className="text-xs text-gris2 mt-1">
+                  Aucun type de billet disponible pour cet événement
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">
+                Quantité *
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={formData.quantity}
+                onChange={(e) =>
+                  handleQuantityChange(parseInt(e.target.value) || 1)
+                }
+                disabled={!formData.ticketTypeId}
+                className="w-full h-10 px-4 rounded-xl border border-gris4 bg-bg text-sm text-navy focus:outline-none focus:border-green focus:ring-1 focus:ring-green/20 disabled:opacity-50"
+              />
+            </div>
+
+            {selectedTicketType && (
+              <div className="p-4 bg-bg rounded-xl">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-navy">
+                    Prix unitaire:
+                  </span>
+                  <span className="text-sm text-navy">
+                    {formatCurrency(selectedTicketType.price)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span className="text-sm font-medium text-navy">
+                    Quantité:
+                  </span>
+                  <span className="text-sm text-navy">{formData.quantity}</span>
+                </div>
+                <div className="flex justify-between items-center mt-2 pt-2 border-t border-gris4/50">
+                  <span className="font-bold text-navy">Total:</span>
+                  <span className="font-bold text-lg text-green">
+                    {formatCurrency(formData.totalPrice)}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Utilisateur */}
+        <div className="bg-white rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <User className="h-5 w-5 text-green" />
+            <h3 className="text-sm font-semibold text-navy">Utilisateur</h3>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-navy mb-1.5">
+              Utilisateur *
+            </label>
+            <Select
+              value={formData.userId}
+              onValueChange={(value) => handleInputChange("userId", value)}
+            >
+              <SelectTrigger className="rounded-xl border-gris4 bg-bg text-sm focus:border-green focus:ring-1 focus:ring-green/20">
+                <SelectValue placeholder="Sélectionner un utilisateur" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user) => (
+                  <SelectItem key={user.id} value={user.id}>
+                    {user.name} - {user.email}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Statut et paiement */}
+        <div className="bg-white rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Tag className="h-5 w-5 text-green" />
+            <h3 className="text-sm font-semibold text-navy">
+              Statut et paiement
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">
+                Statut du ticket
+              </label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) =>
+                  handleInputChange("status", value as TicketFormData["status"])
+                }
+              >
+                <SelectTrigger className="rounded-xl border-gris4 bg-bg text-sm focus:border-green focus:ring-1 focus:ring-green/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">En attente</SelectItem>
+                  <SelectItem value="confirmed">Confirmé</SelectItem>
+                  <SelectItem value="cancelled">Annulé</SelectItem>
+                  <SelectItem value="used">Utilisé</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">
+                Statut du paiement
+              </label>
+              <Select
+                value={formData.paymentStatus}
+                onValueChange={(value) =>
+                  handleInputChange(
+                    "paymentStatus",
+                    value as TicketFormData["paymentStatus"]
+                  )
+                }
+              >
+                <SelectTrigger className="rounded-xl border-gris4 bg-bg text-sm focus:border-green focus:ring-1 focus:ring-green/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">En attente</SelectItem>
+                  <SelectItem value="paid">Payé</SelectItem>
+                  <SelectItem value="refunded">Remboursé</SelectItem>
+                  <SelectItem value="failed">Échoué</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">
+                Méthode de paiement
+              </label>
+              <Select
+                value={formData.paymentMethod}
+                onValueChange={(value) =>
+                  handleInputChange(
+                    "paymentMethod",
+                    value as TicketFormData["paymentMethod"]
+                  )
+                }
+              >
+                <SelectTrigger className="rounded-xl border-gris4 bg-bg text-sm focus:border-green focus:ring-1 focus:ring-green/20">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="card">Carte bancaire</SelectItem>
+                  <SelectItem value="mobile_money">Mobile Money</SelectItem>
+                  <SelectItem value="cash">Espèces</SelectItem>
+                  <SelectItem value="bank_transfer">
+                    Virement bancaire
+                  </SelectItem>
+                  <SelectItem value="free">Gratuit</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Événement et type de billet */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Calendar className="mr-2 h-5 w-5" />
-                Événement et type de billet
-              </CardTitle>
-              <CardDescription>
-                Sélectionnez l'événement et le type de billet
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="eventId">Événement *</Label>
-                <Select value={formData.eventId} onValueChange={handleEventChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un événement" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {events.map((event) => (
-                      <SelectItem key={event.id} value={event.id}>
-                        {event.title} - {new Date(event.date).toLocaleDateString('fr-FR')} - {event.location}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="ticketTypeId">Type de billet *</Label>
-                <Select 
-                  value={formData.ticketTypeId} 
-                  onValueChange={handleTicketTypeChange}
-                  disabled={!formData.eventId || ticketTypes.length === 0}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un type de billet" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ticketTypes.map((type) => (
-                      <SelectItem key={type.id} value={type.id}>
-                        {type.name} - {formatCurrency(type.price)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {formData.eventId && ticketTypes.length === 0 && (
-                  <p className="text-sm text-gray-500 mt-1">Aucun type de billet disponible pour cet événement</p>
-                )}
-              </div>
-              
-              <div>
-                <Label htmlFor="quantity">Quantité *</Label>
-                <Input
-                  id="quantity"
-                  type="number"
-                  min="1"
-                  value={formData.quantity}
-                  onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)}
-                  disabled={!formData.ticketTypeId}
-                />
-              </div>
-              
-              {selectedTicketType && (
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm font-medium">Prix unitaire:</span>
-                    <span>{formatCurrency(selectedTicketType.price)}</span>
-                  </div>
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm font-medium">Quantité:</span>
-                    <span>{formData.quantity}</span>
-                  </div>
-                  <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-200">
-                    <span className="font-bold">Total:</span>
-                    <span className="font-bold text-lg">{formatCurrency(formData.totalPrice)}</span>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+        {/* Notes et options */}
+        <div className="bg-white rounded-2xl p-6">
+          <h3 className="text-sm font-semibold text-navy mb-4">
+            Notes et options
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-navy mb-1.5">
+                Notes (optionnel)
+              </label>
+              <input
+                value={formData.notes}
+                onChange={(e) => handleInputChange("notes", e.target.value)}
+                placeholder="Notes ou commentaires sur ce ticket"
+                className="w-full h-10 px-4 rounded-xl border border-gris4 bg-bg text-sm text-navy placeholder:text-gris3 focus:outline-none focus:border-green focus:ring-1 focus:ring-green/20"
+              />
+            </div>
 
-          {/* Utilisateur */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <User className="mr-2 h-5 w-5" />
-                Utilisateur
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <Label htmlFor="userId">Utilisateur *</Label>
-                <Select value={formData.userId} onValueChange={(value) => handleInputChange('userId', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionner un utilisateur" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name} - {user.email}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Statut et paiement */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Tag className="mr-2 h-5 w-5" />
-                Statut et paiement
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="status">Statut du ticket</Label>
-                <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value as 'pending' | 'confirmed' | 'cancelled' | 'used')}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">En attente</SelectItem>
-                    <SelectItem value="confirmed">Confirmé</SelectItem>
-                    <SelectItem value="cancelled">Annulé</SelectItem>
-                    <SelectItem value="used">Utilisé</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="paymentStatus">Statut du paiement</Label>
-                <Select value={formData.paymentStatus} onValueChange={(value) => handleInputChange('paymentStatus', value as 'pending' | 'paid' | 'refunded' | 'failed')}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pending">En attente</SelectItem>
-                    <SelectItem value="paid">Payé</SelectItem>
-                    <SelectItem value="refunded">Remboursé</SelectItem>
-                    <SelectItem value="failed">Échoué</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="paymentMethod">Méthode de paiement</Label>
-                <Select value={formData.paymentMethod} onValueChange={(value) => handleInputChange('paymentMethod', value as 'card' | 'mobile_money' | 'cash' | 'bank_transfer' | 'free')}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="card">Carte bancaire</SelectItem>
-                    <SelectItem value="mobile_money">Mobile Money</SelectItem>
-                    <SelectItem value="cash">Espèces</SelectItem>
-                    <SelectItem value="bank_transfer">Virement bancaire</SelectItem>
-                    <SelectItem value="free">Gratuit</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Notes et options */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Notes et options</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="notes">Notes (optionnel)</Label>
-                <Input
-                  id="notes"
-                  value={formData.notes}
-                  onChange={(e) => handleInputChange('notes', e.target.value)}
-                  placeholder="Notes ou commentaires sur ce ticket"
-                />
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="sendConfirmationEmail"
-                  checked={formData.sendConfirmationEmail}
-                  onCheckedChange={(checked) => handleInputChange('sendConfirmationEmail', checked as boolean)}
-                />
-                <Label htmlFor="sendConfirmationEmail">Envoyer un email de confirmation</Label>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <div className="flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push('/admin/tickets')}
-              disabled={saving}
-            >
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              className="bg-fanzone-orange hover:bg-fanzone-orange/90"
-              disabled={saving}
-            >
-              {saving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Création...
-                </>
-              ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Créer le ticket
-                </>
-              )}
-            </Button>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.sendConfirmationEmail}
+                onChange={(e) =>
+                  handleInputChange(
+                    "sendConfirmationEmail",
+                    e.target.checked
+                  )
+                }
+                className="h-4 w-4 rounded border-gris4 text-green focus:ring-green/20"
+              />
+              <span className="text-sm text-navy">
+                Envoyer un email de confirmation
+              </span>
+            </label>
           </div>
-        </form>
-      </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => router.push("/admin/tickets")}
+            disabled={saving}
+            className="px-5 py-2.5 border border-gris4 text-navy text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green text-white text-sm font-medium rounded-xl hover:bg-green/90 transition-colors disabled:opacity-50"
+          >
+            {saving ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Création...
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                Créer le ticket
+              </>
+            )}
+          </button>
+        </div>
+      </form>
     </div>
   )
 }

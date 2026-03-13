@@ -1,406 +1,328 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Shield,
+  QrCode,
+  BarChart3,
+  HeadphonesIcon,
+  Star,
+  Eye,
+} from "lucide-react";
+
+const VALUES = [
+  {
+    title: "Innovation",
+    description:
+      "Nous nous engageons à innover en permanence pour offrir des solutions technologiques à la pointe.",
+  },
+  {
+    title: "Transparence",
+    description:
+      "Nous valorisons la transparence dans toutes nos interactions et créons un environnement de confiance.",
+  },
+  {
+    title: "Excellence",
+    description:
+      "Nous visons l'excellence dans tout ce que nous faisons, de la conception à l'expérience utilisateur.",
+  },
+  {
+    title: "Accessibilité",
+    description:
+      "Nous croyons que l'accès à la culture et au divertissement devrait être universel.",
+  },
+  {
+    title: "Responsabilité Sociale",
+    description:
+      "Nous soutenons les initiatives qui favorisent le développement durable et l'épanouissement des talents locaux.",
+  },
+  {
+    title: "Collaboration",
+    description:
+      "Nous croyons en la force du travail d'équipe et de la collaboration avec nos partenaires.",
+  },
+];
+
+const ADVANTAGES = [
+  {
+    icon: Shield,
+    title: "Sécurité des Transactions",
+    description:
+      "Paiements sécurisés grâce à l'intégration de solutions locales comme Mobile Money (MTN, Orange) et cartes bancaires.",
+  },
+  {
+    icon: QrCode,
+    title: "Billetterie 100% Numérique",
+    description:
+      "Billets numériques avec QR Code unique envoyé par e-mail ou SMS pour faciliter l'entrée aux événements.",
+  },
+  {
+    icon: BarChart3,
+    title: "Gestion en Temps Réel",
+    description:
+      "Suivez les ventes et accédez à des statistiques détaillées en temps réel pour des décisions éclairées.",
+  },
+  {
+    icon: HeadphonesIcon,
+    title: "Support Client Dédié",
+    description:
+      "Notre équipe de support est disponible pour assister les utilisateurs à chaque étape.",
+  },
+  {
+    icon: Star,
+    title: "Flexibilité Totale",
+    description:
+      "Concert, conférence, festival ou événement sportif — FanZone Tickets s'adapte à vos besoins.",
+  },
+  {
+    icon: Eye,
+    title: "Transparence Complète",
+    description:
+      "Informations claires sur les frais et les processus pour une confiance totale.",
+  },
+];
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen ">
-      <section className="text-center bg-[url('/bg-about.jpg')] bg-cover bg-center h-[600px] w-full">
-        <div className="w-full h-full bg-black/50 flex items-center justify-center">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-fanzone-orange fanzone-heading">
-              Découvrez l'univers de FanZone Tickets
+    <div className="bg-bg">
+      {/* Hero */}
+      <section className="relative h-[420px] md:h-[500px] w-full overflow-hidden">
+        <Image
+          src="/bg-about.jpg"
+          alt="À propos de FanZone Tickets"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-navy/60" />
+        <div className="absolute inset-0 flex items-center justify-center text-center container">
+          <div className="max-w-3xl">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+              Découvrez l&apos;univers de FanZone Tickets
             </h1>
-            <p className="text-xl text-white mb-6 max-w-3xl mx-auto fanzone-body">
-              Transformons l'expérience événementielle au Cameroun en rendant
-              l'achat et la gestion des billets simples, rapides et sécurisés.
+            <p className="text-lg text-white/80 max-w-2xl mx-auto">
+              Transformons l&apos;expérience événementielle au Cameroun en
+              rendant l&apos;achat et la gestion des billets simples, rapides et
+              sécurisés.
             </p>
           </div>
         </div>
       </section>
-      <main className="container mx-auto px-4 mt-10 py-12 space-y-16">
+
+      <div className="container py-16 space-y-20">
+        {/* Mission */}
         <section>
-          <div className="space-y-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-center text-fanzone-orange mb-4">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-black">
               Notre Mission
             </h2>
-            <div className="prose grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <Image
-                  src="/mission.jpg"
-                  alt="FanZone Tickets"
-                  width={500}
-                  height={500}
-                  className="rounded-lg w-full h-full object-cover"
-                />
-              </div>
-              <div className="max-w-[600px] text-lg">
-                <p className="mb-6">
-                  Chez <strong>FanZone Tickets</strong>, notre mission est de
-                  transformer l'expérience événementielle au Cameroun. Nous nous
-                  engageons à :
-                </p>
-                <ul className="space-y-2 mb-6 max-w-[450px]">
-                  <li>
-                    • <strong>Faciliter l'accès aux événements : </strong>
-                    Offrir une plateforme intuitive qui simplifie le processus
-                    d'achat de billets.
-                  </li>
-                  <li>
-                    • <strong>Promouvoir la transparence :</strong> Garantir un
-                    système de billetterie fiable qui favorise la confiance.
-                  </li>
-                  <li>
-                    •{" "}
-                    <strong>
-                      Soutenir le développement économique local :
-                    </strong>{" "}
-                    Contribuer à la modernisation de l'économie de
-                    l'événementiel au Cameroun.
-                  </li>
-                  <li>
-                    • <strong>Offrir un service client exceptionnel :</strong>{" "}
-                    Assurer un support accessible et réactif.
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <div className="w-16 h-1 bg-green mx-auto mt-3 rounded-full" />
           </div>
-        </section>
-        <section>
-          <div className="space-y-16 text-lg">
-            <h2 className="text-4xl md:text-5xl font-bold text-center text-fanzone-orange mb-4">
-              Nos Valeurs
-            </h2>
-            <div className="">
-              <ul className="space-y-2 prose grid grid-cols-1 md:grid-cols-3 gap-8">
-                <li className="flex items-center gap-2 flex-col text-center">
-                  <strong>1. Innovation </strong> Nous nous engageons à innover
-                  en permanence pour offrir des solutions technologiques à la
-                  pointe.
-                </li>
-                <li className="flex items-center gap-2 flex-col text-center">
-                  <strong>2. Transparence </strong> Nous valorisons la
-                  transparence dans toutes nos interactions et créons un
-                  environnement de confiance.
-                </li>
-                <li className="flex items-center gap-2 flex-col text-center">
-                  <strong>3. Excellence </strong> Nous visons l'excellence dans
-                  tout ce que nous faisons.
-                </li>
-                <li className="flex items-center gap-2 flex-col text-center">
-                  <strong>4. Accessibilité </strong> Nous croyons que l'accès à
-                  la culture et au divertissement devrait être universel.
-                </li>
-                <li className="flex items-center gap-2 flex-col text-center">
-                  <strong>5. Responsabilité Sociale </strong> Nous soutenons les
-                  initiatives qui favorisent le développement durable et
-                  l'épanouissement des talents locaux.
-                </li>
-                <li className="flex items-center gap-2 flex-col text-center">
-                  <strong>6. Collaboration </strong> Nous croyons en la force du
-                  travail d'équipe et de la collaboration.
-                </li>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <div className="relative h-[320px] md:h-[400px] rounded-2xl overflow-hidden">
+              <Image
+                src="/mission.jpg"
+                alt="Notre mission"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <p className="text-gris2 mb-5 leading-relaxed">
+                Chez <strong className="text-black">FanZone Tickets</strong>,
+                notre mission est de transformer l&apos;expérience
+                événementielle au Cameroun. Nous nous engageons à :
+              </p>
+              <ul className="space-y-3">
+                {[
+                  {
+                    label: "Faciliter l'accès aux événements",
+                    text: "Offrir une plateforme intuitive qui simplifie le processus d'achat de billets.",
+                  },
+                  {
+                    label: "Promouvoir la transparence",
+                    text: "Garantir un système de billetterie fiable qui favorise la confiance.",
+                  },
+                  {
+                    label: "Soutenir le développement local",
+                    text: "Contribuer à la modernisation de l'économie de l'événementiel au Cameroun.",
+                  },
+                  {
+                    label: "Service client exceptionnel",
+                    text: "Assurer un support accessible et réactif.",
+                  },
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-3 items-start">
+                    <span className="mt-1 h-6 w-6 rounded-full bg-green/10 flex items-center justify-center flex-shrink-0">
+                      <span className="h-2 w-2 rounded-full bg-green" />
+                    </span>
+                    <p className="text-sm text-gris2 leading-relaxed">
+                      <strong className="text-black">{item.label} :</strong>{" "}
+                      {item.text}
+                    </p>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
         </section>
+
+        {/* Valeurs */}
         <section>
-          <div className="space-y-16 text-lg">
-            <h2 className="text-4xl md:text-5xl font-bold text-center text-fanzone-orange mb-4">
-              Notre Histoire
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-black">
+              Nos Valeurs
             </h2>
-            <div className="prose grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="max-w-[600px]">
-                <p>
-                  <strong>FanZone Tickets</strong> est née en 2025 d'une vision
-                  audacieuse : transformer l'expérience événementielle au
-                  Cameroun. Face aux défis rencontrés par les organisateurs et
-                  les participants dans le processus d'achat de billets, nous
-                  avons compris qu'il était essentiel de créer une plateforme
-                  adaptée aux besoins spécifiques du marché local.
-                </p>
-                <p className="mb-6">
-                  L'idée de <strong>FanZone Tickets</strong> a émergé en réponse
-                  aux préoccupations exprimées par de nombreux organisateurs
-                  d'événements concernant la fraude, la complexité de gestion
-                  des ventes et l'accès limité à des solutions de billetterie
-                  modernes.
-                </p>
-                <p className="mb-6">
-                  Après plusieurs mois de recherche et de développement, nous
-                  avons conçu notre plateforme en intégrant des solutions de
-                  paiement locales telles que Mobile Money, permettant à chaque
-                  utilisateur d'acheter des billets facilement.
-                </p>
-              </div>
-              <div>
-                <Image
-                  src="/equipe.jpg"
-                  alt="FanZone Tickets"
-                  width={500}
-                  height={500}
-                  className="rounded-lg w-full h-full object-cover"
-                />
-              </div>
-            </div>
+            <div className="w-16 h-1 bg-green mx-auto mt-3 rounded-full" />
           </div>
-        </section>
-        <section>
-          <div className="space-y-16 text-lg">
-            <h2 className="text-4xl md:text-5xl font-bold text-center text-fanzone-orange mb-4">
-              Notre Croissance
-            </h2>
-            <div className="prose grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <Image
-                  src="/croissance.jpg"
-                  alt="FanZone Tickets"
-                  width={500}
-                  height={500}
-                  className="rounded-lg w-full h-full object-cover"
-                />
-              </div>
-              <div className="max-w-[600px]">
-                <p className="mb-4">
-                  <strong>FanZone Tickets</strong> a été officiellement lancé en
-                  2025 et a rapidement attiré l'attention des organisateurs
-                  d'événements et du public. Grâce à sa simplicité
-                  d'utilisation, sa sécurité et ses fonctionnalités innovantes,
-                  notre plateforme est devenue un outil essentiel pour gérer
-                  divers événements.
-                </p>
-                <p className="mb-6">
-                  Depuis notre lancement, nous avons constamment évolué en
-                  réponse aux besoins de nos utilisateurs. Nous avons élargi
-                  notre équipe pour inclure des experts en marketing, en analyse
-                  de données et en support client, garantissant ainsi une
-                  expérience optimale pour tous.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-16 space-y-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-center text-fanzone-orange mb-4">
-            Pourquoi Choisir FanZone Tickets ?
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-fanzone-orange"
-                  >
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Sécurité des Transactions
-                </h3>
-                <p className="text-gray-600">
-                  Nous garantissons des paiements sécurisés grâce à
-                  l'intégration de solutions de paiement locales comme Mobile
-                  Money (MTN, Orange) et cartes bancaires.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-fanzone-orange"
-                  >
-                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.25" />
-                    <path d="M21 3v9h-9" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Billetterie 100% Numérique
-                </h3>
-                <p className="text-gray-600">
-                  Tous les billets sont numériques, accompagnés d'un QR Code
-                  unique envoyé par e-mail ou SMS. Ce système facilite l'entrée
-                  aux événements.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-fanzone-orange"
-                  >
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Gestion en Temps Réel
-                </h3>
-                <p className="text-gray-600">
-                  Les organisateurs peuvent suivre les ventes et accéder à des
-                  statistiques détaillées en temps réel, leur permettant de
-                  prendre des décisions éclairées.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-fanzone-orange"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Support Client Dédicacé
-                </h3>
-                <p className="text-gray-600">
-                  Notre équipe de support est disponible pour assister les
-                  utilisateurs à chaque étape, garantissant une expérience
-                  fluide et agréable.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-fanzone-orange"
-                  >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Flexibilité pour Tous Types d'Événements
-                </h3>
-                <p className="text-gray-600">
-                  Que vous organisiez un concert, une conférence, un festival ou
-                  un événement sportif, <strong>FanZone Tickets</strong>{" "}
-                  s'adapte à vos besoins spécifiques.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-fanzone-orange"
-                  >
-                    <path d="M3 3h18v18H3zM9 9h6v6H9z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  Engagement envers la Transparence
-                </h3>
-                <p className="text-gray-600">
-                  Nous croyons en la transparence totale dans nos opérations,
-                  fournissant des informations claires sur les frais et les
-                  processus.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-
-        {/* <section className="max-w-4xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-center">
-            Nos Partenaires Locaux
-          </h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {VALUES.map((v, i) => (
               <div
                 key={i}
-                className="h-24 bg-white rounded-md shadow-sm flex items-center justify-center"
+                className="bg-white rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]"
               >
-                <div className="text-gray-400 font-medium">Partenaire {i}</div>
+                <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-green/10 text-green font-bold text-sm mb-4">
+                  {i + 1}
+                </span>
+                <h3 className="font-semibold text-black mb-2">{v.title}</h3>
+                <p className="text-sm text-gris2 leading-relaxed">
+                  {v.description}
+                </p>
               </div>
             ))}
           </div>
-        </section> */}
+        </section>
 
-        <section className="bg-purple-50 rounded-xl p-8 text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4">
+        {/* Histoire */}
+        <section>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-black">
+              Notre Histoire
+            </h2>
+            <div className="w-16 h-1 bg-green mx-auto mt-3 rounded-full" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <div>
+              <p className="text-gris2 mb-4 leading-relaxed">
+                <strong className="text-black">FanZone Tickets</strong> est née
+                en 2025 d&apos;une vision audacieuse : transformer
+                l&apos;expérience événementielle au Cameroun. Face aux défis
+                rencontrés par les organisateurs et les participants dans le
+                processus d&apos;achat de billets, nous avons compris
+                qu&apos;il était essentiel de créer une plateforme adaptée aux
+                besoins spécifiques du marché local.
+              </p>
+              <p className="text-gris2 mb-4 leading-relaxed">
+                L&apos;idée a émergé en réponse aux préoccupations exprimées par
+                de nombreux organisateurs concernant la fraude, la complexité de
+                gestion des ventes et l&apos;accès limité à des solutions de
+                billetterie modernes.
+              </p>
+              <p className="text-gris2 leading-relaxed">
+                Après plusieurs mois de recherche et de développement, nous
+                avons conçu notre plateforme en intégrant des solutions de
+                paiement locales telles que Mobile Money, permettant à chaque
+                utilisateur d&apos;acheter des billets facilement.
+              </p>
+            </div>
+            <div className="relative h-[320px] md:h-[400px] rounded-2xl overflow-hidden">
+              <Image
+                src="/equipe.jpg"
+                alt="Notre équipe"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Croissance */}
+        <section>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-black">
+              Notre Croissance
+            </h2>
+            <div className="w-16 h-1 bg-green mx-auto mt-3 rounded-full" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            <div className="relative h-[320px] md:h-[400px] rounded-2xl overflow-hidden">
+              <Image
+                src="/croissance.jpg"
+                alt="Notre croissance"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <p className="text-gris2 mb-4 leading-relaxed">
+                <strong className="text-black">FanZone Tickets</strong> a été
+                officiellement lancé en 2025 et a rapidement attiré
+                l&apos;attention des organisateurs d&apos;événements et du
+                public. Grâce à sa simplicité d&apos;utilisation, sa sécurité et
+                ses fonctionnalités innovantes, notre plateforme est devenue un
+                outil essentiel pour gérer divers événements.
+              </p>
+              <p className="text-gris2 leading-relaxed">
+                Depuis notre lancement, nous avons constamment évolué en réponse
+                aux besoins de nos utilisateurs. Nous avons élargi notre équipe
+                pour inclure des experts en marketing, en analyse de données et
+                en support client, garantissant ainsi une expérience optimale
+                pour tous.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Pourquoi choisir */}
+        <section>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-black">
+              Pourquoi Choisir FanZone Tickets ?
+            </h2>
+            <div className="w-16 h-1 bg-green mx-auto mt-3 rounded-full" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {ADVANTAGES.map((item, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]"
+              >
+                <div className="h-12 w-12 rounded-full bg-green/10 flex items-center justify-center mb-4">
+                  <item.icon className="h-6 w-6 text-green" />
+                </div>
+                <h3 className="font-semibold text-black mb-2">{item.title}</h3>
+                <p className="text-sm text-gris2 leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      {/* CTA */}
+      <section className="relative bg-green h-[276px] text-white text-center">
+        <Image
+          src="/filigrame.png"
+          alt=""
+          fill
+          className="object-cover"
+        />
+        <div className="absolute inset-0 max-w-3xl flex flex-col justify-center items-center text-center container">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Prêt à organiser votre événement ?
           </h2>
-          <p className="text-xl text-gray-600 mb-6">
-            Rejoignez les milliers d'organisateurs qui font confiance à{" "}
-            <strong>FanZone Tickets</strong> pour la gestion de leur billetterie
-            au Cameroun. Tickets pour la gestion de leur billetterie au
-            Cameroun.
+          <p className="text-lg mb-8">
+            Rejoignez les organisateurs qui font confiance à FanZone Tickets
+            pour la gestion de leur billetterie au Cameroun.
           </p>
-          <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90 text-lg px-8 py-6 h-auto">
+          <Link
+            href="/auth/register"
+            className="inline-flex items-center h-12 px-8 bg-white text-green font-medium rounded-2xl hover:bg-white/90 transition-colors"
+          >
             Devenir organisateur
-          </Button>
-        </section>
-      </main>
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }

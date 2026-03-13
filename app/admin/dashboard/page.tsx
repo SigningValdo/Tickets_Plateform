@@ -1,246 +1,173 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  Menu,
-  X,
-  LogOut,
-  Home,
-  Calendar,
-  Ticket,
-  Users,
-  BarChart3,
-  Settings,
-  Search,
   TrendingUp,
+  TrendingDown,
   DollarSign,
-  PlusCircle,
+  Ticket,
+  Calendar,
+  Users,
+  Loader2,
+  ArrowUpRight,
+  BarChart3,
+  Tag,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AdminSalesChart } from "@/components/admin-sales-chart";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AdminEventList } from "@/components/admin-event-list";
+
+interface StatCard {
+  label: string;
+  value: string;
+  change: string;
+  trend: "up" | "down";
+  icon: React.ElementType;
+  iconBg: string;
+  iconColor: string;
+}
+
+const stats: StatCard[] = [
+  {
+    label: "Ventes totales",
+    value: "1 250 000 FCFA",
+    change: "+12.5%",
+    trend: "up",
+    icon: DollarSign,
+    iconBg: "bg-green/10",
+    iconColor: "text-green",
+  },
+  {
+    label: "Billets vendus",
+    value: "458",
+    change: "+8.2%",
+    trend: "up",
+    icon: Ticket,
+    iconBg: "bg-blue-500/10",
+    iconColor: "text-blue-500",
+  },
+  {
+    label: "Événements actifs",
+    value: "12",
+    change: "+2",
+    trend: "up",
+    icon: Calendar,
+    iconBg: "bg-yellow/10",
+    iconColor: "text-yellow",
+  },
+  {
+    label: "Utilisateurs",
+    value: "1 245",
+    change: "+5.3%",
+    trend: "up",
+    icon: Users,
+    iconBg: "bg-purple-500/10",
+    iconColor: "text-purple-500",
+  },
+];
+
+const categoryData = [
+  { name: "Concerts", percentage: 45, color: "bg-green" },
+  { name: "Conférences", percentage: 25, color: "bg-blue-500" },
+  { name: "Festivals", percentage: 15, color: "bg-yellow" },
+  { name: "Théâtre", percentage: 10, color: "bg-purple-500" },
+  { name: "Autres", percentage: 5, color: "bg-gris3" },
+];
 
 export default function AdminDashboardPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-
   return (
-    <main className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        <p className="text-gray-500">
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-navy">Tableau de bord</h1>
+        <p className="text-gris2 text-sm mt-0.5">
           Bienvenue dans votre espace administrateur
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">Ventes totales</p>
-                <h3 className="text-2xl font-bold">1,250,000 FCFA</h3>
-                <p className="text-green-600 text-sm flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +12.5% ce mois
-                </p>
-              </div>
-              <div className="bg-purple-100 p-3 rounded-full">
-                <DollarSign className="h-6 w-6 text-fanzone-orange" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">Billets vendus</p>
-                <h3 className="text-2xl font-bold">458</h3>
-                <p className="text-green-600 text-sm flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +8.2% ce mois
-                </p>
-              </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Ticket className="h-6 w-6 text-blue-600" />
+      {/* Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat) => (
+          <div
+            key={stat.label}
+            className="bg-white rounded-2xl p-5 flex items-start justify-between"
+          >
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gris2">{stat.label}</p>
+              <p className="text-xl font-bold text-navy">{stat.value}</p>
+              <div className="flex items-center gap-1">
+                {stat.trend === "up" ? (
+                  <TrendingUp className="h-3.5 w-3.5 text-green" />
+                ) : (
+                  <TrendingDown className="h-3.5 w-3.5 text-red" />
+                )}
+                <span
+                  className={`text-xs font-medium ${stat.trend === "up" ? "text-green" : "text-red"}`}
+                >
+                  {stat.change}
+                </span>
+                <span className="text-xs text-gris3">ce mois</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">Événements actifs</p>
-                <h3 className="text-2xl font-bold">12</h3>
-                <p className="text-green-600 text-sm flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +2 ce mois
-                </p>
-              </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <Calendar className="h-6 w-6 text-green-600" />
-              </div>
+            <div className={`${stat.iconBg} p-2.5 rounded-xl`}>
+              <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-sm">Utilisateurs</p>
-                <h3 className="text-2xl font-bold">1,245</h3>
-                <p className="text-green-600 text-sm flex items-center mt-1">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  +5.3% ce mois
-                </p>
-              </div>
-              <div className="bg-orange-100 p-3 rounded-full">
-                <Users className="h-6 w-6 text-orange-600" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <Card className="lg:col-span-2">
-          <CardHeader className="pb-2">
-            <CardTitle>Ventes des 30 derniers jours</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <AdminSalesChart />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle>Ventes par catégorie</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm">Concerts</span>
-                  <span className="text-sm font-medium">45%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-fanzone-orange h-2 rounded-full"
-                    style={{ width: "45%" }}
-                  ></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm">Conférences</span>
-                  <span className="text-sm font-medium">25%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{ width: "25%" }}
-                  ></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm">Festivals</span>
-                  <span className="text-sm font-medium">15%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-green-600 h-2 rounded-full"
-                    style={{ width: "15%" }}
-                  ></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm">Théâtre</span>
-                  <span className="text-sm font-medium">10%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-orange-600 h-2 rounded-full"
-                    style={{ width: "10%" }}
-                  ></div>
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between mb-1">
-                  <span className="text-sm">Autres</span>
-                  <span className="text-sm font-medium">5%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-gray-600 h-2 rounded-full"
-                    style={{ width: "5%" }}
-                  ></div>
-                </div>
-              </div>
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Sales chart */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-green" />
+              <h3 className="text-sm font-semibold text-navy">
+                Ventes des 30 derniers jours
+              </h3>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+          <AdminSalesChart />
+        </div>
+
+        {/* Category breakdown */}
+        <div className="bg-white rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-6">
+            <Tag className="h-5 w-5 text-green" />
+            <h3 className="text-sm font-semibold text-navy">
+              Ventes par catégorie
+            </h3>
+          </div>
+          <div className="space-y-4">
+            {categoryData.map((cat) => (
+              <div key={cat.name}>
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-sm text-navy">{cat.name}</span>
+                  <span className="text-sm font-medium text-navy">
+                    {cat.percentage}%
+                  </span>
+                </div>
+                <div className="w-full bg-bg rounded-full h-2">
+                  <div
+                    className={`${cat.color} h-2 rounded-full transition-all`}
+                    style={{ width: `${cat.percentage}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Legend summary */}
+          <div className="mt-6 pt-4 border-t border-gris4/50">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-gris2">Total des ventes</span>
+              <span className="text-sm font-semibold text-navy">
+                1 250 000 FCFA
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
-
-      {/* <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-xl font-bold">Événements récents</h2>
-        <Link href="/admin/events/create">
-          <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90">
-            <PlusCircle className="h-4 w-4 mr-2" />
-            Créer un événement
-          </Button>
-        </Link>
-      </div> */}
-
-      {/* <Tabs defaultValue="all">
-        <TabsList className="mb-6">
-          <TabsTrigger value="all">Tous</TabsTrigger>
-          <TabsTrigger value="active">Actifs</TabsTrigger>
-          <TabsTrigger value="upcoming">À venir</TabsTrigger>
-          <TabsTrigger value="past">Passés</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="all">
-          <AdminEventList
-            filter="all"
-            isLoading={false}
-            error={null}
-            events={[]}
-          />
-        </TabsContent>
-        <TabsContent value="active">
-          <AdminEventList
-            filter="active"
-            isLoading={false}
-            error={null}
-            events={[]}
-          />
-        </TabsContent>
-        <TabsContent value="upcoming">
-          <AdminEventList
-            filter="upcoming"
-            isLoading={false}
-            error={null}
-            events={[]}
-          />
-        </TabsContent>
-        <TabsContent value="past">
-          <AdminEventList
-            filter="past"
-            isLoading={false}
-            error={null}
-            events={[]}
-          />
-        </TabsContent>
-      </Tabs> */}
-    </main>
+    </div>
   );
 }

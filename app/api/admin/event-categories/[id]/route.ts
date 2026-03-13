@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -12,17 +12,13 @@ export async function PUT(
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   const { id } = await params;
   const body = await req.json();
   const { name, description } = body;
   if (!name) {
-    return new NextResponse(JSON.stringify({ error: "Le nom est requis" }), {
-      status: 400,
-    });
+    return NextResponse.json({ error: "Le nom est requis" }, { status: 400 });
   }
   try {
     const category = await prisma.eventCategory.update({
@@ -30,16 +26,14 @@ export async function PUT(
       data: { name, description },
     });
     return NextResponse.json(category);
-  } catch (error: any) {
-    if (error.code === "P2002") {
-      return new NextResponse(
-        JSON.stringify({ error: "Une catégorie avec ce nom existe déjà." }),
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && (error as any).code === "P2002") {
+      return NextResponse.json(
+        { error: "Une catégorie avec ce nom existe déjà." },
         { status: 409 }
       );
     }
-    return new NextResponse(JSON.stringify({ error: "Erreur interne" }), {
-      status: 500,
-    });
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
   }
 }
 
@@ -50,27 +44,23 @@ export async function DELETE(
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   const { id } = await params;
   try {
     await prisma.eventCategory.delete({ where: { id } });
     return new NextResponse(null, { status: 204 });
-  } catch (error: any) {
-    if (error?.code === "P2003") {
-      return new NextResponse(
-        JSON.stringify({
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && (error as any).code === "P2003") {
+      return NextResponse.json(
+        {
           error:
             "Impossible de supprimer la catégorie car des événements y sont encore associés. Supprimez ou réassignez ces événements avant de réessayer.",
-        }),
+        },
         { status: 409 }
       );
     }
-    return new NextResponse(JSON.stringify({ error: "Erreur interne" }), {
-      status: 500,
-    });
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
   }
 }
 
@@ -80,24 +70,18 @@ export async function GET(
 ) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   const { id } = await params;
   try {
     const category = await prisma.eventCategory.findFirst({ where: { id } });
 
     if (!category) {
-      return new NextResponse(JSON.stringify({ error: "Ticket not found" }), {
-        status: 404,
-      });
+      return NextResponse.json({ error: "Catégorie non trouvée" }, { status: 404 });
     }
 
-    return new NextResponse(JSON.stringify(category), { status: 200 });
+    return NextResponse.json(category);
   } catch (error) {
-    return new NextResponse(JSON.stringify({ error: "Erreur interne" }), {
-      status: 500,
-    });
+    return NextResponse.json({ error: "Erreur interne" }, { status: 500 });
   }
 }

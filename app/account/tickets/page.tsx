@@ -1,158 +1,204 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
-import { Calendar, Clock, MapPin, Search, Ticket, Loader2, AlertCircle } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Search,
+  Ticket,
+  Loader2,
+  AlertCircle,
+  Eye,
+  ArrowRight,
+  Filter,
+} from "lucide-react";
 
 interface TicketData {
-  id: string
-  qrCode: string
-  status: string
-  name: string
-  email: string | null
-  phone: string | null
-  createdAt: string
-  orderId: string
-  orderDate: string
-  orderTotal: number
+  id: string;
+  qrCode: string;
+  status: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  createdAt: string;
+  orderId: string;
+  orderDate: string;
+  orderTotal: number;
   event: {
-    id: string
-    title: string
-    date: string
-    location: string
-    address: string
-    city: string
-    imageUrl: string
-  }
+    id: string;
+    title: string;
+    date: string;
+    location: string;
+    address: string;
+    city: string;
+    imageUrl: string;
+  };
   ticketType: {
-    id: string
-    name: string
-    price: number
-  }
+    id: string;
+    name: string;
+    price: number;
+  };
 }
 
 export default function AccountTicketsPage() {
-  const router = useRouter()
-  const [tickets, setTickets] = useState<TicketData[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const router = useRouter();
+  const [tickets, setTickets] = useState<TicketData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<
+    "all" | "valid" | "upcoming" | "past"
+  >("all");
 
   useEffect(() => {
-    fetchTickets()
-  }, [])
+    fetchTickets();
+  }, []);
 
   const fetchTickets = async () => {
     try {
-      setLoading(true)
-      const res = await fetch("/api/user/tickets")
+      setLoading(true);
+      setError(null);
+      const res = await fetch("/api/user/tickets");
       if (!res.ok) {
-        throw new Error("Erreur lors de la récupération des billets")
+        throw new Error("Erreur lors de la récupération des billets");
       }
-      const data = await res.json()
-      setTickets(data)
+      const data = await res.json();
+      setTickets(data);
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("fr-FR", {
+  const formatDate = (dateString: string) =>
+    new Date(dateString).toLocaleDateString("fr-FR", {
+      weekday: "short",
       day: "numeric",
       month: "long",
       year: "numeric",
-    })
-  }
+    });
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString("fr-FR", {
+  const formatTime = (dateString: string) =>
+    new Date(dateString).toLocaleTimeString("fr-FR", {
       hour: "2-digit",
       minute: "2-digit",
-    })
-  }
+    });
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("fr-FR").format(price) + " FCFA"
-  }
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("fr-FR").format(price) + " FCFA";
 
-  const isUpcoming = (dateString: string) => {
-    return new Date(dateString) > new Date()
-  }
+  const isUpcoming = (dateString: string) => new Date(dateString) > new Date();
 
-  const getStatusBadge = (ticket: TicketData) => {
-    if (ticket.status === "CANCELLED") {
-      return <Badge className="bg-red-100 text-red-800">Annulé</Badge>
-    }
-    if (ticket.status === "USED") {
-      return <Badge className="bg-gray-100 text-gray-800">Utilisé</Badge>
-    }
-    if (!isUpcoming(ticket.event.date)) {
-      return <Badge className="bg-gray-100 text-gray-800">Expiré</Badge>
-    }
-    return <Badge className="bg-green-100 text-green-800">Valide</Badge>
-  }
+  const getStatusInfo = (ticket: TicketData) => {
+    if (ticket.status === "CANCELLED")
+      return {
+        label: "Annulé",
+        bg: "bg-red/10",
+        text: "text-red",
+        dot: "bg-red",
+      };
+    if (ticket.status === "USED")
+      return {
+        label: "Utilisé",
+        bg: "bg-gris4/30",
+        text: "text-gris2",
+        dot: "bg-gris2",
+      };
+    if (!isUpcoming(ticket.event.date))
+      return {
+        label: "Expiré",
+        bg: "bg-gris4/30",
+        text: "text-gris2",
+        dot: "bg-gris2",
+      };
+    return {
+      label: "Valide",
+      bg: "bg-green/10",
+      text: "text-green",
+      dot: "bg-green",
+    };
+  };
 
   const filteredTickets = tickets.filter((ticket) =>
-    ticket.event.title.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+    ticket.event.title.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
-  const upcomingTickets = filteredTickets.filter(
-    (t) => isUpcoming(t.event.date) && t.status === "VALID"
-  )
+  const validTickets = filteredTickets.filter(
+    (t) => t.status === "VALID" && isUpcoming(t.event.date),
+  );
+  const upcomingTickets = filteredTickets.filter((t) =>
+    isUpcoming(t.event.date),
+  );
   const pastTickets = filteredTickets.filter(
-    (t) => !isUpcoming(t.event.date) || t.status !== "VALID"
-  )
+    (t) => !isUpcoming(t.event.date) || t.status !== "VALID",
+  );
+
+  const displayedTickets =
+    activeTab === "all"
+      ? filteredTickets
+      : activeTab === "valid"
+        ? validTickets
+        : activeTab === "upcoming"
+          ? upcomingTickets
+          : pastTickets;
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-fanzone-orange mx-auto mb-4" />
-          <p className="text-gray-600">Chargement de vos billets...</p>
+          <div className="w-16 h-16 rounded-full bg-green/10 flex items-center justify-center mx-auto mb-4">
+            <Loader2 className="h-8 w-8 animate-spin text-green" />
+          </div>
+          <p className="text-gris2 text-sm">Chargement de vos billets...</p>
         </div>
       </div>
-    )
+    );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Card className="max-w-md">
-          <CardContent className="p-6 text-center">
-            <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Erreur</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={fetchTickets} className="bg-fanzone-orange hover:bg-fanzone-orange/90">
-              Réessayer
-            </Button>
-          </CardContent>
-        </Card>
+      <div className="flex items-center justify-center py-20">
+        <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-10 text-center max-w-md">
+          <div className="w-16 h-16 rounded-full bg-red/10 flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="h-8 w-8 text-red" />
+          </div>
+          <h2 className="text-lg font-bold text-black mb-2">
+            Une erreur est survenue
+          </h2>
+          <p className="text-sm text-gris2 mb-6">{error}</p>
+          <button
+            onClick={fetchTickets}
+            className="h-11 px-8 rounded-xl bg-green text-white text-sm font-medium hover:bg-green/90 transition-colors"
+          >
+            Réessayer
+          </button>
+        </div>
       </div>
-    )
+    );
   }
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold">Mes billets</h1>
-          <p className="text-gray-500">Consultez et gérez tous vos billets</p>
+          <h1 className="text-2xl font-bold text-black">Mes billets</h1>
+          <p className="text-gris2 text-sm mt-1">
+            {tickets.length} billet{tickets.length > 1 ? "s" : ""} au total
+          </p>
         </div>
-        <div className="w-full sm:w-auto">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gris2 h-4 w-4" />
+            <input
+              type="text"
               placeholder="Rechercher un billet..."
-              className="pl-9 w-full sm:w-64 h-9"
+              className="w-full sm:w-72 h-11 pl-11 pr-4 rounded-xl border border-gris4 bg-white text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -160,184 +206,247 @@ export default function AccountTicketsPage() {
         </div>
       </div>
 
+      {/* Stats row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-green/10 flex items-center justify-center">
+              <Ticket className="h-4.5 w-4.5 text-green" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-black">{tickets.length}</p>
+          <p className="text-xs text-gris2 mt-0.5">Total billets</p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-green/10 flex items-center justify-center">
+              <Calendar className="h-4.5 w-4.5 text-green" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-black">
+            {upcomingTickets.length}
+          </p>
+          <p className="text-xs text-gris2 mt-0.5">À venir</p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-gris4/30 flex items-center justify-center">
+              <Clock className="h-4.5 w-4.5 text-gris2" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-black">{pastTickets.length}</p>
+          <p className="text-xs text-gris2 mt-0.5">Passés</p>
+        </div>
+        <div className="bg-white rounded-2xl p-5 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-9 h-9 rounded-xl bg-yellow/10 flex items-center justify-center">
+              <Filter className="h-4.5 w-4.5 text-yellow" />
+            </div>
+          </div>
+          <p className="text-2xl font-bold text-black">
+            {tickets.filter((t) => t.status === "VALID").length}
+          </p>
+          <p className="text-xs text-gris2 mt-0.5">Valides</p>
+        </div>
+      </div>
+
       {tickets.length === 0 ? (
-        <Card className="max-w-md mx-auto">
-          <CardContent className="p-8 text-center">
-            <Ticket className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Aucun billet</h2>
-            <p className="text-gray-600 mb-6">
-              Vous n'avez pas encore acheté de billets. Découvrez nos événements !
-            </p>
-            <Link href="/events">
-              <Button className="bg-fanzone-orange hover:bg-fanzone-orange/90">
-                Voir les événements
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+        /* Empty state */
+        <div className="bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] p-14 text-center max-w-lg mx-auto">
+          <div className="w-20 h-20 rounded-full bg-green/10 flex items-center justify-center mx-auto mb-6">
+            <Ticket className="h-10 w-10 text-green" />
+          </div>
+          <h2 className="text-xl font-bold text-black mb-2">Aucun billet</h2>
+          <p className="text-sm text-gris2 mb-8 max-w-xs mx-auto">
+            Vous n&apos;avez pas encore acheté de billets. Découvrez nos
+            événements et réservez dès maintenant !
+          </p>
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-2 h-12 px-8 rounded-xl bg-green text-white text-sm font-medium hover:bg-green/90 transition-colors"
+          >
+            Voir les événements
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       ) : (
-        <Tabs defaultValue="upcoming">
-          <TabsList className="mb-6">
-            <TabsTrigger value="upcoming">
-              À venir ({upcomingTickets.length})
-            </TabsTrigger>
-            <TabsTrigger value="past">
-              Passés ({pastTickets.length})
-            </TabsTrigger>
-          </TabsList>
+        <>
+          {/* Tabs */}
+          <div className="flex gap-1 p-1 bg-white rounded-xl w-fit mb-6 shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+            {(
+              [
+                { key: "all", label: "Tous", count: filteredTickets.length },
+                { key: "valid", label: "Valides", count: validTickets.length },
+                {
+                  key: "upcoming",
+                  label: "À venir",
+                  count: upcomingTickets.length,
+                },
+                { key: "past", label: "Passés", count: pastTickets.length },
+              ] as const
+            ).map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  activeTab === tab.key
+                    ? "bg-green text-white shadow-sm"
+                    : "text-gris2 hover:text-black"
+                }`}
+              >
+                {tab.label} ({tab.count})
+              </button>
+            ))}
+          </div>
 
-          <TabsContent value="upcoming">
-            {upcomingTickets.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <p className="text-gray-500">Aucun billet à venir</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 gap-6">
-                {upcomingTickets.map((ticket) => (
-                  <Card key={ticket.id} className="overflow-hidden">
-                    <div className="flex flex-col md:flex-row">
-                      <div className="relative w-full md:w-1/4 h-48 md:h-auto min-h-[200px]">
-                        <Image
-                          src={ticket.event.imageUrl || "/placeholder.svg"}
-                          alt={ticket.event.title}
-                          fill
-                          className="object-cover"
-                        />
-                        <Badge className="absolute top-2 right-2 bg-fanzone-orange">
-                          {ticket.ticketType.name}
-                        </Badge>
-                      </div>
-                      <CardContent className="flex-1 p-6">
-                        <div className="flex flex-col h-full justify-between">
-                          <div>
-                            <h3 className="font-bold text-xl mb-2">{ticket.event.title}</h3>
-                            <div className="flex flex-wrap gap-4 mb-4">
-                              <div className="flex items-center text-gray-500">
-                                <Calendar className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{formatDate(ticket.event.date)}</span>
-                              </div>
-                              <div className="flex items-center text-gray-500">
-                                <Clock className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{formatTime(ticket.event.date)}</span>
-                              </div>
-                              <div className="flex items-center text-gray-500">
-                                <MapPin className="h-4 w-4 mr-1" />
-                                <span className="text-sm">
-                                  {ticket.event.location}, {ticket.event.city}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex items-center mb-4">
-                              <Badge variant="outline" className="mr-2">
-                                Billet #{ticket.id.slice(-8)}
-                              </Badge>
-                              {getStatusBadge(ticket)}
-                            </div>
-                          </div>
-
-                          <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
-                            <span className="font-bold text-fanzone-orange text-lg">
-                              {formatPrice(ticket.ticketType.price)}
-                            </span>
-                            <div className="flex flex-wrap gap-2">
-                              <Button
-                                className="bg-fanzone-orange hover:bg-fanzone-orange/90"
-                                onClick={() => router.push(`/account/tickets/${ticket.id}`)}
-                              >
-                                Voir le billet
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </div>
-                  </Card>
-                ))}
+          {displayedTickets.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow-[0_2px_20px_rgba(0,0,0,0.04)] p-10 text-center">
+              <div className="w-14 h-14 rounded-full bg-gris4/20 flex items-center justify-center mx-auto mb-4">
+                <Ticket className="h-7 w-7 text-gris2" />
               </div>
-            )}
-          </TabsContent>
+              <p className="text-sm text-gris2">
+                {activeTab === "all"
+                  ? "Aucun billet trouvé"
+                  : activeTab === "valid"
+                    ? "Aucun billet valide"
+                    : activeTab === "upcoming"
+                      ? "Aucun billet à venir"
+                      : "Aucun billet passé"}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {displayedTickets.map((ticket) => {
+                const status = getStatusInfo(ticket);
+                const isPast =
+                  !isUpcoming(ticket.event.date) || ticket.status !== "VALID";
 
-          <TabsContent value="past">
-            {pastTickets.length === 0 ? (
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <p className="text-gray-500">Aucun billet passé</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 gap-6">
-                {pastTickets.map((ticket) => (
-                  <Card key={ticket.id} className="overflow-hidden">
-                    <div className="flex flex-col md:flex-row">
-                      <div className="relative w-full md:w-1/4 h-48 md:h-auto min-h-[200px]">
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
-                          <Badge className="bg-gray-600">
-                            {ticket.status === "CANCELLED" ? "Annulé" : "Événement passé"}
-                          </Badge>
+                const borderColor =
+                  status.label === "Valide"
+                    ? "border-t-green"
+                    : status.label === "Annulé"
+                      ? "border-t-red"
+                      : "border-t-gris4";
+
+                return (
+                  <div
+                    key={ticket.id}
+                    onClick={() => router.push(`/account/tickets/${ticket.id}`)}
+                    className={`bg-white rounded-2xl overflow-hidden cursor-pointer  group`}
+                  >
+                    {/* Image */}
+                    <div className="relative w-full h-52 overflow-hidden">
+                      {isPast && (
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                          <span className="px-3 py-1.5 rounded-xl bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
+                            {ticket.status === "CANCELLED"
+                              ? "Annulé"
+                              : "Événement passé"}
+                          </span>
                         </div>
-                        <Image
-                          src={ticket.event.imageUrl || "/placeholder.svg"}
-                          alt={ticket.event.title}
-                          fill
-                          className="object-cover filter grayscale"
-                        />
-                        <Badge className="absolute top-2 right-2 bg-fanzone-orange z-20">
+                      )}
+                      <Image
+                        src={ticket.event.imageUrl || "/placeholder.svg"}
+                        alt={ticket.event.title}
+                        fill
+                        className={`object-cover transition-transform duration-300 group-hover:scale-105 ${isPast ? "grayscale" : ""}`}
+                      />
+                      <div className="absolute top-3 left-3 right-3 flex items-start justify-between z-20">
+                        <span className="px-3 py-1.5 rounded-xl bg-white/90 backdrop-blur-sm text-black text-xs font-semibold">
                           {ticket.ticketType.name}
-                        </Badge>
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-medium backdrop-blur-sm ${status.bg} ${status.text}`}
+                        >
+                          <span
+                            className={`w-1.5 h-1.5 rounded-full ${status.dot}`}
+                          />
+                          {status.label}
+                        </span>
                       </div>
-                      <CardContent className="flex-1 p-6">
-                        <div className="flex flex-col h-full justify-between">
-                          <div>
-                            <h3 className="font-bold text-xl mb-2">{ticket.event.title}</h3>
-                            <div className="flex flex-wrap gap-4 mb-4">
-                              <div className="flex items-center text-gray-500">
-                                <Calendar className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{formatDate(ticket.event.date)}</span>
-                              </div>
-                              <div className="flex items-center text-gray-500">
-                                <Clock className="h-4 w-4 mr-1" />
-                                <span className="text-sm">{formatTime(ticket.event.date)}</span>
-                              </div>
-                              <div className="flex items-center text-gray-500">
-                                <MapPin className="h-4 w-4 mr-1" />
-                                <span className="text-sm">
-                                  {ticket.event.location}, {ticket.event.city}
-                                </span>
-                              </div>
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-5 flex flex-col justify-between flex-1">
+                      <div>
+                        <h3 className="font-semibold text-base text-black line-clamp-1 group-hover:text-green transition-colors mb-3">
+                          {ticket.event.title}
+                        </h3>
+
+                        <div className="space-y-2.5 grid grid-cols-2 mb-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-green/10 flex items-center justify-center flex-shrink-0">
+                              <Calendar className="h-4 w-4 text-green" />
                             </div>
-                            <div className="flex items-center mb-4">
-                              <Badge variant="outline" className="mr-2">
-                                Billet #{ticket.id.slice(-8)}
-                              </Badge>
-                              {getStatusBadge(ticket)}
+                            <div>
+                              <p className="text-[11px] text-gris2 uppercase tracking-wider">
+                                Date
+                              </p>
+                              <p className="text-sm text-black font-medium">
+                                {formatDate(ticket.event.date)}
+                              </p>
                             </div>
                           </div>
-
-                          <div className="flex flex-wrap items-center justify-between gap-2 mt-4">
-                            <span className="font-bold text-gray-600 text-lg">
-                              {formatPrice(ticket.ticketType.price)}
-                            </span>
-                            <div className="flex flex-wrap gap-2">
-                              <Button
-                                variant="outline"
-                                onClick={() => router.push(`/account/tickets/${ticket.id}`)}
-                              >
-                                Voir le billet
-                              </Button>
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-green/10 flex items-center justify-center flex-shrink-0">
+                              <Clock className="h-4 w-4 text-green" />
+                            </div>
+                            <div>
+                              <p className="text-[11px] text-gris2 uppercase tracking-wider">
+                                Heure
+                              </p>
+                              <p className="text-sm text-black font-medium">
+                                {formatTime(ticket.event.date)}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 rounded-lg bg-green/10 flex items-center justify-center flex-shrink-0">
+                              <MapPin className="h-4 w-4 text-green" />
+                            </div>
+                            <div>
+                              <p className="text-[11px] text-gris2 uppercase tracking-wider">
+                                Lieu
+                              </p>
+                              <p className="text-sm text-black font-medium line-clamp-1">
+                                {ticket.event.location}, {ticket.event.city}
+                              </p>
                             </div>
                           </div>
                         </div>
-                      </CardContent>
+
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-bg text-xs text-gris2 font-mono">
+                          #{ticket.id.slice(-8).toUpperCase()}
+                        </span>
+                      </div>
+
+                      {/* Footer */}
+                      <div className="flex items-center justify-between gap-3 mt-4 pt-4 border-t border-gris4/30">
+                        <span
+                          className={`font-bold text-lg ${
+                            isPast ? "text-gris2" : "text-green"
+                          }`}
+                        >
+                          {formatPrice(ticket.ticketType.price)}
+                        </span>
+                        <span
+                          className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${
+                            isPast ? "text-gris2" : "text-green"
+                          }`}
+                        >
+                          <Eye className="h-4 w-4" />
+                          Voir
+                          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </div>
                     </div>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
     </div>
-  )
+  );
 }

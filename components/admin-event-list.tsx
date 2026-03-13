@@ -1,8 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { MoreVertical, Calendar, MapPin, Tag, Ticket } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { MoreVertical, Calendar, MapPin, Tag, Ticket, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +12,9 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ConfirmDeleteDialog } from "@/components/confirm-delete-dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import { useState } from "react";
 
 export type EventWithTicketTypes = Event & {
   ticketTypes: TicketType[];
@@ -27,10 +28,6 @@ interface AdminEventListProps {
   error: Error | null;
   onDeleted?: () => void;
 }
-
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { useState } from "react";
 
 export function AdminEventList({
   filter,
@@ -66,13 +63,20 @@ export function AdminEventList({
   }
 
   if (isLoading) {
-    return <div className="text-center p-10">Loading events...</div>;
+    return (
+      <div className="flex items-center justify-center py-16">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin text-green mx-auto mb-3" />
+          <p className="text-gris2 text-sm">Chargement des événements...</p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div className="text-center p-10 text-red-500">
-        Error: {error.message}
+      <div className="text-center py-16">
+        <p className="text-red text-sm">Erreur : {error.message}</p>
       </div>
     );
   }
@@ -95,60 +99,80 @@ export function AdminEventList({
 
   if (filteredEvents.length === 0) {
     return (
-      <div className="text-center py-10">
-        <h3 className="text-lg font-medium mb-2">Aucun événement trouvé</h3>
-        <p className="text-gray-500 mb-6">
+      <div className="text-center py-16 bg-white rounded-2xl">
+        <Ticket className="h-12 w-12 text-gris3 mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-navy mb-2">
+          Aucun événement trouvé
+        </h3>
+        <p className="text-gris2 text-sm mb-6">
           Aucun événement ne correspond à ce filtre
         </p>
         <Link href="/admin/events/create">
-          <Button>Créer un événement</Button>
+          <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-green text-white text-sm font-medium rounded-xl hover:bg-green/90 transition-colors">
+            Créer un événement
+          </button>
         </Link>
       </div>
     );
   }
 
+  const StatusBadge = ({ date }: { date: Date }) => {
+    const status = getEventStatus(date);
+    const isUpcoming = status === "UPCOMING";
+    return (
+      <span
+        className={`inline-flex items-center px-2.5 py-1 text-xs font-semibold rounded-full ${
+          isUpcoming
+            ? "bg-green/10 text-green"
+            : "bg-gris4/50 text-gris2"
+        }`}
+      >
+        {isUpcoming ? "À venir" : "Passé"}
+      </span>
+    );
+  };
+
   return (
-    <div className="overflow-x-auto">
+    <div>
       {/* Mobile View */}
-      <div className="md:hidden">
+      <div className="md:hidden space-y-3">
         {filteredEvents.map((event) => (
           <div
             key={event.id}
-            className="bg-white rounded-lg shadow-md mb-4 p-4"
+            className="bg-white rounded-2xl p-4"
           >
-            <div className="flex items-center">
-              <Image
-                src={event.imageUrl || "/placeholder.svg?height=100&width=100"}
-                alt={event.title}
-                width={80}
-                height={80}
-                className="rounded-md mr-4"
-              />
-              <div className="flex-grow">
-                <h3 className="text-lg font-semibold truncate">
+            <div className="flex items-center gap-3">
+              <div className="relative h-16 w-16 flex-shrink-0 rounded-xl overflow-hidden">
+                <Image
+                  src={event.imageUrl || "/placeholder.svg?height=100&width=100"}
+                  alt={event.title}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex-grow min-w-0">
+                <h3 className="text-sm font-semibold text-navy truncate">
                   {event.title}
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs text-gris2 mt-0.5">
                   {format(new Date(event.date), "d MMMM yyyy", { locale: fr })}
                 </p>
               </div>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <MoreVertical className="h-5 w-5" />
-                  </Button>
+                  <button className="p-1.5 rounded-lg hover:bg-gray-50">
+                    <MoreVertical className="h-4 w-4 text-gris2" />
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/events/${event.id}`}>Voir</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={`/admin/events/${event.id}/edit`}>
-                      Modifier
-                    </Link>
+                    <Link href={`/admin/events/${event.id}/edit`}>Modifier</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="text-red-600"
+                    className="text-red"
                     onClick={() => {
                       setToDelete(event);
                       setDeleteOpen(true);
@@ -159,163 +183,104 @@ export function AdminEventList({
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <div className="mt-4 border-t pt-4 space-y-2">
-              <div className="flex items-center text-sm text-gray-500">
-                <MapPin className="mr-2 h-4 w-4" /> {event.location}
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Tag className="mr-2 h-4 w-4" />{" "}
-                {event.category?.name || event.categoryId}
-              </div>
-              <div className="flex items-center text-sm text-gray-500">
-                <Ticket className="mr-2 h-4 w-4" />{" "}
-                {event.ticketTypes.reduce((acc, tt) => acc + tt.quantity, 0)}{" "}
-                tickets
-              </div>
-              <div className="flex items-center pt-2">
-                {(() => {
-                  const status = getEventStatus(event.date);
-                  const statusText =
-                    status === "UPCOMING" ? "À venir" : "Passé";
-                  const statusColor =
-                    status === "UPCOMING"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-gray-100 text-gray-800";
-                  return (
-                    <span
-                      className={`px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}
-                    >
-                      {statusText}
-                    </span>
-                  );
-                })()}
-              </div>
+            <div className="mt-3 pt-3 border-t border-gris4/50 flex flex-wrap items-center gap-3">
+              <span className="inline-flex items-center gap-1 text-xs text-gris2">
+                <MapPin className="h-3.5 w-3.5" /> {event.location}
+              </span>
+              <span className="inline-flex items-center gap-1 text-xs text-gris2">
+                <Tag className="h-3.5 w-3.5" /> {event.category?.name || event.categoryId}
+              </span>
+              <span className="inline-flex items-center gap-1 text-xs text-gris2">
+                <Ticket className="h-3.5 w-3.5" /> {event.ticketTypes.reduce((acc, tt) => acc + tt.quantity, 0)} tickets
+              </span>
+              <StatusBadge date={event.date} />
             </div>
           </div>
         ))}
       </div>
 
       {/* Desktop View */}
-      <div className="hidden md:block">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+      <div className="hidden md:block bg-white rounded-2xl overflow-hidden">
+        <table className="min-w-full">
+          <thead>
+            <tr className="border-b border-gris4/50">
+              <th className="px-6 py-4 text-left text-xs font-medium text-gris2 uppercase tracking-wider">
                 Événement
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-4 text-left text-xs font-medium text-gris2 uppercase tracking-wider">
                 Date
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-4 text-left text-xs font-medium text-gris2 uppercase tracking-wider">
                 Lieu
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-4 text-left text-xs font-medium text-gris2 uppercase tracking-wider">
                 Catégorie
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-4 text-left text-xs font-medium text-gris2 uppercase tracking-wider">
                 Statut
               </th>
-              <th
-                scope="col"
-                className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
+              <th className="px-6 py-4 text-right text-xs font-medium text-gris2 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredEvents.map((event) => (
-              <tr key={event.id}>
+          <tbody>
+            {filteredEvents.map((event, index) => (
+              <tr
+                key={event.id}
+                className={index < filteredEvents.length - 1 ? "border-b border-gris4/30" : ""}
+              >
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0 mr-3">
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 flex-shrink-0 rounded-lg overflow-hidden">
                       <Image
                         src={event.imageUrl || "/placeholder.svg"}
                         alt={event.title}
-                        width={40}
-                        height={40}
-                        className="rounded-md object-cover h-full w-full"
+                        fill
+                        className="object-cover"
                       />
                     </div>
-                    <div className="truncate max-w-[200px]">
-                      <div className="font-medium text-gray-900">
-                        {event.title}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center text-gray-500">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    <span>
-                      {format(new Date(event.date), "d MMM yyyy", {
-                        locale: fr,
-                      })}
+                    <span className="font-medium text-navy text-sm truncate max-w-[200px]">
+                      {event.title}
                     </span>
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center text-gray-500">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    <span className="truncate max-w-[150px]">
-                      {event.location}
-                    </span>
-                  </div>
+                  <span className="inline-flex items-center gap-1.5 text-sm text-gris2">
+                    <Calendar className="h-3.5 w-3.5" />
+                    {format(new Date(event.date), "d MMM yyyy", { locale: fr })}
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <Badge variant="outline">
+                  <span className="inline-flex items-center gap-1.5 text-sm text-gris2 truncate max-w-[150px]">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {event.location}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full border border-gris4 text-navy">
                     {event.category?.name || event.categoryId}
-                  </Badge>
+                  </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {(() => {
-                    const status = getEventStatus(event.date);
-                    const statusText =
-                      status === "UPCOMING" ? "À venir" : "Passé";
-                    const statusColor =
-                      status === "UPCOMING"
-                        ? "bg-blue-100 text-blue-800"
-                        : "bg-gray-100 text-gray-800";
-                    return (
-                      <Badge className={`${statusColor} hover:${statusColor}`}>
-                        {statusText}
-                      </Badge>
-                    );
-                  })()}
+                  <StatusBadge date={event.date} />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreVertical className="h-5 w-5" />
-                      </Button>
+                      <button className="p-1.5 rounded-lg hover:bg-gray-50">
+                        <MoreVertical className="h-4 w-4 text-gris2" />
+                      </button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent>
+                    <DropdownMenuContent align="end">
                       <DropdownMenuItem asChild>
                         <Link href={`/admin/events/${event.id}`}>Voir</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
-                        <Link href={`/admin/events/${event.id}/edit`}>
-                          Modifier
-                        </Link>
+                        <Link href={`/admin/events/${event.id}/edit`}>Modifier</Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-red-600"
+                        className="text-red"
                         onClick={() => {
                           setToDelete(event);
                           setDeleteOpen(true);
@@ -331,14 +296,12 @@ export function AdminEventList({
           </tbody>
         </table>
       </div>
-      {/* Confirm delete dialog */}
+
       <ConfirmDeleteDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
         title="Supprimer l'événement"
-        description={`Voulez-vous supprimer "${
-          toDelete?.title ?? ""
-        }" ? Cette action est irréversible.`}
+        description={`Voulez-vous supprimer "${toDelete?.title ?? ""}" ? Cette action est irréversible.`}
         onConfirm={handleConfirmDelete}
       />
     </div>

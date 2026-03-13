@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { sanitizeEventData } from "@/lib/sanitize";
 
@@ -11,15 +11,18 @@ export const runtime = "nodejs";
 export async function GET(req: Request) {
   const session = await getServerSession(authOptions);
 
-  // if (!session || session.user.role !== "ADMIN") {
-  //   return new NextResponse(JSON.stringify({ error: "Forbidden" }), { status: 403 })
-  // }
+  if (!session || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
-  const searchParams = new URLSearchParams(req.url);
+  const { searchParams } = new URL(req.url);
   const search = searchParams.get("search");
   const category = searchParams.get("category");
-  const dateFilter = searchParams.get("dateFilter");
+  const date = searchParams.get("date");
   const locationFilter = searchParams.get("location");
+
+  const parsedDate = date ? new Date(date) : null;
+  const validDate = parsedDate && !isNaN(parsedDate.getTime()) ? parsedDate : undefined;
 
   try {
     const events = await prisma.event.findMany({
@@ -27,14 +30,8 @@ export async function GET(req: Request) {
         title: {
           contains: search || "",
         },
-        category: {
-          name: {
-            contains: category || "",
-          },
-        },
-        date: {
-          gte: dateFilter ? new Date(dateFilter) : undefined,
-        },
+        ...(category ? { category: { name: { contains: category } } } : {}),
+        ...(validDate ? { date: { gte: validDate } } : {}),
         location: {
           contains: locationFilter || "",
         },
@@ -50,10 +47,7 @@ export async function GET(req: Request) {
     return NextResponse.json(events);
   } catch (error) {
     console.error("Error fetching events:", error);
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -61,9 +55,7 @@ export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   let body: unknown;
@@ -131,17 +123,6 @@ export async function POST(req: Request) {
     return NextResponse.json(newEvent, { status: 201 });
   } catch (error) {
     console.error("Error creating event:", error);
-    try {
-      console.error(
-        "Error details:",
-        JSON.stringify(error, Object.getOwnPropertyNames(error))
-      );
-    } catch (e) {
-      console.error("Error stringify", e);
-    }
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

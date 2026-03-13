@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -9,14 +9,12 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   try {
     const url = new URL(request.url);
-    const page = parseInt(url.searchParams.get("page") || "1", 10);
-    const limit = parseInt(url.searchParams.get("limit") || "20", 10);
+    const page = Math.max(parseInt(url.searchParams.get("page") || "1", 10), 1);
+    const limit = Math.min(Math.max(parseInt(url.searchParams.get("limit") || "20", 10), 1), 100);
     const skip = (page - 1) * limit;
     const role = url.searchParams.get("role") || undefined;
     const status = url.searchParams.get("status") || undefined;
@@ -39,7 +37,7 @@ export async function GET(request: Request) {
           email: true,
           emailVerified: true,
           image: true,
-          password: true,
+          phone: true,
           role: true,
           status: true,
           createdAt: true,
@@ -72,10 +70,7 @@ export async function GET(request: Request) {
         JSON.stringify(error, Object.getOwnPropertyNames(error))
       );
     } catch (e) {}
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -85,12 +80,9 @@ import bcrypt from "bcryptjs";
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(
-      JSON.stringify({ error: "Accès refusé. Réservé aux administrateurs." }),
-      {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      }
+    return NextResponse.json(
+      { error: "Accès refusé. Réservé aux administrateurs." },
+      { status: 403 }
     );
   }
 
@@ -100,28 +92,22 @@ export async function POST(req: Request) {
 
     // Validation des champs obligatoires
     if (!name || !email || !password || !role) {
-      return new NextResponse(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           error: "Champs manquants",
           details:
             "Les champs suivants sont obligatoires: nom, email, mot de passe, rôle",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        },
+        { status: 400 }
       );
     }
 
     // Validation du format de l'email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return new NextResponse(
-        JSON.stringify({ error: "Format d'email invalide" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+      return NextResponse.json(
+        { error: "Format d'email invalide" },
+        { status: 400 }
       );
     }
 
@@ -131,15 +117,12 @@ export async function POST(req: Request) {
     });
 
     if (existing) {
-      return new NextResponse(
-        JSON.stringify({
+      return NextResponse.json(
+        {
           error: "Email déjà utilisé",
           details: "Un utilisateur avec cette adresse email existe déjà",
-        }),
-        {
-          status: 409,
-          headers: { "Content-Type": "application/json" },
-        }
+        },
+        { status: 409 }
       );
     }
 
@@ -179,32 +162,26 @@ export async function POST(req: Request) {
         headers: { "Content-Type": "application/json" },
       }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating user:", error);
 
     // Gestion spécifique des erreurs Prisma
-    if (error.code === "P2002") {
-      return new NextResponse(
-        JSON.stringify({
+    if (error instanceof Error && "code" in error && (error as any).code === "P2002") {
+      return NextResponse.json(
+        {
           error: "Erreur de contrainte unique",
           details: "Une contrainte d'unicité n'a pas été respectée",
-        }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        },
+        { status: 400 }
       );
     }
 
-    return new NextResponse(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         error: "Erreur serveur",
         details: "Une erreur est survenue lors de la création de l'utilisateur",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+      },
+      { status: 500 }
     );
   }
 }

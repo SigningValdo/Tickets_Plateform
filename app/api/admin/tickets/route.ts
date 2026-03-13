@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -9,9 +9,7 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   try {
     const url = new URL(request.url);
@@ -52,10 +50,7 @@ export async function GET(request: Request) {
         JSON.stringify(error, Object.getOwnPropertyNames(error))
       );
     } catch (e) {}
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
 
@@ -63,19 +58,15 @@ export async function GET(request: Request) {
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
   if (!session || session.user.role !== "ADMIN") {
-    return new NextResponse(JSON.stringify({ error: "Forbidden" }), {
-      status: 403,
-    });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
   try {
     const body = await req.json();
     let { qrCode, status, eventId, ticketTypeId, orderId } = body;
     // Vérification des champs obligatoires
     if (!eventId || !ticketTypeId || !orderId) {
-      return new NextResponse(
-        JSON.stringify({
-          error: "eventId, ticketTypeId et orderId sont obligatoires",
-        }),
+      return NextResponse.json(
+        { error: "eventId, ticketTypeId et orderId sont obligatoires" },
         { status: 400 }
       );
     }
@@ -86,20 +77,11 @@ export async function POST(req: Request) {
       prisma.order.findUnique({ where: { id: orderId } }),
     ]);
     if (!event)
-      return new NextResponse(
-        JSON.stringify({ error: "Événement introuvable" }),
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Événement introuvable" }, { status: 404 });
     if (!ticketType)
-      return new NextResponse(
-        JSON.stringify({ error: "Type de billet introuvable" }),
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Type de billet introuvable" }, { status: 404 });
     if (!order)
-      return new NextResponse(
-        JSON.stringify({ error: "Commande introuvable" }),
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Commande introuvable" }, { status: 404 });
     // Génération automatique du QR code si non fourni
     if (!qrCode) {
       qrCode = `${eventId}-${ticketTypeId}-${orderId}-${Date.now()}-${Math.random()
@@ -109,16 +91,16 @@ export async function POST(req: Request) {
     // Vérification unicité du QR code
     const existing = await prisma.ticket.findUnique({ where: { qrCode } });
     if (existing) {
-      return new NextResponse(
-        JSON.stringify({ error: "QR code déjà utilisé, veuillez réessayer" }),
+      return NextResponse.json(
+        { error: "QR code déjà utilisé, veuillez réessayer" },
         { status: 409 }
       );
     }
     // Validation du statut
     const allowedStatus = ["VALID", "USED", "INVALID"];
     if (status && !allowedStatus.includes(status)) {
-      return new NextResponse(
-        JSON.stringify({ error: "Statut de ticket invalide" }),
+      return NextResponse.json(
+        { error: "Statut de ticket invalide" },
         { status: 400 }
       );
     }
@@ -156,9 +138,6 @@ export async function POST(req: Request) {
         JSON.stringify(error, Object.getOwnPropertyNames(error))
       );
     } catch (e) {}
-    return new NextResponse(
-      JSON.stringify({ error: "Internal Server Error" }),
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

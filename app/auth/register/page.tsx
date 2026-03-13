@@ -1,62 +1,75 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { isValidCameroonPhone } from "@/lib/sanitize";
+import {
+  Eye,
+  EyeOff,
+  Loader2,
+  Mail,
+  Lock,
+  Phone,
+  CircleUserRound,
+  MapPin,
+} from "lucide-react";
+import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 export default function RegisterPage() {
-  const router = useRouter()
-  const { toast } = useToast()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/account/tickets";
 
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [acceptTerms, setAcceptTerms] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      toast({
-        title: "Erreur",
+      toast.error("Erreur", {
         description: "Veuillez remplir tous les champs",
-        variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     if (password !== confirmPassword) {
-      toast({
-        title: "Erreur",
+      toast.error("Erreur", {
         description: "Les mots de passe ne correspondent pas",
-        variant: "destructive",
-      })
-      return
+      });
+      return;
+    }
+
+    if (phone && !isValidCameroonPhone(phone)) {
+      toast.error("Erreur", {
+        description:
+          "Numéro de téléphone invalide. Format attendu : 6XXXXXXXX ou +237 6XXXXXXXX",
+      });
+      return;
     }
 
     if (!acceptTerms) {
-      toast({
-        title: "Erreur",
+      toast.error("Erreur", {
         description: "Vous devez accepter les conditions d'utilisation",
-        variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       const res = await fetch("/api/auth/register", {
@@ -67,181 +80,289 @@ export default function RegisterPage() {
         body: JSON.stringify({
           firstName,
           lastName,
+          phone,
+          address,
           email,
           password,
         }),
-      })
+      });
 
-      const data = await res.json()
+      const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Erreur lors de l'inscription")
+        throw new Error(data.error || "Erreur lors de l'inscription");
       }
 
-      toast({
-        title: "Inscription réussie",
-        description: "Votre compte a été créé avec succès. Vous pouvez maintenant vous connecter.",
-      })
+      // Auto-login après inscription
+      const signInResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-      router.push("/auth/login")
+      if (signInResult?.error) {
+        // Inscription réussie mais connexion échouée, rediriger vers login
+        toast.success("Inscription réussie", {
+          description: "Votre compte a été créé. Veuillez vous connecter.",
+        });
+        router.push("/auth/login");
+        return;
+      }
+
+      toast.success("Bienvenue !", {
+        description:
+          "Votre compte a été créé et vous êtes maintenant connecté.",
+      });
+
+      router.push(callbackUrl);
     } catch (error: any) {
-      toast({
-        title: "Erreur d'inscription",
-        description: error.message || "Une erreur est survenue lors de l'inscription",
-        variant: "destructive",
-      })
+      toast.error("Erreur d'inscription", {
+        description:
+          error.message || "Une erreur est survenue lors de l'inscription",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
+  const inputClass =
+    "w-full h-12 pl-12 pr-4 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors";
+
+  const iconClass =
+    "absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gris2";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-fanzone-orange">E-Tickets</h1>
-          </Link>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">Créez votre compte</h2>
-          <p className="mt-2 text-gray-600">
-            Ou{" "}
-            <Link href="/auth/login" className="text-fanzone-orange hover:text-purple-500">
-              connectez-vous à votre compte existant
+    <div className="min-h-screen flex items-center justify-center bg-bg py-12 px-4">
+      <div className="w-full max-w-xl space-y-8">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.06)] px-8 py-10 space-y-8">
+          {/* Logo */}
+          <div className="flex justify-center">
+            <Image
+              src="/logo/logo-green.svg"
+              alt="Fanzone Tickets"
+              width={139}
+              height={103}
+              priority
+            />
+          </div>
+
+          {/* Header */}
+          <div className="text-center space-y-1">
+            <h1 className="text-xl font-semibold text-black">
+              Créer mon compte
+            </h1>
+            <p className="text-sm text-gris2">
+              Créer un compte pour acheter des billet et gérer mes évènements
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Nom & Prénom */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="relative">
+                <CircleUserRound className={iconClass} />
+                <input
+                  type="text"
+                  placeholder="Nom"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div className="relative">
+                <CircleUserRound className={iconClass} />
+                <input
+                  type="text"
+                  placeholder="Prénom"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {/* Téléphone */}
+            <div className="relative">
+              <Phone className={iconClass} />
+              <input
+                type="tel"
+                placeholder="Ex: +237 6XX XXX XXX"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className={inputClass}
+              />
+              {phone && !isValidCameroonPhone(phone) && (
+                <p className="text-red text-xs mt-1">
+                  Format invalide. Ex: 6XXXXXXXX ou +237 6XXXXXXXX
+                </p>
+              )}
+            </div>
+
+            {/* Quartier */}
+            <div className="relative">
+              <MapPin className={iconClass} />
+              <input
+                type="text"
+                placeholder="Quartier (ex: Bonamoussadi)"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+
+            {/* Email */}
+            <div className="relative">
+              <Mail className={iconClass} />
+              <input
+                type="email"
+                placeholder="Adresse mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className={inputClass}
+              />
+            </div>
+
+            {/* Mot de passe */}
+            <div className="relative">
+              <Lock className={iconClass} />
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Mot de passe"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full h-12 pl-12 pr-12 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors"
+              />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gris2 hover:text-black transition-colors"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+
+            {/* Confirmer mot de passe */}
+            <div className="relative">
+              <Lock className={iconClass} />
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                placeholder="Confirmer mot de passe"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full h-12 pl-12 pr-12 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors"
+              />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gris2 hover:text-black transition-colors"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+
+            {/* CGU */}
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={acceptTerms}
+                onChange={(e) => setAcceptTerms(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-gris4 text-green focus:ring-green accent-green cursor-pointer"
+              />
+              <label
+                htmlFor="terms"
+                className="text-sm text-black leading-relaxed cursor-pointer"
+              >
+                J&apos;ai lu et j&apos;accepte les{" "}
+                <Link href="/terms" className="text-green hover:underline">
+                  Conditions Générales d&apos;Utilisation
+                </Link>{" "}
+                et la{" "}
+                <Link href="/privacy" className="text-green hover:underline">
+                  Politique de Confidentialité
+                </Link>{" "}
+                de la plateforme
+              </label>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-12 bg-green hover:bg-green/90 text-white font-medium rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Inscription en cours...
+                </>
+              ) : (
+                "S'inscrire"
+              )}
+            </button>
+          </form>
+
+          {/* Login link */}
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gris2">Vous avez déjà un compte ?</p>
+            <Link
+              href="/auth/login"
+              className="text-sm font-medium text-green hover:underline"
+            >
+              Me connecter
             </Link>
-          </p>
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Inscription</CardTitle>
-            <CardDescription>Créez un compte pour acheter des billets et gérer vos événements</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
-                  <Input
-                    id="firstName"
-                    placeholder="Jean"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
-                  <Input
-                    id="lastName"
-                    placeholder="Dupont"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
-                <Input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={acceptTerms}
-                  onCheckedChange={(checked) => setAcceptTerms(checked as boolean)}
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  J'accepte les{" "}
-                  <Link href="/terms" className="text-fanzone-orange hover:text-purple-500">
-                    conditions d'utilisation
-                  </Link>{" "}
-                  et la{" "}
-                  <Link href="/privacy" className="text-fanzone-orange hover:text-purple-500">
-                    politique de confidentialité
-                  </Link>
-                </label>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90" disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Inscription en cours...
-                  </>
-                ) : (
-                  "S'inscrire"
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-
-        <div className="mt-6">
+        {/* Social login */}
+        <div className="space-y-4">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-gris4" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">Ou continuer avec</span>
+              <span className="px-3 bg-bg text-gris2">Ou continuez avec</span>
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <Button variant="outline" className="w-full">
+          <div className="grid grid-cols-2 gap-3">
+            <button className="flex items-center justify-center gap-2 h-12 bg-white border border-gris4 rounded-xl text-sm font-medium text-black hover:bg-gray-50 transition-colors">
+              <Image
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+                width={20}
+                height={20}
+              />
               Google
-            </Button>
-            <Button variant="outline" className="w-full">
+            </button>
+            <button className="flex items-center justify-center gap-2 h-12 bg-white border border-gris4 rounded-xl text-sm font-medium text-black hover:bg-gray-50 transition-colors">
+              <svg
+                className="h-5 w-5 text-[#1877F2]"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
               Facebook
-            </Button>
+            </button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,28 +1,25 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '../../../../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/db';
 
 type Params = {
-  params: {
-    group: string;
-  };
+  params: Promise<{ group: string }>;
 };
 
 export async function GET(_: Request, { params }: Params) {
   try {
-    // Vérifier l'authentification et les droits d'admin
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== 'ADMIN') {
-      return new NextResponse('Non autorisé', { status: 401 });
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
     }
 
-    const { group } = params;
+    const { group } = await params;
 
     // Vérifier que le groupe est valide
     const validGroups = ['general', 'notifications', 'payments', 'security'];
     if (!validGroups.includes(group)) {
-      return new NextResponse('Groupe de paramètres invalide', { status: 400 });
+      return NextResponse.json({ error: 'Groupe de paramètres invalide' }, { status: 400 });
     }
 
     // Récupérer les paramètres du groupe
@@ -34,6 +31,6 @@ export async function GET(_: Request, { params }: Params) {
     return NextResponse.json(settings);
   } catch (error) {
     console.error('Erreur lors de la récupération des paramètres du groupe:', error);
-    return new NextResponse('Erreur interne du serveur', { status: 500 });
+    return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
   }
 }

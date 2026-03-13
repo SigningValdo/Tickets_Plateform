@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -70,7 +70,7 @@ export async function GET(req: Request, { params }: Params) {
     }
 
     // Verify the ticket belongs to the user
-    if (ticket.order.userId !== session.user.id) {
+    if (!ticket.order || ticket.order.userId !== session.user.id) {
       return NextResponse.json(
         { error: "Vous n'avez pas accès à ce billet" },
         { status: 403 }
@@ -129,7 +129,7 @@ export async function DELETE(req: Request, { params }: Params) {
     }
 
     // Verify ownership
-    if (ticket.order.userId !== session.user.id) {
+    if (!ticket.order || ticket.order.userId !== session.user.id) {
       return NextResponse.json(
         { error: "Vous n'avez pas accès à ce billet" },
         { status: 403 }

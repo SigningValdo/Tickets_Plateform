@@ -4,11 +4,9 @@ import { SiteFooter } from "@/components/site-footer";
 
 export function SiteLayout({ children }: PropsWithChildren<{}>) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex flex-col">
+    <div className="min-h-screen bg-bg flex flex-col">
       <SiteHeader />
-      <main className="container mx-auto px-4 pt-4 pb-8 flex-1 mt-[150px]">
-        {children}
-      </main>
+      <main className="flex-1 mt-[90px]">{children}</main>
       <SiteFooter />
     </div>
   );

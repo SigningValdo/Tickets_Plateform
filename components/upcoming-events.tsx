@@ -1,25 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
-import { Calendar, MapPin } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
-import { CountdownTimer } from "@/components/countdown-timer";
-
-type ApiEvent = {
-  id: string;
-  title: string;
-  imageUrl: string;
-  date: string;
-  location: string;
-  status?: "UPCOMING" | "ACTIVE" | "PAST";
-  category?: { name: string } | null;
-  ticketTypes?: { price: number }[];
-};
+import { EventCard } from "@/components/event-card";
+import { ApiEvent } from "@/types";
 
 const fetchEvents = async (): Promise<ApiEvent[]> => {
-  const res = await fetch("/api/admin/events");
+  const res = await fetch("/api/events");
   if (!res.ok) throw new Error("Failed to fetch events");
   return res.json();
 };
@@ -32,12 +18,13 @@ export default function UpcomingEvents() {
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
         {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="h-[260px] bg-gray-200 rounded-2xl animate-pulse"
-          />
+          <div key={i} className="space-y-3">
+            <div className="h-[200px] bg-gris4/30 rounded-2xl animate-pulse" />
+            <div className="h-4 w-3/4 bg-gris4/30 rounded animate-pulse" />
+            <div className="h-3 w-1/2 bg-gris4/30 rounded animate-pulse" />
+          </div>
         ))}
       </div>
     );
@@ -45,7 +32,7 @@ export default function UpcomingEvents() {
 
   if (error) {
     return (
-      <div className="text-sm text-red-600">
+      <div className="text-sm text-gris2">
         Impossible de charger les événements.
       </div>
     );
@@ -57,75 +44,32 @@ export default function UpcomingEvents() {
 
   if (upcoming.length === 0) {
     return (
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-gris2">
         Aucun événement à venir pour le moment.
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
       {upcoming.map((event) => {
         const minPrice =
           event.ticketTypes && event.ticketTypes.length
             ? Math.min(...event.ticketTypes.map((t) => t.price))
             : undefined;
-        const daysUntil = Math.floor(
-          (new Date(event.date).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-        );
-        const showCountdown = daysUntil >= 0 && daysUntil <= 7;
 
         return (
-          <Link
+          <EventCard
             key={event.id}
-            href={`/events/${event.id}`}
-            className="group relative overflow-hidden rounded-2xl"
-          >
-            <div className="relative h-[260px] w-full">
-              <Image
-                src={event.imageUrl || "/placeholder.svg"}
-                alt={event.title}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 event-card-gradient" />
-
-              {/* Top badges */}
-              <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
-                <Badge className="bg-fanzone-orange text-white text-xs">
-                  {event.category?.name ?? "À venir"}
-                </Badge>
-                {showCountdown && (
-                  <CountdownTimer targetDate={event.date} compact />
-                )}
-              </div>
-
-              {/* Bottom content */}
-              <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h3 className="font-bold text-white text-base mb-2 line-clamp-1">
-                  {event.title}
-                </h3>
-                <div className="flex items-center text-white/80 text-xs mb-1">
-                  <Calendar className="h-3 w-3 mr-1" />
-                  <span>
-                    {new Date(event.date).toLocaleDateString("fr-FR", {
-                      day: "numeric",
-                      month: "short",
-                    })}
-                  </span>
-                </div>
-                <div className="flex items-center text-white/80 text-xs mb-2">
-                  <MapPin className="h-3 w-3 mr-1" />
-                  <span className="line-clamp-1">{event.location}</span>
-                </div>
-                {minPrice !== undefined && (
-                  <div className="font-bold text-fanzone-orange text-sm">
-                    {minPrice.toLocaleString("fr-FR")} FCFA
-                  </div>
-                )}
-              </div>
-            </div>
-          </Link>
+            id={event.id}
+            title={event.title}
+            imageUrl={event.imageUrl}
+            date={event.date}
+            location={event.location}
+            city={event.city}
+            categoryName={event.category?.name}
+            minPrice={minPrice}
+          />
         );
       })}
     </div>

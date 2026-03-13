@@ -4,20 +4,10 @@ import type React from "react";
 
 import { useState, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Eye, EyeOff, Loader2, Mail, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 function LoginForm() {
@@ -64,123 +54,148 @@ function LoginForm() {
       if (session?.user?.role === "ADMIN") {
         router.push("/admin/dashboard");
       } else {
-        router.push("/account");
+        router.push("/account/tickets");
       }
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <Link href="/" className="inline-block">
-            <h1 className="text-3xl font-bold text-fanzone-orange">E-Tickets</h1>
-          </Link>
-          <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            Connectez-vous à votre compte
-          </h2>
-          <p className="mt-2 text-gray-600">
-            Ou{" "}
+    <div className="min-h-screen flex items-center justify-center bg-bg py-12 px-4">
+      <div className="w-full max-w-xl space-y-8">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.06)] px-8 py-10 space-y-8">
+          {/* Logo */}
+          <div className="flex justify-center">
+            <Image
+              src="/logo/logo-green.svg"
+              alt="Fanzone Tickets"
+              width={139}
+              height={103}
+              priority
+            />
+          </div>
+
+          {/* Header */}
+          <div className="text-center space-y-1">
+            <h1 className="text-xl font-semibold text-black">
+              Connectez-vous à votre compte
+            </h1>
+            <p className="text-sm text-gris2">
+              Entrez vos identifiants pour accéder à votre espace
+            </p>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div className="relative">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gris2" />
+              <input
+                type="email"
+                placeholder="Adresse mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full h-12 pl-12 pr-4 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gris2" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Mot de passe"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full h-12 pl-12 pr-12 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors"
+                />
+                <button
+                  type="button"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gris2 hover:text-black transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
+              <div className="flex justify-end mt-2">
+                <Link
+                  href="/auth/forgot-password"
+                  className="text-sm text-red hover:underline"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full h-12 bg-green hover:bg-green/90 text-white font-medium rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Connexion en cours...
+                </>
+              ) : (
+                "Se connecter"
+              )}
+            </button>
+          </form>
+
+          {/* Register link */}
+          <div className="text-center space-y-2">
+            <p className="text-sm text-gris2">
+              Vous n&apos;avez pas encore de compte ?
+            </p>
             <Link
               href="/auth/register"
-              className="text-fanzone-orange hover:text-purple-500"
+              className="text-sm font-medium text-green hover:underline"
             >
-              créez un nouveau compte
+              Créer mon compte
             </Link>
-          </p>
+          </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Connexion</CardTitle>
-            <CardDescription>
-              Entrez vos identifiants pour accéder à votre compte
-            </CardDescription>
-          </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="votre@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="text-sm text-fanzone-orange hover:text-purple-500"
-                  >
-                    Mot de passe oublié?
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                type="submit"
-                className="w-full bg-fanzone-orange hover:bg-fanzone-orange/90"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Connexion en cours...
-                  </>
-                ) : (
-                  "Se connecter"
-                )}
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-
-        <div className="mt-6">
+        {/* Social login */}
+        <div className="space-y-4">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
+              <div className="w-full border-t border-gris4" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">
-                Ou continuer avec
-              </span>
+              <span className="px-3 bg-bg text-gris2">Ou continuez avec</span>
             </div>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <Button variant="outline" className="w-full">
+          <div className="grid grid-cols-2 gap-3">
+            <button className="flex items-center justify-center gap-2 h-12 bg-white border border-gris4 rounded-xl text-sm font-medium text-black hover:bg-gray-50 transition-colors">
+              <Image
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt="Google"
+                width={20}
+                height={20}
+              />
               Google
-            </Button>
-            <Button variant="outline" className="w-full">
+            </button>
+            <button className="flex items-center justify-center gap-2 h-12 bg-white border border-gris4 rounded-xl text-sm font-medium text-black hover:bg-gray-50 transition-colors">
+              <svg
+                className="h-5 w-5 text-[#1877F2]"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+              </svg>
               Facebook
-            </Button>
+            </button>
           </div>
         </div>
       </div>
@@ -192,8 +207,8 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Loader2 className="h-8 w-8 animate-spin text-fanzone-orange" />
+        <div className="min-h-screen flex items-center justify-center bg-bg">
+          <Loader2 className="h-8 w-8 animate-spin text-green" />
         </div>
       }
     >

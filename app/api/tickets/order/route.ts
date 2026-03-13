@@ -1,7 +1,7 @@
 import prisma from "@/lib/db";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { initNotchpayPayment } from "@/lib/notchpay";
 import { sanitizeOrderData } from "@/lib/sanitize";
 import { applyRateLimit, rateLimiters } from "@/lib/rate-limit";
@@ -56,10 +56,10 @@ export const POST = async (req: Request) => {
     );
   }
 
-  // Compute total amount based on ticket prices
+  // Compute total amount based on ticket prices (O(1) lookups via Map)
+  const priceMap = new Map(ticketsTypes.map((t) => [t.id, t.price]));
   const total = tickets.reduce((acc, ticket) => {
-    const tt = ticketsTypes.find((t) => t.id === ticket.ticketTypeId);
-    const price = tt?.price ?? 0;
+    const price = priceMap.get(ticket.ticketTypeId) ?? 0;
     return acc + price * ticket.quantity;
   }, 0);
 
@@ -135,10 +135,10 @@ export const POST = async (req: Request) => {
     }
 
     throw new Error("Failed to get payment URL from Notchpay");
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Notchpay payment initialization error:", error);
     return NextResponse.json(
-      { error: error.message || "Payment initialization failed" },
+      { error: error instanceof Error ? error.message : "Payment initialization failed" },
       { status: 500 }
     );
   }

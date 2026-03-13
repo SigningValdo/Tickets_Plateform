@@ -91,7 +91,7 @@ export function AdminSalesChart() {
       ctx.lineTo(x, y)
     }
 
-    ctx.strokeStyle = "#7c3aed"
+    ctx.strokeStyle = "#008D50"
     ctx.lineWidth = 2
     ctx.stroke()
 
@@ -99,7 +99,7 @@ export function AdminSalesChart() {
     ctx.lineTo(margin.left + (days.length - 1) * xScale, height + margin.top)
     ctx.lineTo(margin.left, height + margin.top)
     ctx.closePath()
-    ctx.fillStyle = "rgba(124, 58, 237, 0.1)"
+    ctx.fillStyle = "rgba(0, 141, 80, 0.08)"
     ctx.fill()
 
     // Dessiner les points sur la ligne
@@ -109,7 +109,7 @@ export function AdminSalesChart() {
 
       ctx.beginPath()
       ctx.arc(x, y, 3, 0, 2 * Math.PI)
-      ctx.fillStyle = "#7c3aed"
+      ctx.fillStyle = "#008D50"
       ctx.fill()
       ctx.strokeStyle = "white"
       ctx.lineWidth = 1

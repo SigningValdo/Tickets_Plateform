@@ -29,6 +29,9 @@ export function SettingItem({ setting, onUpdate, onDelete }: SettingItemProps) {
     resolver: zodResolver(settingSchema),
     defaultValues: {
       ...setting,
+      type: setting.type as SettingFormValues["type"],
+      group: setting.group as SettingFormValues["group"],
+      helpText: setting.helpText ?? undefined,
       options: setting.options as Record<string, unknown> || {},
     },
   });

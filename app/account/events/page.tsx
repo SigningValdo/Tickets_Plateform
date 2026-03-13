@@ -41,7 +41,7 @@ export default function AccountEventsPage() {
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/events");
+      const res = await fetch("/api/events");
       if (res.ok) {
         const data = await res.json();
         setEvents(data);

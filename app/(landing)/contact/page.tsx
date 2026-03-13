@@ -3,16 +3,11 @@
 import type React from "react";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
+import { Mail, Phone, MapPin, Loader2, Send, CircleUserRound } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ContactPage() {
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -32,10 +27,8 @@ export default function ContactPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simuler l'envoi du formulaire
     setTimeout(() => {
-      toast({
-        title: "Message envoyé",
+      toast.success("Message envoyé", {
         description: "Nous vous répondrons dans les plus brefs délais.",
       });
       setIsSubmitting(false);
@@ -48,238 +41,223 @@ export default function ContactPage() {
     }, 1500);
   };
 
+  const inputClass =
+    "w-full h-12 pl-12 pr-4 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors";
+
+  const iconClass =
+    "absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gris2";
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <main className="container mx-auto px-4 py-12">
-        <section className="mx-auto mb-16">
-          <h1 className="text-4xl font-bold mb-6 text-center">
+    <div className="bg-bg">
+      {/* Hero banner */}
+      <section className="relative bg-navy text-white py-16 md:py-20 overflow-hidden">
+        <Image
+          src="/filigrame.png"
+          alt=""
+          fill
+          className="object-cover opacity-20"
+        />
+        <div className="relative container text-center">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3">
             Contactez-nous
           </h1>
-          <p className="text-xl text-gray-600 mb-12 text-center max-w-3xl mx-auto">
-            Vous avez des questions ou besoin d'assistance ? Notre équipe est là
-            pour vous aider. N'hésitez pas à nous contacter.
+          <p className="text-white/70 max-w-2xl mx-auto">
+            Vous avez des questions ou besoin d&apos;assistance ? Notre équipe
+            est là pour vous aider.
           </p>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-            <Card>
-              <CardContent className="p-6 flex flex-col items-center text-center">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <Mail className="h-6 w-6 text-fanzone-orange" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Email</h3>
-                <p className="text-gray-600 mb-4">
-                  Pour toute question ou demande d'information
-                </p>
-                <a
-                  href="mailto:fanszonetickets@gmail.com"
-                  className="text-fanzone-orange font-medium"
-                >
-                  fanszonetickets@gmail.com
-                </a>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 flex flex-col items-center text-center">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <Phone className="h-6 w-6 text-fanzone-orange" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Téléphone</h3>
-                <p className="text-gray-600 mb-4">
-                  Du lundi au vendredi, de 9h à 18h
-                </p>
-                <a
-                  href="tel:+123456789"
-                  className="text-fanzone-orange font-medium"
-                >
-                  6 76 76 64 71 / 694 59 30 08
-                </a>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-6 flex flex-col items-center text-center">
-                <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                  <MapPin className="h-6 w-6 text-fanzone-orange" />
-                </div>
-                <h3 className="text-lg font-bold mb-2">Adresse</h3>
-                <p className="text-gray-600 mb-4">Venez nous rencontrer</p>
-                <address className="text-fanzone-orange font-medium not-italic">
-                  Mimboman, DOVV OPEP
-                  <br />
-                  Yaoundé, Cameroun
-                </address>
-              </CardContent>
-            </Card>
+      <div className="container py-12 md:py-16">
+        {/* Contact info cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
+          <div className="bg-white rounded-2xl p-6 flex flex-col items-center text-center shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+            <div className="h-14 w-14 rounded-full bg-green/10 flex items-center justify-center mb-4">
+              <Mail className="h-6 w-6 text-green" />
+            </div>
+            <h3 className="text-base font-semibold text-black mb-1">Email</h3>
+            <p className="text-sm text-gris2 mb-3">
+              Pour toute question ou demande
+            </p>
+            <a
+              href="mailto:support@fanzonetickets.com"
+              className="text-sm text-green font-medium hover:underline"
+            >
+              support@fanzonetickets.com
+            </a>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div>
-              <h2 className="text-2xl font-bold mb-6">
-                Envoyez-nous un message
-              </h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Nom complet *
-                  </label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Email *
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="subject"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Sujet *
-                  </label>
-                  <Input
-                    id="subject"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Message *
-                  </label>
-                  <Textarea
-                    id="message"
-                    name="message"
-                    rows={6}
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  className="bg-fanzone-orange hover:bg-fanzone-orange/90 w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Envoi en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="h-4 w-4 mr-2" />
-                      Envoyer le message
-                    </>
-                  )}
-                </Button>
-              </form>
+          <div className="bg-white rounded-2xl p-6 flex flex-col items-center text-center shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+            <div className="h-14 w-14 rounded-full bg-green/10 flex items-center justify-center mb-4">
+              <Phone className="h-6 w-6 text-green" />
             </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-6">Foire aux questions</h2>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-bold mb-2">
-                    Comment puis-je acheter des billets ?
-                  </h3>
-                  <p className="text-gray-600">
-                    Vous pouvez acheter des billets en créant un compte sur
-                    notre plateforme, en sélectionnant l'événement qui vous
-                    intéresse et en suivant les étapes de paiement.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">
-                    Comment recevoir mes billets ?
-                  </h3>
-                  <p className="text-gray-600">
-                    Après votre achat, vos billets électroniques sont envoyés à
-                    votre adresse email et sont également disponibles dans votre
-                    espace personnel sur notre plateforme.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">
-                    Puis-je annuler ma commande ?
-                  </h3>
-                  <p className="text-gray-600">
-                    Les conditions d'annulation dépendent de la politique de
-                    chaque organisateur. Veuillez consulter les conditions
-                    spécifiques de l'événement avant d'acheter vos billets.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">
-                    Comment devenir organisateur d'événements ?
-                  </h3>
-                  <p className="text-gray-600">
-                    Pour devenir organisateur et utiliser notre plateforme pour
-                    vendre vos billets, veuillez nous contacter directement par
-                    email ou téléphone.
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-bold mb-2">
-                    Quels moyens de paiement acceptez-vous ?
-                  </h3>
-                  <p className="text-gray-600">
-                    Nous acceptons les paiements par carte bancaire, mobile
-                    money (Orange Money, MTN Mobile Money) et d'autres moyens de
-                    paiement locaux selon les pays.
-                  </p>
-                </div>
+            <h3 className="text-base font-semibold text-black mb-1">
+              Téléphone
+            </h3>
+            <p className="text-sm text-gris2 mb-3">
+              Du lundi au vendredi, de 9h à 18h
+            </p>
+            <a
+              href="tel:+237676766471"
+              className="text-sm text-green font-medium hover:underline"
+            >
+              676 76 64 71 / 694 59 30 08
+            </a>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 flex flex-col items-center text-center shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
+            <div className="h-14 w-14 rounded-full bg-green/10 flex items-center justify-center mb-4">
+              <MapPin className="h-6 w-6 text-green" />
+            </div>
+            <h3 className="text-base font-semibold text-black mb-1">
+              Adresse
+            </h3>
+            <p className="text-sm text-gris2 mb-3">Venez nous rencontrer</p>
+            <address className="text-sm text-green font-medium not-italic">
+              DOCC OPEP, Mimboman
+              <br />
+              Yaoundé - Cameroun
+            </address>
+          </div>
+        </div>
+
+        {/* Form + FAQ */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Form card */}
+          <div className="bg-white rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.06)] px-8 py-10">
+            <h2 className="text-xl font-semibold text-black mb-1">
+              Envoyez-nous un message
+            </h2>
+            <p className="text-sm text-gris2 mb-6">
+              Remplissez le formulaire ci-dessous et nous vous répondrons
+              rapidement.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Nom */}
+              <div className="relative">
+                <CircleUserRound className={iconClass} />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Nom complet"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className={inputClass}
+                />
               </div>
+
+              {/* Email */}
+              <div className="relative">
+                <Mail className={iconClass} />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Adresse mail"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Sujet */}
+              <div className="relative">
+                <Send className={iconClass} />
+                <input
+                  type="text"
+                  name="subject"
+                  placeholder="Sujet"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                  className={inputClass}
+                />
+              </div>
+
+              {/* Message */}
+              <div>
+                <textarea
+                  name="message"
+                  rows={5}
+                  placeholder="Votre message..."
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 rounded-xl border border-gris4 bg-bg text-sm text-black placeholder:text-gris2 focus:outline-none focus:border-green focus:ring-1 focus:ring-green transition-colors resize-none"
+                />
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-12 bg-green hover:bg-green/90 text-white font-medium rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-5 w-5" />
+                    Envoyer le message
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+
+          {/* FAQ */}
+          <div>
+            <h2 className="text-xl font-semibold text-black mb-6">
+              Foire aux questions
+            </h2>
+            <div className="space-y-4">
+              {[
+                {
+                  q: "Comment puis-je acheter des billets ?",
+                  a: "Vous pouvez acheter des billets en créant un compte sur notre plateforme, en sélectionnant l'événement qui vous intéresse et en suivant les étapes de paiement.",
+                },
+                {
+                  q: "Comment recevoir mes billets ?",
+                  a: "Après votre achat, vos billets électroniques sont envoyés à votre adresse email et sont également disponibles dans votre espace personnel sur notre plateforme.",
+                },
+                {
+                  q: "Puis-je annuler ma commande ?",
+                  a: "Les conditions d'annulation dépendent de la politique de chaque organisateur. Veuillez consulter les conditions spécifiques de l'événement avant d'acheter vos billets.",
+                },
+                {
+                  q: "Comment devenir organisateur d'événements ?",
+                  a: "Pour devenir organisateur et utiliser notre plateforme pour vendre vos billets, veuillez nous contacter directement par email ou téléphone.",
+                },
+                {
+                  q: "Quels moyens de paiement acceptez-vous ?",
+                  a: "Nous acceptons les paiements par carte bancaire, mobile money (Orange Money, MTN Mobile Money) et d'autres moyens de paiement locaux.",
+                },
+              ].map((faq, i) => (
+                <div
+                  key={i}
+                  className="bg-white rounded-xl p-5 shadow-[0_2px_20px_rgba(0,0,0,0.04)]"
+                >
+                  <h3 className="font-semibold text-sm text-black mb-2">
+                    {faq.q}
+                  </h3>
+                  <p className="text-sm text-gris2 leading-relaxed">{faq.a}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </section>
+        </div>
 
-        <section className="mx-auto mb-16">
-          <h2 className="text-2xl font-bold mb-6">Notre emplacement</h2>
-          <div className="h-96 bg-gray-200 rounded-xl flex items-center justify-center">
+        {/* Map */}
+        <section className="mt-12">
+          <h2 className="text-xl font-semibold text-black mb-5">
+            Notre emplacement
+          </h2>
+          <div className="h-96 rounded-2xl overflow-hidden shadow-[0_2px_20px_rgba(0,0,0,0.04)]">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3980.7619490893007!2d11.570066576602091!3d3.861182796112591!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x108bc5512d0916e1%3A0xfdb220eb93b060ec!2sD%C3%94VV%20Mimboman!5e0!3m2!1sfr!2scm!4v1760502834065!5m2!1sfr!2scm"
               width="100%"
@@ -291,7 +269,7 @@ export default function ContactPage() {
             ></iframe>
           </div>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

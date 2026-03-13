@@ -5,28 +5,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import Link from "next/link";
+import { ArrowLeft, Loader2, Save, Trash2, Tag } from "lucide-react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useToast } from "@/components/ui/use-toast";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import Link from "next/link";
-import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -48,7 +36,6 @@ export default function EditEventCategoryPage() {
   const queryClient = useQueryClient();
   const categoryId = params.id as string;
 
-  // Fetch category data
   const { data: category, isLoading: isLoadingCategory } = useQuery({
     queryKey: ["event-category", categoryId],
     queryFn: async () => {
@@ -80,9 +67,7 @@ export default function EditEventCategoryPage() {
         `/api/admin/event-categories/${categoryId}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(values),
         }
       );
@@ -118,9 +103,7 @@ export default function EditEventCategoryPage() {
     mutationFn: async () => {
       const response = await fetch(
         `/api/admin/event-categories/${categoryId}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
       if (!response.ok) {
         const error = await response.json();
@@ -163,154 +146,175 @@ export default function EditEventCategoryPage() {
 
   if (isLoadingCategory) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin text-green mx-auto mb-4" />
+          <p className="text-gris2 text-sm">Chargement...</p>
+        </div>
       </div>
     );
   }
 
   if (!category) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold">Catégorie non trouvée</h2>
-        <p className="text-muted-foreground mt-2">
-          La catégorie demandée n'existe pas ou a été supprimée.
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <h2 className="text-xl font-semibold text-navy">
+          Catégorie non trouvée
+        </h2>
+        <p className="text-gris2 text-sm">
+          La catégorie demandée n&apos;existe pas ou a été supprimée.
         </p>
-        <Button
-          className="mt-4"
+        <button
           onClick={() => router.push("/admin/event-categories")}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-gris2 border border-gris4 rounded-xl hover:bg-gray-50 transition-colors"
         >
           Retour à la liste des catégories
-        </Button>
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-6">
-        {/* <Link
-          href="/admin/event-categories"
-          className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/event-categories"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-gris2 border border-gris4 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" /> Retour
+          </Link>
+          <div>
+            <h1 className="text-2xl font-bold text-navy">
+              Modifier la catégorie
+            </h1>
+            <p className="text-gris2 text-sm mt-0.5">
+              Modifiez les informations de cette catégorie
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={handleDelete}
+          disabled={deleteMutation.isPending}
+          className="inline-flex items-center gap-2 px-4 py-2.5 bg-red/10 text-red text-sm font-medium rounded-xl hover:bg-red/20 transition-colors disabled:opacity-50"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Retour à la liste des catégories
-        </Link> */}
-        <h1 className="text-3xl font-bold tracking-tight">
-          Modifier la catégorie
-        </h1>
-        <p className="text-muted-foreground">
-          Modifiez les informations de cette catégorie
-        </p>
+          {deleteMutation.isPending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+          Supprimer
+        </button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle>Détails de la catégorie</CardTitle>
-              <CardDescription>
-                Modifiez les informations de la catégorie. Les champs marqués
-                d'un astérisque (*) sont obligatoires.
-              </CardDescription>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Détails */}
+          <div className="bg-white rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Tag className="h-5 w-5 text-green" />
+              <h3 className="text-sm font-semibold text-navy">
+                Détails de la catégorie
+              </h3>
             </div>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDelete}
-              disabled={deleteMutation.isPending}
-            >
-              {deleteMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <Trash2 className="h-4 w-4 mr-2" />
-              )}
-              Supprimer
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid gap-6 md:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nom de la catégorie *</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Ex: Musique, Sport, Conférence..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Le nom qui sera affiché pour cette catégorie.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+            <p className="text-xs text-gris2 mb-4">
+              Les champs marqués d&apos;un astérisque (*) sont obligatoires.
+            </p>
 
+            <div className="grid gap-6 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <label className="block text-sm font-medium text-navy mb-1.5">
+                      Nom de la catégorie *
+                    </label>
+                    <FormControl>
+                      <input
+                        placeholder="Ex: Musique, Sport, Conférence..."
+                        className="w-full h-10 px-4 rounded-xl border border-gris4 bg-bg text-sm text-navy placeholder:text-gris3 focus:outline-none focus:border-green focus:ring-1 focus:ring-green/20"
+                        {...field}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gris3 mt-1">
+                      Le nom qui sera affiché pour cette catégorie.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="mt-6">
               <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <label className="block text-sm font-medium text-navy mb-1.5">
+                      Description
+                    </label>
                     <FormControl>
-                      <Textarea
+                      <textarea
                         placeholder="Décrivez cette catégorie..."
-                        className="min-h-[100px]"
+                        className="w-full min-h-[100px] px-4 py-3 rounded-xl border border-gris4 bg-bg text-sm text-navy placeholder:text-gris3 focus:outline-none focus:border-green focus:ring-1 focus:ring-green/20 resize-none"
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
+                    <p className="text-xs text-gris3 mt-1">
                       Une brève description de cette catégorie (optionnelle).
-                    </FormDescription>
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </div>
+          </div>
 
-              <div className="flex justify-between pt-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Créé le:{" "}
-                    {new Date(category.createdAt).toLocaleDateString("fr-FR")}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Dernière mise à jour:{" "}
-                    {new Date(category.updatedAt).toLocaleDateString("fr-FR")}
-                  </p>
-                </div>
-                <div className="flex gap-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => router.push("/admin/event-categories")}
-                    disabled={mutation.isPending}
-                  >
-                    Annuler
-                  </Button>
-                  <Button type="submit" disabled={mutation.isPending}>
-                    {mutation.isPending ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Enregistrement...
-                      </>
-                    ) : (
-                      "Enregistrer les modifications"
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+          {/* Dates info + Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="space-y-1">
+              <p className="text-xs text-gris2">
+                Créé le:{" "}
+                {new Date(category.createdAt).toLocaleDateString("fr-FR")}
+              </p>
+              <p className="text-xs text-gris2">
+                Dernière mise à jour:{" "}
+                {new Date(category.updatedAt).toLocaleDateString("fr-FR")}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => router.push("/admin/event-categories")}
+                disabled={mutation.isPending}
+                className="px-5 py-2.5 border border-gris4 text-navy text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-green text-white text-sm font-medium rounded-xl hover:bg-green/90 transition-colors disabled:opacity-50"
+              >
+                {mutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Enregistrement...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    Enregistrer les modifications
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

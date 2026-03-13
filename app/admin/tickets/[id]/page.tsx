@@ -2,18 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import QRCode from "react-qr-code";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Copy, Loader2 } from "lucide-react";
+import { ArrowLeft, Copy, Loader2, Ticket, Calendar, User, Tag, Mail, Phone, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { CameroonFlag } from "@/components/cameroon-flag";
@@ -23,7 +14,6 @@ interface TicketDetails {
   id: string;
   qrCode: string;
   status: "VALID" | "USED" | "INVALID" | "CANCELLED";
-  // Include imageUrl from event to show on the page and in the PDF
   event: { id: string; title: string; imageUrl?: string };
   ticketType: { id: string; name: string };
   order: { id: string } | null;
@@ -33,6 +23,20 @@ interface TicketDetails {
   address: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const map: Record<string, string> = {
+    VALID: "bg-green/10 text-green",
+    USED: "bg-blue-100 text-blue-700",
+    INVALID: "bg-red/10 text-red",
+    CANCELLED: "bg-yellow/10 text-yellow",
+  };
+  return (
+    <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${map[status] || "bg-gris4/50 text-gris2"}`}>
+      {status}
+    </span>
+  );
 }
 
 export default function AdminTicketDetailsPage() {
@@ -84,259 +88,252 @@ export default function AdminTicketDetailsPage() {
     }
   }
 
-  function statusBadge(status: TicketDetails["status"]) {
-    const map: Record<string, string> = {
-      VALID: "bg-green-100 text-green-800 border-green-200",
-      USED: "bg-blue-100 text-blue-800 border-blue-200",
-      INVALID: "bg-red-100 text-red-800 border-red-200",
-      CANCELLED: "bg-yellow-100 text-yellow-800 border-yellow-200",
-    };
-    return (
-      <Badge variant="outline" className={map[status] || ""}>
-        {status}
-      </Badge>
-    );
-  }
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-muted-foreground">
-        <Loader2 className="h-5 w-5 mr-2 animate-spin" /> Chargement du
-        ticket...
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin text-green mx-auto mb-4" />
+          <p className="text-gris2 text-sm">Chargement du billet...</p>
+        </div>
       </div>
     );
   }
 
   if (error || !ticket) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
-        <p className="text-red-600">{error || "Ticket introuvable"}</p>
-        <Button variant="outline" onClick={() => router.push("/admin/tickets")}>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+        <p className="text-red text-sm">{error || "Ticket introuvable"}</p>
+        <button
+          onClick={() => router.push("/admin/tickets")}
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-gris2 border border-gris4 rounded-xl hover:bg-gray-50 transition-colors"
+        >
           Retour
-        </Button>
+        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            {/* <Button variant="outline" onClick={() => router.push("/admin/tickets")}>
-              <ArrowLeft className="h-4 w-4 mr-2" /> Retour
-            </Button> */}
-            <h1 className="text-2xl font-bold">Détail du billet</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={async () => {
-                try {
-                  const [{ default: html2canvas }, { jsPDF }] =
-                    await Promise.all([
-                      import("html2canvas"),
-                      import("jspdf").then((m) => ({ jsPDF: m.jsPDF })),
-                    ]);
-                  if (!pdfRef.current) return;
-                  const canvas = await html2canvas(pdfRef.current, {
-                    useCORS: true,
-                    scale: 2,
-                    backgroundColor: "#ffffff",
-                  });
-                  const imgData = canvas.toDataURL("image/png");
-                  const pdf = new jsPDF("p", "mm", "a4");
-                  const pageWidth = pdf.internal.pageSize.getWidth();
-                  const pageHeight = pdf.internal.pageSize.getHeight();
-                  const imgWidth = pageWidth - 20; // 10mm margins
-                  const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                  const y = Math.max(10, (pageHeight - imgHeight) / 2);
-                  pdf.addImage(imgData, "PNG", 10, y, imgWidth, imgHeight);
-                  pdf.save(`billet_${ticket.id}.pdf`);
-                  toast({ title: "PDF téléchargé" });
-                } catch (e) {
-                  console.error(e);
-                  toast({
-                    title: "Modules PDF manquants",
-                    description:
-                      "Veuillez installer jspdf et html2canvas: pnpm add jspdf html2canvas",
-                    variant: "destructive",
-                  });
-                }
-              }}
-            >
-              Télécharger le billet (PDF)
-            </Button>
-            <div className="text-sm text-muted-foreground">ID: {ticket.id}</div>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/admin/tickets"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm text-gris2 border border-gris4 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" /> Retour
+          </Link>
+          <h1 className="text-2xl font-bold text-navy">Détail du billet</h1>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>QR Code</CardTitle>
-              <CardDescription>
-                Présentez ce code lors du contrôle
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col items-center gap-4">
-              <div className="bg-white p-4 rounded-md">
-                <QRCode value={ticket.qrCode} size={192} />
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <code className="px-2 py-1 bg-muted rounded">
-                  {ticket.qrCode}
-                </code>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(ticket.qrCode);
-                      toast({ title: "Copié" });
-                    } catch {
-                      toast({
-                        title: "Copie impossible",
-                        variant: "destructive",
-                      });
-                    }
-                  }}
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-              <div>{statusBadge(ticket.status)}</div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Informations</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Événement</span>
-                <span className="font-medium">
-                  {ticket.event?.title || "—"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Type de billet</span>
-                <span className="font-medium">
-                  {ticket.ticketType?.name || "—"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Commande</span>
-                <span className="font-medium">{ticket.order?.id || "—"}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Nom</span>
-                <span className="font-medium">{ticket.name || "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Email</span>
-                <span className="font-medium">{ticket.email || "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Téléphone</span>
-                <span className="font-medium">{ticket.phone || "—"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Adresse</span>
-                <span className="font-medium">{ticket.address || "—"}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Créé le</span>
-                <span className="font-medium">
-                  {formatDate(ticket.createdAt)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Mis à jour le</span>
-                <span className="font-medium">
-                  {formatDate(ticket.updatedAt)}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={async () => {
+              try {
+                const [{ default: html2canvas }, { jsPDF }] =
+                  await Promise.all([
+                    import("html2canvas"),
+                    import("jspdf").then((m) => ({ jsPDF: m.jsPDF })),
+                  ]);
+                if (!pdfRef.current) return;
+                const canvas = await html2canvas(pdfRef.current, {
+                  useCORS: true,
+                  scale: 2,
+                  backgroundColor: "#ffffff",
+                });
+                const imgData = canvas.toDataURL("image/png");
+                const pdf = new jsPDF("p", "mm", "a4");
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+                const imgWidth = pageWidth - 20;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                const y = Math.max(10, (pageHeight - imgHeight) / 2);
+                pdf.addImage(imgData, "PNG", 10, y, imgWidth, imgHeight);
+                pdf.save(`billet_${ticket.id}.pdf`);
+                toast({ title: "PDF téléchargé" });
+              } catch (e) {
+                console.error(e);
+                toast({
+                  title: "Modules PDF manquants",
+                  description:
+                    "Veuillez installer jspdf et html2canvas: pnpm add jspdf html2canvas",
+                  variant: "destructive",
+                });
+              }
+            }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green text-white text-sm font-medium rounded-xl hover:bg-green/90 transition-colors"
+          >
+            Télécharger le billet (PDF)
+          </button>
+          <span className="text-xs text-gris2">ID: {ticket.id}</span>
         </div>
+      </div>
 
-        {/* Aperçu du billet pour le PDF */}
-        <Card className="bg-white">
-          <CardHeader>
-            <CardTitle>Billet</CardTitle>
-            <CardDescription>
-              Aperçu du billet (utilisé pour la génération du PDF)
-            </CardDescription>
-          </CardHeader>
-          <CardContent ref={pdfRef} className="border p-5 rounded-lg">
-            {/* En-tête avec drapeaux */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <CameroonFlag width={36} height={24} />
-                <FecafootBadge size={32} />
-              </div>
-              <h2 className="text-lg font-bold text-center uppercase flex-1">
-                FANZONE TICKETS
-              </h2>
-              <div className="flex items-center gap-2">
-                <FecafootBadge size={32} />
-                <CameroonFlag width={36} height={24} />
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* QR Code */}
+        <div className="bg-white rounded-2xl p-6">
+          <h3 className="text-sm font-semibold text-navy mb-1">QR Code</h3>
+          <p className="text-xs text-gris2 mb-4">Présentez ce code lors du contrôle</p>
+          <div className="flex flex-col items-center gap-4">
+            <div className="bg-bg p-5 rounded-xl">
+              <QRCode value={ticket.qrCode} size={192} />
             </div>
-            <div className="border-b-2 border-green-700 mb-4" />
-            <div className="flex items-center gap-4">
-              <div className="w-full max-w-md">
-                {ticket.event?.imageUrl ? (
-                  <div className="relative w-full max-w-md h-56 overflow-hidden rounded-md border">
-                    <Image
-                      src={ticket.event.imageUrl}
-                      alt={ticket.event.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-full max-w-md h-56 flex items-center justify-center bg-muted rounded-md border text-muted-foreground">
-                    Image indisponible
-                  </div>
-                )}
-              </div>
-              <div>
-                <div>
-                  <h2 className="text-xl font-semibold">
-                    {ticket.event.title}
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Type de billet: {ticket.ticketType.name}
-                  </p>
-                </div>
-                {/* QR Code intégré dans le PDF */}
-                <div className="bg-white p-4 rounded-md">
-                  <QRCode value={ticket.qrCode} size={144} />
-                </div>
-              </div>
-            </div>
-            {/* Pied de billet */}
-            <div className="border-t border-gray-200 mt-4 pt-3 flex items-center justify-between">
-              <div className="flex items-center gap-1">
-                <CameroonFlag width={16} height={10} />
-                <span className="text-xs text-muted-foreground">
-                  Solution camerounaise
-                </span>
-              </div>
-              <div className="text-xs text-center text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm">
+              <code className="px-2 py-1 bg-bg rounded-lg text-xs text-navy">
                 {ticket.qrCode}
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-muted-foreground">FECAFOOT</span>
-                <CameroonFlag width={16} height={10} />
+              </code>
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(ticket.qrCode);
+                    toast({ title: "Copié" });
+                  } catch {
+                    toast({
+                      title: "Copie impossible",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+                className="p-1.5 rounded-lg hover:bg-bg transition-colors"
+              >
+                <Copy className="h-4 w-4 text-gris2" />
+              </button>
+            </div>
+            <StatusBadge status={ticket.status} />
+          </div>
+        </div>
+
+        {/* Informations */}
+        <div className="bg-white rounded-2xl p-6">
+          <h3 className="text-sm font-semibold text-navy mb-4">Informations</h3>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-bg rounded-xl">
+              <Ticket className="h-4 w-4 text-gris3 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gris3">Événement</p>
+                <p className="text-sm text-navy">{ticket.event?.title || "—"}</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            <div className="flex items-center gap-3 p-3 bg-bg rounded-xl">
+              <Tag className="h-4 w-4 text-gris3 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gris3">Type de billet</p>
+                <p className="text-sm text-navy">{ticket.ticketType?.name || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-bg rounded-xl">
+              <Calendar className="h-4 w-4 text-gris3 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gris3">Commande</p>
+                <p className="text-sm text-navy">{ticket.order?.id || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-bg rounded-xl">
+              <User className="h-4 w-4 text-gris3 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gris3">Nom</p>
+                <p className="text-sm text-navy">{ticket.name || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-bg rounded-xl">
+              <Mail className="h-4 w-4 text-gris3 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gris3">Email</p>
+                <p className="text-sm text-navy">{ticket.email || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-bg rounded-xl">
+              <Phone className="h-4 w-4 text-gris3 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gris3">Téléphone</p>
+                <p className="text-sm text-navy">{ticket.phone || "—"}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-bg rounded-xl">
+              <MapPin className="h-4 w-4 text-gris3 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gris3">Adresse</p>
+                <p className="text-sm text-navy">{ticket.address || "—"}</p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-gris4/50 space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gris2">Créé le</span>
+              <span className="text-navy font-medium">{formatDate(ticket.createdAt)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gris2">Mis à jour le</span>
+              <span className="text-navy font-medium">{formatDate(ticket.updatedAt)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Aperçu du billet pour le PDF */}
+      <div className="bg-white rounded-2xl p-6">
+        <h3 className="text-sm font-semibold text-navy mb-1">Billet</h3>
+        <p className="text-xs text-gris2 mb-4">Aperçu du billet (utilisé pour la génération du PDF)</p>
+        <div ref={pdfRef} className="border border-gris4 p-5 rounded-xl">
+          {/* En-tête avec drapeaux */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <CameroonFlag width={36} height={24} />
+              <FecafootBadge size={32} />
+            </div>
+            <h2 className="text-lg font-bold text-center uppercase flex-1 text-navy">
+              FANZONE TICKETS
+            </h2>
+            <div className="flex items-center gap-2">
+              <FecafootBadge size={32} />
+              <CameroonFlag width={36} height={24} />
+            </div>
+          </div>
+          <div className="border-b-2 border-green mb-4" />
+          <div className="flex items-center gap-4">
+            <div className="w-full max-w-md">
+              {ticket.event?.imageUrl ? (
+                <div className="relative w-full max-w-md h-56 overflow-hidden rounded-xl border border-gris4">
+                  <Image
+                    src={ticket.event.imageUrl}
+                    alt={ticket.event.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-full max-w-md h-56 flex items-center justify-center bg-bg rounded-xl border border-gris4 text-gris2">
+                  Image indisponible
+                </div>
+              )}
+            </div>
+            <div>
+              <div>
+                <h2 className="text-xl font-semibold text-navy">
+                  {ticket.event.title}
+                </h2>
+                <p className="text-sm text-gris2">
+                  Type de billet: {ticket.ticketType.name}
+                </p>
+              </div>
+              <div className="bg-white p-4 rounded-xl">
+                <QRCode value={ticket.qrCode} size={144} />
+              </div>
+            </div>
+          </div>
+          {/* Pied de billet */}
+          <div className="border-t border-gris4 mt-4 pt-3 flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <CameroonFlag width={16} height={10} />
+              <span className="text-xs text-gris2">Solution camerounaise</span>
+            </div>
+            <div className="text-xs text-center text-gris2">{ticket.qrCode}</div>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-gris2">FECAFOOT</span>
+              <CameroonFlag width={16} height={10} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
