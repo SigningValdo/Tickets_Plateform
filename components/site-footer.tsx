@@ -23,7 +23,7 @@ export function SiteFooter() {
               &quot;Agility vos émotions, un ticket à la fois&quot;
             </p>
           </div>
-          <div className="flex gap-y-10 md:flex-row md:justify-between flex-1">
+          <div className="flex flex-col gap-y-10 md:flex-row md:justify-between flex-1">
             {/* Liens rapides */}
             <div>
               <h4 className="font-semibold mb-5">Liens rapides</h4>

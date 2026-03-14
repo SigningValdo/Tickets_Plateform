@@ -149,8 +149,16 @@ export default function AdminTicketDetailsPage() {
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
                 const y = Math.max(10, (pageHeight - imgHeight) / 2);
                 pdf.addImage(imgData, "PNG", 10, y, imgWidth, imgHeight);
-                pdf.save(`billet_${ticket.id}.pdf`);
-                toast({ title: "PDF téléchargé" });
+                // On mobile, open PDF in new tab instead of direct download
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                if (isMobile) {
+                  const pdfBlob = pdf.output("blob");
+                  const blobUrl = URL.createObjectURL(pdfBlob);
+                  window.open(blobUrl, "_blank");
+                } else {
+                  pdf.save(`billet_${ticket.id}.pdf`);
+                }
+                toast({ title: isMobile ? "Le billet s'ouvre dans un nouvel onglet" : "PDF téléchargé" });
               } catch (e) {
                 console.error(e);
                 toast({

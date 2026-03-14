@@ -1,19 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Plus, Minus, ShoppingCart, Ticket } from "lucide-react";
 import { TicketType } from "@prisma/client";
 import { BuyTicketModal } from "./buy-ticket-modal";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface TicketSelectionProps {
   tickets: TicketType[];
   eventId: string;
 }
 
-export default function TicketSelection({ tickets }: TicketSelectionProps) {
+export default function TicketSelection(props: TicketSelectionProps) {
+  return (
+    <Suspense fallback={<TicketSelectionSkeleton />}>
+      <TicketSelectionInner {...props} />
+    </Suspense>
+  );
+}
+
+function TicketSelectionSkeleton() {
+  return (
+    <div className="space-y-3 animate-pulse">
+      <div className="rounded-xl border border-gris4 bg-bg p-4 h-20" />
+      <div className="rounded-xl border border-gris4 bg-bg p-4 h-20" />
+      <div className="h-12 bg-gris4/30 rounded-2xl" />
+    </div>
+  );
+}
+
+function TicketSelectionInner({ tickets }: TicketSelectionProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const checkoutParam = searchParams.get("checkout");
+
+  // Parse checkout param to restore ticket selections after login redirect
   const [selectedTickets, setSelectedTickets] = useState<
     Record<string, number>
-  >({});
+  >(() => {
+    if (!checkoutParam) return {};
+    const restored: Record<string, number> = {};
+    checkoutParam.split(",").forEach((entry) => {
+      const [id, qty] = entry.split(":");
+      if (id && qty) {
+        const quantity = parseInt(qty, 10);
+        // Validate the ticket ID exists
+        if (!isNaN(quantity) && quantity > 0) {
+          restored[id] = quantity;
+        }
+      }
+    });
+    return restored;
+  });
+
+  // Auto-open modal if returning from auth with checkout param
+  const shouldAutoOpen = !!checkoutParam && Object.keys(selectedTickets).length > 0;
+
+  // Clean up URL params after restoring (remove ?checkout=...)
+  useEffect(() => {
+    if (checkoutParam) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("checkout");
+      router.replace(url.pathname, { scroll: false });
+    }
+  }, [checkoutParam, router]);
 
   const incrementTicket = (ticketId: string) => {
     const ticket = tickets.find((t) => t.id === ticketId);
@@ -63,17 +113,6 @@ export default function TicketSelection({ tickets }: TicketSelectionProps) {
           >
             <div className="flex justify-between items-center">
               <div className="flex items-start gap-3">
-                {/* <div
-                  className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    isSelected ? "bg-green/10" : "bg-gris4/30"
-                  }`}
-                >
-                  <Ticket
-                    className={`h-4 w-4 ${
-                      isSelected ? "text-green" : "text-gris2"
-                    }`}
-                  />
-                </div> */}
                 <div>
                   <h3 className="text-sm font-semibold text-black">
                     {ticket.name}
@@ -133,6 +172,7 @@ export default function TicketSelection({ tickets }: TicketSelectionProps) {
           ticketTypeId: key,
           quantity: selectedTickets[key],
         }))}
+        defaultOpen={shouldAutoOpen}
       >
         <button
           disabled={totalTickets === 0}

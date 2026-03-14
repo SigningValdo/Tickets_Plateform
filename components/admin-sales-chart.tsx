@@ -2,53 +2,54 @@
 
 import { useEffect, useRef } from "react"
 
-export function AdminSalesChart() {
+interface SalesDataPoint {
+  date: string
+  total: number
+}
+
+interface AdminSalesChartProps {
+  data: SalesDataPoint[]
+}
+
+export function AdminSalesChart({ data }: AdminSalesChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    if (!canvasRef.current) return
+    if (!canvasRef.current || data.length === 0) return
 
     const canvas = canvasRef.current
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    // Dans une implémentation réelle, nous utiliserions une bibliothèque comme Chart.js
-    // Pour cet exemple, nous dessinons un graphique simple
+    const sales = data.map((d) => d.total)
+    const labels = data.map((d) => {
+      const date = new Date(d.date)
+      return `${date.getDate()}/${date.getMonth() + 1}`
+    })
 
-    // Données simulées pour les 30 derniers jours
-    const days = Array.from({ length: 30 }, (_, i) => i + 1)
-    const sales = [
-      120000, 150000, 130000, 180000, 200000, 190000, 210000, 230000, 200000, 180000, 190000, 220000, 240000, 230000,
-      250000, 270000, 260000, 280000, 300000, 290000, 310000, 330000, 320000, 340000, 360000, 350000, 370000, 390000,
-      380000, 400000,
-    ]
-
-    // Définir les dimensions du canvas
     canvas.width = canvas.offsetWidth
     canvas.height = 300
 
-    // Définir les marges
-    const margin = { top: 20, right: 20, bottom: 30, left: 50 }
+    const margin = { top: 20, right: 20, bottom: 30, left: 60 }
     const width = canvas.width - margin.left - margin.right
     const height = canvas.height - margin.top - margin.bottom
 
-    // Calculer les échelles
-    const xScale = width / (days.length - 1)
-    const yMax = Math.max(...sales) * 1.1
+    const xScale = width / (sales.length - 1 || 1)
+    const yMax = Math.max(...sales, 1) * 1.1
     const yScale = height / yMax
 
-    // Dessiner l'axe des y
+    // Y axis
     ctx.beginPath()
     ctx.moveTo(margin.left, margin.top)
     ctx.lineTo(margin.left, height + margin.top)
     ctx.strokeStyle = "#e5e7eb"
     ctx.stroke()
 
-    // Dessiner les lignes horizontales et les étiquettes de l'axe des y
+    // Horizontal grid lines and Y labels
     const yTickCount = 5
     for (let i = 0; i <= yTickCount; i++) {
       const y = margin.top + height - (i * height) / yTickCount
-      const value = Math.round((i * yMax) / yTickCount / 1000) * 1000
+      const value = Math.round((i * yMax) / yTickCount)
 
       ctx.beginPath()
       ctx.moveTo(margin.left, y)
@@ -59,33 +60,34 @@ export function AdminSalesChart() {
       ctx.fillStyle = "#6b7280"
       ctx.font = "10px Arial"
       ctx.textAlign = "right"
-      ctx.fillText(`${(value / 1000).toFixed(0)}k`, margin.left - 5, y + 3)
+      const label = value >= 1000 ? `${(value / 1000).toFixed(0)}k` : `${value}`
+      ctx.fillText(label, margin.left - 5, y + 3)
     }
 
-    // Dessiner l'axe des x
+    // X axis
     ctx.beginPath()
     ctx.moveTo(margin.left, height + margin.top)
     ctx.lineTo(canvas.width - margin.right, height + margin.top)
     ctx.strokeStyle = "#e5e7eb"
     ctx.stroke()
 
-    // Dessiner les étiquettes de l'axe des x (jours)
-    const xTickCount = 6
+    // X labels
+    const xTickCount = Math.min(6, labels.length)
     for (let i = 0; i < xTickCount; i++) {
-      const x = margin.left + (i * width) / (xTickCount - 1)
-      const day = Math.round((i * (days.length - 1)) / (xTickCount - 1)) + 1
+      const idx = Math.round((i * (labels.length - 1)) / (xTickCount - 1 || 1))
+      const x = margin.left + idx * xScale
 
       ctx.fillStyle = "#6b7280"
       ctx.font = "10px Arial"
       ctx.textAlign = "center"
-      ctx.fillText(`Jour ${day}`, x, height + margin.top + 15)
+      ctx.fillText(labels[idx], x, height + margin.top + 15)
     }
 
-    // Dessiner la ligne du graphique
+    // Line
     ctx.beginPath()
     ctx.moveTo(margin.left, height + margin.top - sales[0] * yScale)
 
-    for (let i = 1; i < days.length; i++) {
+    for (let i = 1; i < sales.length; i++) {
       const x = margin.left + i * xScale
       const y = height + margin.top - sales[i] * yScale
       ctx.lineTo(x, y)
@@ -95,15 +97,15 @@ export function AdminSalesChart() {
     ctx.lineWidth = 2
     ctx.stroke()
 
-    // Dessiner la zone sous la courbe
-    ctx.lineTo(margin.left + (days.length - 1) * xScale, height + margin.top)
+    // Area fill
+    ctx.lineTo(margin.left + (sales.length - 1) * xScale, height + margin.top)
     ctx.lineTo(margin.left, height + margin.top)
     ctx.closePath()
     ctx.fillStyle = "rgba(0, 141, 80, 0.08)"
     ctx.fill()
 
-    // Dessiner les points sur la ligne
-    for (let i = 0; i < days.length; i++) {
+    // Points
+    for (let i = 0; i < sales.length; i++) {
       const x = margin.left + i * xScale
       const y = height + margin.top - sales[i] * yScale
 
@@ -115,7 +117,7 @@ export function AdminSalesChart() {
       ctx.lineWidth = 1
       ctx.stroke()
     }
-  }, [])
+  }, [data])
 
   return (
     <div className="w-full h-[300px]">

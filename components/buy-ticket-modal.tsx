@@ -29,11 +29,13 @@ import { usePathname } from "next/navigation";
 export const BuyTicketModal = ({
   children,
   selectedTickets,
+  defaultOpen = false,
 }: {
   children: React.ReactNode;
   selectedTickets: { ticketTypeId: string; quantity: number }[];
+  defaultOpen?: boolean;
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
@@ -123,7 +125,15 @@ export const BuyTicketModal = ({
     );
   }
 
-  const callbackUrl = encodeURIComponent(pathname);
+  // Encode ticket selections in the callback URL so they persist through login
+  const ticketParams = selectedTickets
+    .filter((t) => t.quantity > 0)
+    .map((t) => `${t.ticketTypeId}:${t.quantity}`)
+    .join(",");
+  const callbackWithTickets = ticketParams
+    ? `${pathname}?checkout=${ticketParams}`
+    : pathname;
+  const callbackUrl = encodeURIComponent(callbackWithTickets);
 
   const benefits = [
     {

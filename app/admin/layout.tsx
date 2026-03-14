@@ -197,7 +197,7 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="lg:pl-72">
         {/* Header */}
-        <header className="sticky top-5 z-30 bg-white rounded-2xl mr-5">
+        <header className="sticky top-5 z-30 bg-white rounded-2xl ml-5 lg:ml-0 mr-5">
           <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
             <button
               className="lg:hidden p-2 -ml-2 rounded-lg hover:bg-gray-50"

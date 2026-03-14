@@ -96,7 +96,7 @@ export function HeroCarousel() {
 
             return (
               <CarouselItem key={event.id}>
-                <div className="relative h-[400px] md:h-[520px] w-full">
+                <div className="relative h-[480px] md:h-[520px] w-full">
                   <Image
                     src={event.imageUrl || "/placeholder.svg"}
                     alt={event.title}
@@ -176,7 +176,7 @@ export function HeroCarousel() {
           </div>
         )} */}
       </Carousel>
-      <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 z-20">
+      <div className="absolute bottom-4 md:bottom-16 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 z-20">
         <SearchBar />
       </div>
     </section>

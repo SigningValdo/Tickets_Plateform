@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import {
   TrendingUp,
   TrendingDown,
@@ -10,70 +9,112 @@ import {
   Calendar,
   Users,
   Loader2,
-  ArrowUpRight,
   BarChart3,
   Tag,
 } from "lucide-react";
 import { AdminSalesChart } from "@/components/admin-sales-chart";
 
-interface StatCard {
-  label: string;
-  value: string;
-  change: string;
-  trend: "up" | "down";
-  icon: React.ElementType;
-  iconBg: string;
-  iconColor: string;
+interface DashboardData {
+  stats: {
+    revenue: { value: number; change: string; trend: "up" | "down" };
+    ticketsSold: { value: number; change: string; trend: "up" | "down" };
+    activeEvents: { value: number; change: string; trend: "up" | "down" };
+    users: { value: number; change: string; trend: "up" | "down" };
+  };
+  dailySales: { date: string; total: number }[];
+  categories: { name: string; total: number; percentage: number }[];
 }
 
-const stats: StatCard[] = [
-  {
-    label: "Ventes totales",
-    value: "1 250 000 FCFA",
-    change: "+12.5%",
-    trend: "up",
-    icon: DollarSign,
-    iconBg: "bg-green/10",
-    iconColor: "text-green",
-  },
-  {
-    label: "Billets vendus",
-    value: "458",
-    change: "+8.2%",
-    trend: "up",
-    icon: Ticket,
-    iconBg: "bg-blue-500/10",
-    iconColor: "text-blue-500",
-  },
-  {
-    label: "Événements actifs",
-    value: "12",
-    change: "+2",
-    trend: "up",
-    icon: Calendar,
-    iconBg: "bg-yellow/10",
-    iconColor: "text-yellow",
-  },
-  {
-    label: "Utilisateurs",
-    value: "1 245",
-    change: "+5.3%",
-    trend: "up",
-    icon: Users,
-    iconBg: "bg-purple-500/10",
-    iconColor: "text-purple-500",
-  },
+const CATEGORY_COLORS = [
+  "bg-green",
+  "bg-blue-500",
+  "bg-yellow",
+  "bg-purple-500",
+  "bg-gris3",
 ];
 
-const categoryData = [
-  { name: "Concerts", percentage: 45, color: "bg-green" },
-  { name: "Conférences", percentage: 25, color: "bg-blue-500" },
-  { name: "Festivals", percentage: 15, color: "bg-yellow" },
-  { name: "Théâtre", percentage: 10, color: "bg-purple-500" },
-  { name: "Autres", percentage: 5, color: "bg-gris3" },
-];
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat("fr-FR").format(value) + " FCFA";
+}
 
 export default function AdminDashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchDashboard() {
+      try {
+        const res = await fetch("/api/admin/dashboard");
+        if (!res.ok) throw new Error("Erreur lors du chargement des données");
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Erreur inconnue");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-green" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-red text-sm">{error || "Erreur de chargement"}</p>
+      </div>
+    );
+  }
+
+  const statCards = [
+    {
+      label: "Ventes totales",
+      value: formatCurrency(data.stats.revenue.value),
+      change: data.stats.revenue.change,
+      trend: data.stats.revenue.trend,
+      icon: DollarSign,
+      iconBg: "bg-green/10",
+      iconColor: "text-green",
+    },
+    {
+      label: "Billets vendus",
+      value: data.stats.ticketsSold.value.toLocaleString("fr-FR"),
+      change: data.stats.ticketsSold.change,
+      trend: data.stats.ticketsSold.trend,
+      icon: Ticket,
+      iconBg: "bg-blue-500/10",
+      iconColor: "text-blue-500",
+    },
+    {
+      label: "Événements actifs",
+      value: data.stats.activeEvents.value.toString(),
+      change: data.stats.activeEvents.change,
+      trend: data.stats.activeEvents.trend,
+      icon: Calendar,
+      iconBg: "bg-yellow/10",
+      iconColor: "text-yellow",
+    },
+    {
+      label: "Utilisateurs",
+      value: data.stats.users.value.toLocaleString("fr-FR"),
+      change: data.stats.users.change,
+      trend: data.stats.users.trend,
+      icon: Users,
+      iconBg: "bg-purple-500/10",
+      iconColor: "text-purple-500",
+    },
+  ];
+
+  const totalCategorySales = data.categories.reduce((sum, c) => sum + c.total, 0);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -86,7 +127,7 @@ export default function AdminDashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <div
             key={stat.label}
             className="bg-white rounded-2xl p-5 flex items-start justify-between"
@@ -127,7 +168,7 @@ export default function AdminDashboardPage() {
               </h3>
             </div>
           </div>
-          <AdminSalesChart />
+          <AdminSalesChart data={data.dailySales} />
         </div>
 
         {/* Category breakdown */}
@@ -139,22 +180,28 @@ export default function AdminDashboardPage() {
             </h3>
           </div>
           <div className="space-y-4">
-            {categoryData.map((cat) => (
-              <div key={cat.name}>
-                <div className="flex justify-between mb-1.5">
-                  <span className="text-sm text-navy">{cat.name}</span>
-                  <span className="text-sm font-medium text-navy">
-                    {cat.percentage}%
-                  </span>
+            {data.categories.length === 0 ? (
+              <p className="text-sm text-gris2 text-center py-4">
+                Aucune donnée disponible
+              </p>
+            ) : (
+              data.categories.map((cat, index) => (
+                <div key={cat.name}>
+                  <div className="flex justify-between mb-1.5">
+                    <span className="text-sm text-navy">{cat.name}</span>
+                    <span className="text-sm font-medium text-navy">
+                      {cat.percentage}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-bg rounded-full h-2">
+                    <div
+                      className={`${CATEGORY_COLORS[index % CATEGORY_COLORS.length]} h-2 rounded-full transition-all`}
+                      style={{ width: `${cat.percentage}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-bg rounded-full h-2">
-                  <div
-                    className={`${cat.color} h-2 rounded-full transition-all`}
-                    style={{ width: `${cat.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Legend summary */}
@@ -162,7 +209,7 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-between">
               <span className="text-xs text-gris2">Total des ventes</span>
               <span className="text-sm font-semibold text-navy">
-                1 250 000 FCFA
+                {formatCurrency(totalCategorySales)}
               </span>
             </div>
           </div>

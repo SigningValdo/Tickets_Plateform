@@ -1,41 +1,20 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { Download, Calendar, DollarSign, Users, BarChart3, PieChart as PieChartIcon, TrendingUp } from 'lucide-react';
+import { Download, DollarSign, Users, BarChart3, PieChart as PieChartIcon, TrendingUp, Loader2 } from 'lucide-react';
 
-const mockEventData = [
-  { name: 'Jan', events: 3, tickets: 120 },
-  { name: 'Fév', events: 2, tickets: 80 },
-  { name: 'Mar', events: 5, tickets: 200 },
-  { name: 'Avr', events: 4, tickets: 180 },
-  { name: 'Mai', events: 7, tickets: 280 },
-  { name: 'Juin', events: 6, tickets: 240 },
-];
 
-const mockSalesData = [
-  { name: 'Jan', sales: 2400, tickets: 120 },
-  { name: 'Fév', sales: 1800, tickets: 80 },
-  { name: 'Mar', sales: 5000, tickets: 200 },
-  { name: 'Avr', sales: 4500, tickets: 180 },
-  { name: 'Mai', sales: 7000, tickets: 280 },
-  { name: 'Juin', sales: 6000, tickets: 240 },
-];
+interface ReportsData {
+  eventData: { name: string; events: number; tickets: number }[];
+  salesData: { name: string; sales: number; tickets: number }[];
+  userData: { name: string; users: number }[];
+  categoryBreakdown: { name: string; value: number }[];
+  userStatus: { name: string; value: number }[];
+}
 
 const COLORS = ['#008D50', '#3B82F6', '#EAB308', '#A855F7', '#80858E', '#008D50'];
-
-const mockUserData = [
-  { name: 'Nouveaux', value: 45 },
-  { name: 'Actifs', value: 30 },
-  { name: 'Inactifs', value: 25 },
-];
-
-const eventCategoryData = [
-  { name: 'Culturels', value: 40 },
-  { name: 'Sportifs', value: 30 },
-  { name: 'Professionnels', value: 20 },
-  { name: 'Autres', value: 10 },
-];
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -44,7 +23,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-sm font-medium text-navy mb-1">{label}</p>
         {payload.map((entry: any, index: number) => (
           <p key={`tooltip-${index}`} className="text-xs" style={{ color: entry.color }}>
-            {entry.name}: {entry.value}
+            {entry.name}: {entry.value.toLocaleString('fr-FR')}
           </p>
         ))}
       </div>
@@ -54,10 +33,31 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export function ReportsOverview() {
-  const exportToCSV = (data: any[], filename: string) => {
+  const [data, setData] = useState<ReportsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchReports() {
+      try {
+        const res = await fetch('/api/admin/reports/stats');
+        if (!res.ok) throw new Error('Erreur lors du chargement des rapports');
+        const json = await res.json();
+        setData(json);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur inconnue');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchReports();
+  }, []);
+
+  const exportToCSV = (rows: Record<string, any>[], filename: string) => {
+    if (rows.length === 0) return;
     const csvContent = [
-      Object.keys(data[0]).join(','),
-      ...data.map(row => Object.values(row).join(','))
+      Object.keys(rows[0]).join(','),
+      ...rows.map(row => Object.values(row).join(','))
     ].join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -70,12 +70,28 @@ export function ReportsOverview() {
     document.body.removeChild(link);
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-green" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-red text-sm">{error || 'Erreur de chargement'}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Export button */}
       <div className="flex justify-end">
         <button
-          onClick={() => exportToCSV(mockEventData, 'evenements')}
+          onClick={() => exportToCSV(data.eventData, 'evenements')}
           className="inline-flex items-center gap-2 px-4 py-2.5 border border-gris4 text-navy text-sm font-medium rounded-xl hover:bg-gray-50 transition-colors"
         >
           <Download className="h-4 w-4" />
@@ -115,7 +131,7 @@ export function ReportsOverview() {
               </div>
               <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={mockEventData}>
+                  <BarChart data={data.eventData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
@@ -138,36 +154,40 @@ export function ReportsOverview() {
                 <h3 className="text-sm font-semibold text-navy">Répartition des événements</h3>
               </div>
               <div className="h-[280px] flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={eventCategoryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={90}
-                      innerRadius={50}
-                      fill="#008D50"
-                      dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      stroke="none"
-                    >
-                      {eventCategoryData.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value) => [value, 'Événements']}
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #CFD4E4',
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        padding: '8px 12px',
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                {data.categoryBreakdown.length === 0 ? (
+                  <p className="text-sm text-gris2">Aucune donnée disponible</p>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={data.categoryBreakdown}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={90}
+                        innerRadius={50}
+                        fill="#008D50"
+                        dataKey="value"
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        stroke="none"
+                      >
+                        {data.categoryBreakdown.map((_entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value) => [value, 'Événements']}
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #CFD4E4',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          padding: '8px 12px',
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </div>
           </div>
@@ -183,7 +203,7 @@ export function ReportsOverview() {
               </div>
               <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={mockSalesData}>
+                  <LineChart data={data.salesData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
@@ -207,7 +227,7 @@ export function ReportsOverview() {
               </div>
               <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={mockSalesData}>
+                  <BarChart data={data.salesData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
@@ -235,7 +255,7 @@ export function ReportsOverview() {
               </div>
               <div className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={mockEventData}>
+                  <LineChart data={data.userData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#CFD4E4" vertical={false} />
                     <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 12, fill: '#80858E' }} axisLine={false} tickLine={false} />
@@ -245,7 +265,7 @@ export function ReportsOverview() {
                       iconSize={8}
                       wrapperStyle={{ fontSize: '12px', color: '#80858E' }}
                     />
-                    <Line type="monotone" dataKey="events" stroke="#008D50" strokeWidth={2} dot={{ r: 4, fill: '#008D50' }} name="Nouveaux utilisateurs" />
+                    <Line type="monotone" dataKey="users" stroke="#008D50" strokeWidth={2} dot={{ r: 4, fill: '#008D50' }} name="Nouveaux utilisateurs" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -257,36 +277,40 @@ export function ReportsOverview() {
                 <h3 className="text-sm font-semibold text-navy">Répartition des utilisateurs</h3>
               </div>
               <div className="h-[280px] flex items-center justify-center">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={mockUserData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      outerRadius={90}
-                      innerRadius={50}
-                      fill="#008D50"
-                      dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      stroke="none"
-                    >
-                      {mockUserData.map((_entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(value) => [value, 'Utilisateurs']}
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #CFD4E4',
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        padding: '8px 12px',
-                      }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
+                {data.userStatus.length === 0 ? (
+                  <p className="text-sm text-gris2">Aucune donnée disponible</p>
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={data.userStatus}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={90}
+                        innerRadius={50}
+                        fill="#008D50"
+                        dataKey="value"
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        stroke="none"
+                      >
+                        {data.userStatus.map((_entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        formatter={(value) => [value, 'Utilisateurs']}
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #CFD4E4',
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          padding: '8px 12px',
+                        }}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
               </div>
             </div>
           </div>

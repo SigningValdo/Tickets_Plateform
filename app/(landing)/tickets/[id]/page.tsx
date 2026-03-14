@@ -146,8 +146,17 @@ export default function UserTicketPage() {
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       const y = Math.max(10, (pageHeight - imgHeight) / 2);
       pdf.addImage(imgData, "PNG", 10, y, imgWidth, imgHeight);
-      pdf.save(`billet_${ticket.id}.pdf`);
-      toast.success("Billet téléchargé !");
+
+      // On mobile, open PDF in new tab (download attribute not supported on iOS Safari)
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        const pdfBlob = pdf.output("blob");
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        window.open(blobUrl, "_blank");
+      } else {
+        pdf.save(`billet_${ticket.id}.pdf`);
+      }
+      toast.success(isMobile ? "Le billet s'ouvre dans un nouvel onglet" : "Billet téléchargé !");
     } catch (e) {
       console.error(e);
       toast.error("Erreur lors du téléchargement du PDF");

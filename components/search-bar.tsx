@@ -38,7 +38,7 @@ export function SearchBar() {
       </div>
       <button
         type="submit"
-        className="py-[14px] px-12 bg-green hover:bg-green/90 rounded-2xl text-white font-medium transition-colors flex-shrink-0"
+        className="py-[14px] px-4 sm:px-12 bg-green hover:bg-green/90 rounded-2xl text-white font-medium transition-colors flex-shrink-0 text-sm sm:text-base"
       >
         Rechercher
       </button>
